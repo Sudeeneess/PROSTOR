@@ -1,0 +1,37 @@
+﻿# IDE файлы
+.idea/
+.vscode/
+
+# Сборка
+build/
+target/
+*.jar
+*.class
+
+# Node.js зависимости
+node_modules/
+
+# Сборка фронтенда
+dist/
+frontend/dist/
+
+# Логи
+logs/
+*.log
+
+# Временные файлы
+.DS_Store
+Thumbs.db
+
+# Бэкапы и копии
+*.backup
+*.bak
+*~
+
+# Gradle
+.gradle/
+gradle/
+!gradle/wrapper/
+gradle/wrapper/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
