@@ -4,20 +4,16 @@
 FROM gradle:8.14.3-jdk21-alpine AS builder
 WORKDIR /app
 
-# файлы Gradle
-COPY gradlew .
-COPY gradle ./gradle
-COPY build.gradle .
-COPY settings.gradle .
-COPY src ./src
+# Копируем ВСЕ файлы проекта
+COPY . .
 
-# права на выполнение gradlew
+# Права на выполнение gradlew (на всякий случай)
 RUN chmod +x gradlew
 
-# сборка приложения
+# Сборка приложения
 RUN ./gradlew build --no-daemon -x test
 
-# запуск приложения
+# Запуск приложения
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
