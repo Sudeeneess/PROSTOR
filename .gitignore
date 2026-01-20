@@ -11,6 +11,10 @@ target/
 # Node.js зависимости
 node_modules/
 
+# Сборка фронтенда
+dist/
+frontend/dist/
+
 # Логи
 logs/
 *.log
@@ -19,7 +23,12 @@ logs/
 .DS_Store
 Thumbs.db
 
-# Gradle кэш (исключаем, но разрешаем wrapper)
+# Бэкапы и копии
+*.backup
+*.bak
+*~
+
+# Gradle
 .gradle/
 gradle/
 !gradle/wrapper/
