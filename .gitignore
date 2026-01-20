@@ -1,0 +1,28 @@
+﻿# IDE файлы
+.idea/
+.vscode/
+
+# Сборка
+build/
+target/
+*.jar
+*.class
+
+# Node.js зависимости
+node_modules/
+
+# Логи
+logs/
+*.log
+
+# Временные файлы
+.DS_Store
+Thumbs.db
+
+# Gradle кэш (исключаем, но разрешаем wrapper)
+.gradle/
+gradle/
+!gradle/wrapper/
+gradle/wrapper/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
