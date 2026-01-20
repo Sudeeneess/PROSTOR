@@ -7,7 +7,7 @@
 ## **ДЛЯ ТЕСТА/ПРОД:**
 ```bash
 # 1. Клонируй
-git clone https://github.com/ваш-логин/prostor-marketplace.git
+git clone https://github.com/Sudeeneess/PROSTOR.git
 cd prostor-marketplace
 
 # 2. Запусти
