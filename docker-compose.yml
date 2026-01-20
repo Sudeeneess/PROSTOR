@@ -1,6 +1,4 @@
-﻿version: '3.8'
-
-services:
+﻿services:
   postgres:
     image: postgres:15-alpine
     container_name: prostor-db
@@ -13,12 +11,13 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U developer']
+      test: ['CMD-SHELL', 'pg_isready -U developer -d prostor_dev']
       interval: 10s
       timeout: 5s
       retries: 3
 
   backend:
+    build: .  # ← ДОБАВЬ ЭТУ СТРОКУ!
     image: prostor-backend:1.0.0
     container_name: prostor-backend
     depends_on:
@@ -35,6 +34,7 @@ services:
     restart: unless-stopped
 
   frontend:
+    build: ./frontend  # ← ДОБАВЬ ЭТУ СТРОКУ!
     image: prostor-frontend:1.0.0
     container_name: prostor-frontend
     ports:
