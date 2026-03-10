@@ -1,0 +1,12 @@
+CREATE TABLE IF NOT EXISTS roles(
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) UNIQUE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS users(
+    id SERIAL PRIMARY KEY,
+    role_id INT REFERENCES roles(id),
+    user_name VARCHAR(25) unique NOT NULL,
+    password_hash VARCHAR(25) unique  NOT NULL,
+    contact_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
