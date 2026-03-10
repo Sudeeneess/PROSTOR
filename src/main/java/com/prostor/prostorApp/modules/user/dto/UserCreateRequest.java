@@ -13,7 +13,7 @@ public class UserCreateRequest {
     private String userName;
 
     @NotBlank
-    @Size(max = 256)
+    @Size(max = 60)
     private String password;
 
     @NotBlank
