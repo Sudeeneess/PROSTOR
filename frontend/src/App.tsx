@@ -1,3 +1,4 @@
+
 import './index.css';
 import { LuMenu } from "react-icons/lu";
 import { RxAvatar } from "react-icons/rx";
@@ -11,8 +12,6 @@ function App() {
     { id: 5, name: 'Товар 5', price: 4000, rating: 3, reviews: 3, image: '' },
     { id: 6, name: 'Товар 6', price: 4000, rating: 3, reviews: 3, image: '' },
     { id: 7, name: 'Товар 7', price: 4000, rating: 3, reviews: 3, image: '' },
-    { id: 8, name: 'Товар 8', price: 4000, rating: 3, reviews: 3, image: '' },
-    { id: 9, name: 'Товар 9', price: 4000, rating: 3, reviews: 3, image: '' },
   ];
 
   return (
@@ -34,7 +33,7 @@ function App() {
           
         </div>
 
-        {/* Пустой div для баланса (чтобы лого остался слева) */}
+        {}
         <div className="header-right"></div>
       </header>
 
