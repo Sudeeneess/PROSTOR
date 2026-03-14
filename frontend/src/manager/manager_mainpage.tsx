@@ -17,17 +17,16 @@ const manager: React.FC<ManagerProps> = ({ onLogin }) => {
       return;
     }
 
-    // Здесь будет реальная авторизация через API
+    // реальная авторизация через API
     console.log('Попытка входа с логином:', login);
     
     // Имитация успешного входа
     if (login.length > 0 && password.length > 0) {
       setError('');
-      // Переходим в личный кабинет
+      // Переход в личный кабинет
       if (onLogin) {
         onLogin();
       } else {
-        // Если onLogin не передан, просто показываем сообщение
         alert('Вход выполнен успешно!');
       }
     }
