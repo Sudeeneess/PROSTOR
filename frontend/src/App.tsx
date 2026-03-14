@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './index.css';
-import Sklad from 'src/manager/sklad';
-import Manager from 'src/manager/manager_mainpage';
+import Sklad from "./manager/sklad";
+import Manager from "./manager/manager_mainpage";
 
 function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'sklad' | 'manager'>('home');
