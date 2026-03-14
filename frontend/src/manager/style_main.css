@@ -1,0 +1,130 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: white;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  background-color: #e0e0e0;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 0;
+}
+
+.header-title {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.prostor {
+  font-size: 32px;
+  font-weight: bold;
+  color: black;
+  letter-spacing: 1px;
+}
+
+.manager {
+  font-size: 24px;
+  color: white;
+  font-weight: normal;
+}
+
+.nav {
+  display: flex;
+  gap: 30px;
+  font-size: 18px;
+}
+
+.nav span {
+  color: black;
+  font-weight: 300;
+  cursor: default;
+}
+
+.nav span.login-bold {
+  font-weight: bold;
+  color: black;
+}
+
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 500px;
+}
+
+.auth-box {
+  width: 350px;
+  padding: 30px;
+  border: 1px solid #ccc;
+  border-radius: 15px;
+  background-color: white;
+}
+
+.auth-box h2 {
+  font-size: 24px;
+  font-weight: 300;
+  margin-bottom: 25px;
+  color: black;
+  text-align: left;
+}
+
+.input-field {
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 12px 0;
+  font-size: 18px;
+  font-weight: 300;
+  color: black;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  outline: none;
+  background: transparent;
+}
+
+.input-field::placeholder {
+  color: #999;
+  font-weight: 300;
+}
+
+.input-field:focus {
+  border-bottom-color: #666;
+}
+
+.login-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #e0e0e0;
+  color: black;
+  border: none;
+  border-radius: 25px;
+  font-size: 18px;
+  font-weight: 300;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+.login-button:hover {
+  background-color: #d0d0d0;
+}
+
+.error-message {
+  color: #d32f2f;
+  font-size: 14px;
+  margin-bottom: 15px;
+  text-align: left;
+  font-weight: 300;
+} 
