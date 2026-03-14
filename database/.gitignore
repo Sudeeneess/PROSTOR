@@ -1,0 +1,22 @@
+# Секретные данные (НИКОГДА не пушим в репозиторий)
+.env
+
+# База данных и дампы
+*.dump
+*.backup
+*.sql.gz
+postgres_data/
+
+# Настройки IDE (VS Code, IntelliJ IDEA)
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Системные файлы
+.DS_Store
+Thumbs.db
+
+# Логи
+*.log
+npm-debug.log*
