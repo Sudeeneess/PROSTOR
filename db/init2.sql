@@ -163,18 +163,31 @@ INSERT INTO movements_status (name) VALUES ('pending'), ('processing'), ('in_tra
 
 CREATE OR REPLACE FUNCTION fn_manage_stock_logic()
 RETURNS TRIGGER AS $$
+DECLARE
+    current_stock INTEGER;
 BEGIN
     -- 1. ЛОГИКА РЕЗЕРВИРОВАНИЯ (Товар добавлен в заказ)
     -- Срабатывает при INSERT (is_ordered = true) или UPDATE (false -> true)
     IF (TG_OP = 'INSERT' AND NEW.is_ordered = true) OR 
        (TG_OP = 'UPDATE' AND OLD.is_ordered = false AND NEW.is_ordered = true) THEN
+        
+        -- Получаем текущее количество товара на складе для проверки
+        SELECT quantity INTO current_stock 
+        FROM warehouse_stock 
+        WHERE products_id = NEW.products_id;
+
+        -- ПРОВЕРКА НА 0: Если товара нет, прерываем операцию и выводим ошибку
+        IF current_stock <= 0 OR current_stock IS NULL THEN
+            RAISE EXCEPTION 'Ошибка: Товар с ID % отсутствует на складе (остаток 0)', NEW.products_id;
+        END IF;
+
         UPDATE warehouse_stock 
         SET quantity = quantity - 1, 
             reserved_quantity = reserved_quantity + 1
         WHERE products_id = NEW.products_id;
 
-    -- 2. ЛОГИКА ОТМЕНЫ БРОНИ (Заказ отменен до продажи)
-    -- Срабатывает при UPDATE (true -> false), если товар еще не был продан
+    -- 2. ЛОГИКА ОТМЕНЫ БРОНИ (Заказ отменен до того, как был продан)
+    -- Срабатывает при UPDATE (is_ordered: true -> false), если продажа еще не завершена
     ELSIF (TG_OP = 'UPDATE' AND OLD.is_ordered = true AND NEW.is_ordered = false AND NEW.is_finalized = false) THEN
         UPDATE warehouse_stock 
         SET reserved_quantity = reserved_quantity - 1, 
@@ -189,7 +202,7 @@ BEGIN
             sold_quantity = sold_quantity + 1
         WHERE products_id = NEW.products_id;
 
-    -- 4. ЛОГИКА ВОЗВРАТА (Товар вернули после продажи)
+    -- 4. ЛОГИКА ВОЗВРАТА (Товар вернули после финализации продажи)
     -- Срабатывает при UPDATE (is_finalized: true -> false)
     ELSIF (TG_OP = 'UPDATE' AND OLD.is_finalized = true AND NEW.is_finalized = false) THEN
         UPDATE warehouse_stock 
@@ -202,7 +215,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Создание триггера на таблицу orders_items
+-- Пересоздание триггера на таблицу orders_items
 DROP TRIGGER IF EXISTS trg_stock_update ON orders_items;
 CREATE TRIGGER trg_stock_update
 AFTER INSERT OR UPDATE ON orders_items
