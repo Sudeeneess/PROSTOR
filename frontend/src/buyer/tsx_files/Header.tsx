@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { LuMenu } from "react-icons/lu";
-import { RxAvatar } from "react-icons/rx";
+import { IoPersonCircleOutline } from "react-icons/io5";
 import '../css_files/Header.css';
 import AuthPopup from './AuthPopup';
 
@@ -23,7 +23,7 @@ const Header: React.FC = () => {
             <input type="text" placeholder="Поиск товаров..." />
           </div>
           <div className='ava-icon' onClick={openPopup}>
-            <RxAvatar size={40} color='#000000' />
+            <IoPersonCircleOutline size={50} color='#000000' />
           </div>
         </div>
 
