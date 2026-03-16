@@ -1,0 +1,292 @@
+/* Основной фон страницы и базовые настройки шрифта */
+body {
+  background-color: #fafafa;
+  color: #333;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Главный контейнер приложения */
+.prostor-seller-app {
+  width: 100%;
+  max-width: 1200px; /* Увеличено с 800px до 1200px */
+  margin: 0 auto;
+  padding: 30px; /* Увеличено с 20px до 30px */
+  background-color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  min-height: 100vh; /* Растягиваем на всю высоту */
+}
+
+/* Логотип - черная часть "PROSTOR" - делаем БОЛЬШЕ */
+.logo-prostor {
+  color: #000000; /* Черный цвет */
+  font-weight: bold;
+  font-size: 32px; /* Увеличено с 28px до 32px */
+}
+
+/* Логотип - белая часть "Seller" - оставляем меньше */
+.logo-seller {
+  color: white; /* Белый цвет */
+  font-weight: bold;
+  font-size: 22px; /* Увеличено с 18px до 22px */
+  /* Добавляем отступ слева для красивого разделения */
+  margin-left: 8px; /* Увеличено с 5px до 8px */
+  /* Тень для читаемости на сером фоне */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  /* Выравнивание по вертикали */
+  vertical-align: middle;
+}
+
+/* Верхняя секция с серым фоном */
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px; /* Увеличено с 20px до 30px */
+  padding: 15px ; /* Увеличено с 10px 20px до 15px 30px */
+  background-color: rgb(161, 161, 161); /* Серый фон */
+  border-radius: 0; /* ИЗМЕНЕНО: было 20px, теперь 0 - убрано закругление */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+}
+
+/* Логотип приложения */
+.logo-text {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Навигационная панель */
+.navigation-bar {
+  display: flex;
+  gap: 15px; /* Увеличено с 10px до 15px */
+  font-size: 16px; /* Увеличено с 14px до 16px */
+  color: rgb(14, 12, 12);
+}
+
+/* Кнопки навигации (без обводки, только заливка цветом) */
+.navigation-link {
+  background: rgb(161, 161, 161); /* Приятный светло-голубой фон */
+  color: rgb(87, 84, 84); /* Темно-синий цвет текста */
+  font-size: 16px; /* Увеличено с 14px до 16px */
+  cursor: pointer;
+  padding: 8px 16px; /* Увеличено с 5px 10px до 8px 16px */
+  font-weight: normal;
+  text-decoration: none;
+  border-radius: 20px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  border: none !important; /* Убираем обводку (рамку) */
+}
+
+/* Эффект при наведении мышью */
+.navigation-link:hover {
+  background-color: rgb(161, 161, 161);
+  color: black;
+}
+
+/* Стрелочка назад */
+.back-link {
+  font-size: 16px; /* Увеличено с 14px до 16px */
+  color: grey;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.back-link:hover {
+  color: grey;
+}
+
+/* Основная рабочая зона страницы */
+.content-section {
+  margin-top: 30px; /* Увеличено с 20px до 30px */
+}
+
+/* Заголовок раздела */
+.section-title {
+  font-size: 24px; /* Увеличено с 20px до 24px */
+  font-weight: 600;
+  margin-bottom: 20px; /* Увеличено с 15px до 20px */
+  color: #333;
+}
+
+/* Форма добавления товара */
+.form-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Увеличено с 250px до 300px */
+  gap: 30px; /* Увеличено с 20px до 30px */
+}
+
+/* Группа полей ввода */
+.form-field {
+  position: relative;
+  margin-bottom: 25px; /* Увеличено с 20px до 25px */
+}
+
+/* Надпись-плейсхолдер */
+.label-text {
+  position: absolute;
+  top: -12px; /* Увеличено с -10px до -12px */
+  left: 12px; /* Увеличено с 10px до 12px */
+  background-color: #fff;
+  padding: 0 8px; /* Увеличено с 0 5px до 0 8px */
+  font-size: 14px; /* Увеличено с 12px до 14px */
+  color: #666;
+}
+
+/* Поле ввода */
+.input-field {
+  width: 100%;
+  padding: 14px; /* Увеличено с 10px до 14px */
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  font-size: 16px; /* Увеличено с 14px до 16px */
+  transition: border-color 0.3s ease;
+}
+
+/* Эффект при фокусе на поле ввода */
+.input-field:focus {
+  border-color: #aaa;
+  outline: none;
+}
+
+/* Многострочное текстовое поле */
+.text-area {
+  min-height: 150px; /* Увеличено с 100px до 150px */
+  resize: vertical;
+}
+
+/* Раздел загрузки изображения */
+.upload-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px; /* Увеличено с 10px до 15px */
+}
+
+/* Метка-заголовок для загрузки изображения */
+.upload-label {
+  font-size: 16px; /* Увеличено с 14px до 16px */
+  color: #666;
+}
+
+.upload-input {
+  padding: 120px 20px; /* Увеличено с 90px 10px до 120px 20px */
+  border: 2px dashed #ccc; /* Увеличено с 1px до 2px */
+  width: 100%;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 20px;
+  font-size: 18px; /* Добавлен размер шрифта */
+}
+
+/* Блок предварительного просмотра загруженного изображения */
+.preview-image {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  border: 1px solid #ddd;
+  padding: 15px; /* Увеличено с 10px до 15px */
+  border-radius: 20px;
+}
+
+/* Нижняя группа кнопок */
+.button-section {
+  display: flex;
+  gap: 15px; /* Увеличено с 10px до 15px */
+  margin-top: 30px; /* Увеличено с 20px до 30px */
+  padding-top: 30px; /* Увеличено с 20px до 30px */
+  border-top: 2px solid #e0e0e0;
+}
+
+/* Кнопки с мягкими тенями и закруглёнными углами */
+.save-button,
+.delete-button {
+  padding: 12px 25px; /* Увеличено с 8px 20px до 12px 25px */
+  border: 1px solid #ccc;
+  background-color: #fff;
+  color: #333;
+  font-size: 16px; /* Увеличено с 14px до 16px */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border-radius: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.save-button {
+  background: #fff;
+  color: #333;
+  border: 1px solid #ccc;
+}
+
+
+/* Сообщение об ошибке */
+.error-message {
+  background: #ffe6e6;
+  color: #cc0000;
+  padding: 15px; /* Увеличено с 10px до 15px */
+  margin: 20px 0; /* Увеличено с 15px 0 до 20px 0 */
+  border: 1px solid #ff9999;
+  font-size: 16px; /* Увеличено с 14px до 16px */
+  border-radius: 20px;
+}
+
+/* Сообщение об успехе */
+.success-message {
+  background: #e6ffe6;
+  color: #006600;
+  padding: 15px; /* Увеличено с 10px до 15px */
+  margin: 20px 0; /* Увеличено с 15px 0 до 20px 0 */
+  border: 1px solid #99ff99;
+  font-size: 16px; /* Увеличено с 14px до 16px */
+  border-radius: 20px;
+}
+
+/* Контейнер для кнопки Назад */
+.back-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px; /* Увеличено с 15px до 20px */
+}
+
+/* Кнопка Назад */
+.back-link {
+  font-size: 16px; /* Увеличено с 14px до 16px */
+  color: #666;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.back-link:hover {
+  color: #000;
+}
+
+/* Заголовок оставляем как есть */
+.section-title {
+  font-size: 24px; /* Увеличено с 20px до 24px */
+  font-weight: 600;
+  margin-bottom: 20px; /* Увеличено с 15px до 20px */
+  color: #333;
+}
+
+.button-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Увеличено с 10px до 15px */
+  margin-top: 30px; /* Увеличено с 20px до 30px */
+  padding-top: 30px; /* Увеличено с 20px до 30px */
+  border-top: 2px solid #e0e0e0;
+}
+
+/* Растягиваем кнопки на всю ширину */
+.button-section .save-button,
+.button-section .delete-button {
+  width: 100%;
+  padding: 16px 20px; /* Увеличено с 12px 20px до 16px 20px */
+  font-size: 18px; /* Увеличено с 16px до 18px */
+}

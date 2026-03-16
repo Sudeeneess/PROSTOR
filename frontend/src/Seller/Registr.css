@@ -1,0 +1,242 @@
+/* Основные настройки */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #fafafa;
+  color: #333;
+  min-height: 100vh;
+}
+
+/* Главный контейнер */
+.prostor-seller-app {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px;
+  background-color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  min-height: 100vh;
+}
+
+/* Шапка страницы */
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.logo-text {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.logo-prostor {
+  color: #000000;
+  font-weight: bold;
+  font-size: 32px;
+}
+
+.logo-seller {
+  color: white;
+  font-weight: bold;
+  font-size: 22px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  vertical-align: middle;
+}
+
+/* Навигация */
+.navigation-bar {
+  display: flex;
+  gap: 15px;
+  font-size: 16px;
+  color: #333;
+}
+
+.navigation-link {
+  background: transparent;
+  color: #333;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 8px 16px;
+  font-weight: normal;
+  text-decoration: none;
+  border-radius: 20px;
+  transition: background-color 0.3s ease;
+  border: none !important;
+}
+
+/* Основная секция */
+.content-section {
+  margin-top: 30px;
+}
+
+/* Заголовок страницы */
+.section-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #4d78aa;
+  margin-bottom: 32px;
+}
+
+/* Форма авторизации */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-row {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 25px;
+}
+
+.form-field {
+  flex-grow: 1;
+}
+
+.label-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a2634;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.input-field {
+  padding: 14px 18px;
+  border: 2px solid #e1e8f0;
+  border-radius: 12px;
+  font-size: 16px;
+  background: #fafbfc;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.input-field:focus {
+  border-color: #1a2634;
+  background: white;
+}
+
+.input-select {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+/* Кнопка регистрации */
+.save-button {
+  background: grey;
+  color: white;
+  border: none;
+  padding: 16px;
+  border-radius: 40px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: background 0.2s;
+  width: 100%;
+  text-transform: uppercase;
+}
+
+.save-button:hover {
+  background: grey;
+}
+
+/* Ошибки и сообщения успеха */
+.error-message {
+  background: #ffe6e6;
+  color: #cc0000;
+  padding: 15px;
+  margin: 20px 0;
+  border: 1px solid #ff9999;
+  font-size: 16px;
+  border-radius: 20px;
+}
+
+.success-message {
+  background: #e6ffe6;
+  color: #006600;
+  padding: 15px;
+  margin: 20px 0;
+  border: 1px solid #99ff99;
+  font-size: 16px;
+  border-radius: 20px;
+}
+
+/* Формы внутри секции */
+.button-section {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+  padding-top: 30px;
+  border-top: 2px solid #e0e0e0;
+}
+
+.login-footer {
+  font-size: 16px;
+  color: #666;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.login-footer a {
+  color: #000000;
+  font-weight: bold;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.login-footer a:hover {
+  color: #333;
+}
+
+
+/* Остальные стили остаются такими же, как раньше */
+
+/* Новая сетка для равномерного расстояния между полями */
+.form-container {
+  display: grid;
+  gap: 30px; /* Расстояние между всеми элементами сетки */
+  grid-template-columns: 1fr; /* Один столбец */
+}
+
+.form-row {
+  /* Отключаем ненужные отступы */
+  margin-bottom: 0;
+  gap: inherit;
+}
+
+.form-field {
+  /* Оставляем стандартный отступ между меткой и полем */
+  gap: 8px;
+}
+
+/* Дополнительно: выравниваем надписи полей относительно самих полей */
+.label-text {
+  display: block;
+  margin-bottom: 8px; /* Небольшой отступ снизу для лучшей читаемости */
+}
+
+/* Сохраняются остальные стили */

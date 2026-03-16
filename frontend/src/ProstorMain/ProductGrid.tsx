@@ -1,9 +1,7 @@
 // import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
-import './index.css';
-import Header from './buyer/tsx_files/Header';
+import './ProductGrid.css';
 
-function App() {
+function ProductGrid() {
   const products = [
     { id: 1, price: '000 ₽', name: 'Название товара', rating: '5.0', reviews: '00 000' },
     { id: 2, price: '000 ₽', name: 'Название товара', rating: '5.0', reviews: '00 000' },
@@ -24,32 +22,24 @@ function App() {
   ];
 
   return (
-    <Router>
-    <div className="app">
-      <Header />
-      
-      <main className="main">
-        <div className="product-grid">
-          {products.map(product => (
-            <div key={product.id} className="product-card">
-              <div className="product-image">
-                <div className="image-placeholder">📦</div>
-              </div>
-              <div className="product-info">
-                <div className="price">{product.price}</div>
-                <div className="name">{product.name}</div>
-                <div className="rating">
-                  ★ {product.rating} {product.reviews} отзывов
-                </div>
-                <button className="add-to-cart">Добавить в корзину</button>
-              </div>
+    <div className="product-grid">
+      {products.map(product => (
+        <div key={product.id} className="product-card">
+          <div className="product-image">
+            <div className="image-placeholder">📦</div>
+          </div>
+          <div className="product-info">
+            <div className="price">{product.price}</div>
+            <div className="name">{product.name}</div>
+            <div className="rating">
+              ★ {product.rating} {product.reviews} отзывов
             </div>
-          ))}
+            <button className="add-to-cart">Добавить в корзину</button>
+          </div>
         </div>
-      </main>
+      ))}
     </div>
-    </Router>
   );
 }
 
-export default App; // app.tsx
+export default ProductGrid;
