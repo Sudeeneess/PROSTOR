@@ -1,12 +1,11 @@
--- 1. УДАЛЕНИЕ СУЩЕСТВУЮЩИХ ТАБЛИЦ (для чистого перезапуска, если нужно)
+-- 1. УДАЛЕНИЕ (CASCADE обеспечит чистоту)
 DROP TABLE IF EXISTS orders_movements, payments, orders_items, order_returns, orders CASCADE;
 DROP TABLE IF EXISTS movements_status, payments_status, order_returns_status, orders_status CASCADE;
 DROP TABLE IF EXISTS warehouse_stock, warehouse CASCADE;
 DROP TABLE IF EXISTS product_card, products, category, size, brand CASCADE;
 DROP TABLE IF EXISTS warehouse_manager, seller, administrator, customer, users, roles CASCADE;
 
--- 2. СОЗДАНИЕ ТАБЛИЦ ПОЛЬЗОВАТЕЛЕЙ И РОЛЕЙ
-
+-- 2. ПОЛЬЗОВАТЕЛИ
 CREATE TABLE roles (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) UNIQUE NOT NULL
@@ -15,56 +14,33 @@ CREATE TABLE roles (
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     roles_id INTEGER NOT NULL REFERENCES roles(id),
-    password_hash VARCHAR(256) NOT NULL,
-    user_name VARCHAR(25) NOT NULL,
+    password_hash VARCHAR(60) NOT NULL,
+    user_name VARCHAR(25) UNIQUE NOT NULL,
     contact_phone VARCHAR(11) UNIQUE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE customer (
-    id SERIAL PRIMARY KEY, 
-    users_id INTEGER UNIQUE NOT NULL REFERENCES users(id)
-);
-
-CREATE TABLE administrator (
-    id SERIAL PRIMARY KEY, 
-    users_id INTEGER UNIQUE NOT NULL REFERENCES users(id)
-);
-
+-- Таблицы профилей
+CREATE TABLE customer (id SERIAL PRIMARY KEY, users_id INTEGER UNIQUE NOT NULL REFERENCES users(id));
+CREATE TABLE administrator (id SERIAL PRIMARY KEY, users_id INTEGER UNIQUE NOT NULL REFERENCES users(id));
 CREATE TABLE seller (
     id SERIAL PRIMARY KEY, 
     users_id INTEGER UNIQUE NOT NULL REFERENCES users(id),
     inn VARCHAR(12) UNIQUE NOT NULL,
     company_name VARCHAR(50) NOT NULL
 );
+CREATE TABLE warehouse_manager (id SERIAL PRIMARY KEY, users_id INTEGER UNIQUE NOT NULL REFERENCES users(id));
 
-CREATE TABLE warehouse_manager (
-    id SERIAL PRIMARY KEY, 
-    users_id INTEGER UNIQUE NOT NULL REFERENCES users(id)
-);
-
--- 3. СОЗДАНИЕ СПРАВОЧНИКОВ И ТОВАРОВ
-
-CREATE TABLE brand (
-    id SERIAL PRIMARY KEY, 
-    name VARCHAR(50) UNIQUE NOT NULL
-);
-
-CREATE TABLE size (
-    id SERIAL PRIMARY KEY, 
-    name VARCHAR(30) UNIQUE NOT NULL
-);
-
-CREATE TABLE category (
-    id SERIAL PRIMARY KEY, 
-    category_name VARCHAR(50) UNIQUE NOT NULL
-);
+-- 3. ТОВАРЫ
+CREATE TABLE brand (id SERIAL PRIMARY KEY, name VARCHAR(50) UNIQUE NOT NULL);
+CREATE TABLE size (id SERIAL PRIMARY KEY, name VARCHAR(30) UNIQUE NOT NULL);
+CREATE TABLE category (id SERIAL PRIMARY KEY, category_name VARCHAR(50) UNIQUE NOT NULL);
 
 CREATE TABLE products (
     id SERIAL PRIMARY KEY,
     seller_id INTEGER NOT NULL REFERENCES seller(id),
     category_id INTEGER NOT NULL REFERENCES category(id),
-    parent_id INTEGER REFERENCES products(id), -- Nullable для иерархии
+    parent_id INTEGER REFERENCES products(id),
     name VARCHAR(150) NOT NULL,
     price DECIMAL(12, 2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -75,14 +51,13 @@ CREATE TABLE product_card (
     products_id INTEGER NOT NULL REFERENCES products(id),
     brand_id INTEGER REFERENCES brand(id),
     size_id INTEGER REFERENCES size(id),
-    photo_json VARCHAR(1000),
+    photo JSONB NOT NULL DEFAULT '[]'::jsonb,
     description TEXT NOT NULL,
     type VARCHAR(30) NOT NULL,
     is_active BOOLEAN DEFAULT true
 );
 
--- 4. СКЛАДСКАЯ ИНФРАСТРУКТУРА
-
+-- 4. СКЛАД
 CREATE TABLE warehouse (
     id SERIAL PRIMARY KEY,
     warehouse_manager_id INTEGER NOT NULL REFERENCES warehouse_manager(id),
@@ -99,14 +74,11 @@ CREATE TABLE warehouse_stock (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 5. СТАТУСЫ (СПРАВОЧНИКИ)
-
+-- 5. СТАТУСЫ И ЗАКАЗЫ
 CREATE TABLE orders_status (id SERIAL PRIMARY KEY, name VARCHAR(50) UNIQUE NOT NULL);
 CREATE TABLE order_returns_status (id SERIAL PRIMARY KEY, name VARCHAR(30) UNIQUE NOT NULL);
 CREATE TABLE payments_status (id SERIAL PRIMARY KEY, name VARCHAR(30) UNIQUE NOT NULL);
 CREATE TABLE movements_status (id SERIAL PRIMARY KEY, name VARCHAR(30) UNIQUE NOT NULL);
-
--- 6. ЗАКАЗЫ, ЛОГИСТИКА И ФИНАНСЫ
 
 CREATE TABLE orders (
     id SERIAL PRIMARY KEY,
@@ -151,72 +123,71 @@ CREATE TABLE orders_movements (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 7. ЗАПОЛНЕНИЕ ДАННЫМИ (DML)
-
+-- 6. ДАННЫЕ
 INSERT INTO roles (name) VALUES ('admin'), ('seller'), ('customer'), ('warehouse_manager');
 INSERT INTO orders_status (name) VALUES ('confirmed'), ('packed'), ('in_transit'), ('delivered');
 INSERT INTO payments_status (name) VALUES ('success'), ('waiting'), ('reject');
 INSERT INTO order_returns_status (name) VALUES ('success'), ('waiting'), ('reject');
 INSERT INTO movements_status (name) VALUES ('pending'), ('processing'), ('in_transit'), ('delivered'), ('lost'), ('returned');
 
--- 8. ТРИГГЕРЫ ДЛЯ АВТОМАТИЗАЦИИ СТОКА
-
+-- 7. ТРИГГЕР
 CREATE OR REPLACE FUNCTION fn_manage_stock_logic()
 RETURNS TRIGGER AS $$
 DECLARE
     current_stock INTEGER;
 BEGIN
-    -- 1. ЛОГИКА РЕЗЕРВИРОВАНИЯ (Товар добавлен в заказ)
-    -- Срабатывает при INSERT (is_ordered = true) или UPDATE (false -> true)
     IF (TG_OP = 'INSERT' AND NEW.is_ordered = true) OR 
        (TG_OP = 'UPDATE' AND OLD.is_ordered = false AND NEW.is_ordered = true) THEN
-        
-        -- Получаем текущее количество товара на складе для проверки
-        SELECT quantity INTO current_stock 
-        FROM warehouse_stock 
-        WHERE products_id = NEW.products_id;
-
-        -- ПРОВЕРКА НА 0: Если товара нет, прерываем операцию и выводим ошибку
+        SELECT quantity INTO current_stock FROM warehouse_stock WHERE products_id = NEW.products_id;
         IF current_stock <= 0 OR current_stock IS NULL THEN
-            RAISE EXCEPTION 'Ошибка: Товар с ID % отсутствует на складе (остаток 0)', NEW.products_id;
+            RAISE EXCEPTION 'Ошибка: Товар с ID % отсутствует на складе', NEW.products_id;
         END IF;
-
-        UPDATE warehouse_stock 
-        SET quantity = quantity - 1, 
-            reserved_quantity = reserved_quantity + 1
-        WHERE products_id = NEW.products_id;
-
-    -- 2. ЛОГИКА ОТМЕНЫ БРОНИ (Заказ отменен до того, как был продан)
-    -- Срабатывает при UPDATE (is_ordered: true -> false), если продажа еще не завершена
+        UPDATE warehouse_stock SET quantity = quantity - 1, reserved_quantity = reserved_quantity + 1 WHERE products_id = NEW.products_id;
     ELSIF (TG_OP = 'UPDATE' AND OLD.is_ordered = true AND NEW.is_ordered = false AND NEW.is_finalized = false) THEN
-        UPDATE warehouse_stock 
-        SET reserved_quantity = reserved_quantity - 1, 
-            quantity = quantity + 1
-        WHERE products_id = NEW.products_id;
-
-    -- 3. ЛОГИКА ПОДТВЕРЖДЕНИЯ ПРОДАЖИ (Товар оплачен и выдан)
-    -- Срабатывает при UPDATE (is_finalized: false -> true)
+        UPDATE warehouse_stock SET reserved_quantity = reserved_quantity - 1, quantity = quantity + 1 WHERE products_id = NEW.products_id;
     ELSIF (TG_OP = 'UPDATE' AND OLD.is_finalized = false AND NEW.is_finalized = true) THEN
-        UPDATE warehouse_stock 
-        SET reserved_quantity = reserved_quantity - 1, 
-            sold_quantity = sold_quantity + 1
-        WHERE products_id = NEW.products_id;
-
-    -- 4. ЛОГИКА ВОЗВРАТА (Товар вернули после финализации продажи)
-    -- Срабатывает при UPDATE (is_finalized: true -> false)
+        UPDATE warehouse_stock SET reserved_quantity = reserved_quantity - 1, sold_quantity = sold_quantity + 1 WHERE products_id = NEW.products_id;
     ELSIF (TG_OP = 'UPDATE' AND OLD.is_finalized = true AND NEW.is_finalized = false) THEN
-        UPDATE warehouse_stock 
-        SET sold_quantity = sold_quantity - 1, 
-            quantity = quantity + 1
-        WHERE products_id = NEW.products_id;
+        UPDATE warehouse_stock SET sold_quantity = sold_quantity - 1, quantity = quantity + 1 WHERE products_id = NEW.products_id;
     END IF;
-
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
--- Пересоздание триггера на таблицу orders_items
-DROP TRIGGER IF EXISTS trg_stock_update ON orders_items;
 CREATE TRIGGER trg_stock_update
 AFTER INSERT OR UPDATE ON orders_items
 FOR EACH ROW EXECUTE FUNCTION fn_manage_stock_logic();
+
+CREATE INDEX idx_users_roles_id ON users(roles_id);
+CREATE INDEX idx_users_user_name ON users(user_name);
+CREATE INDEX idx_customer_users_id ON customer(users_id);
+CREATE INDEX idx_administrator_users_id ON administrator(users_id);
+CREATE INDEX idx_seller_users_id ON seller(users_id);
+CREATE INDEX idx_warehouse_manager_users_id ON warehouse_manager(users_id);
+
+CREATE INDEX idx_products_seller_id ON products(seller_id);
+CREATE INDEX idx_products_category_id ON products(category_id);
+CREATE INDEX idx_products_parent_id ON products(parent_id);
+CREATE INDEX idx_products_name ON products(name);
+CREATE INDEX idx_product_card_products_id ON product_card(products_id);
+CREATE INDEX idx_product_card_brand_id ON product_card(brand_id);
+CREATE INDEX idx_product_card_size_id ON product_card(size_id);
+CREATE INDEX idx_product_card_photo_gin ON product_card USING GIN (photo);
+
+CREATE INDEX idx_warehouse_warehouse_manager_id ON warehouse(warehouse_manager_id);
+CREATE INDEX idx_warehouse_stock_warehouse_id ON warehouse_stock(warehouse_id);
+CREATE INDEX idx_warehouse_stock_products_id ON warehouse_stock(products_id);
+CREATE INDEX idx_warehouse_stock_quantity ON warehouse_stock(quantity);
+
+CREATE INDEX idx_orders_customer_id ON orders(customer_id);
+CREATE INDEX idx_orders_orders_status_id ON orders(orders_status_id);
+CREATE INDEX idx_order_returns_order_returns_status_id ON order_returns(order_returns_status_id);
+CREATE INDEX idx_orders_items_orders_id ON orders_items(orders_id);
+CREATE INDEX idx_orders_items_order_returns_id ON orders_items(order_returns_id);
+CREATE INDEX idx_orders_items_products_id ON orders_items(products_id);
+CREATE INDEX idx_orders_items_sold_at ON orders_items(sold_at);
+CREATE INDEX idx_payments_payments_status_id ON payments(payments_status_id);
+CREATE INDEX idx_payments_orders_items_id ON payments(orders_items_id);
+CREATE INDEX idx_orders_movements_warehouse_id ON orders_movements(warehouse_id);
+CREATE INDEX idx_orders_movements_orders_items_id ON orders_movements(orders_items_id);
+CREATE INDEX idx_orders_movements_movements_status_id ON orders_movements(movements_status_id);
