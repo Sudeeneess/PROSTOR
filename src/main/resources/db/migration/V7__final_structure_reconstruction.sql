@@ -1,3 +1,9 @@
+DROP TABLE IF EXISTS orders_movements, payments, orders_items, order_returns, orders CASCADE;
+DROP TABLE IF EXISTS movements_status, payments_status, order_returns_status, orders_status CASCADE;
+DROP TABLE IF EXISTS warehouse_stock, warehouse CASCADE;
+DROP TABLE IF EXISTS product_card, products, category, size, brand CASCADE;
+DROP TABLE IF EXISTS warehouse_manager, seller, administrator, customer, users, roles CASCADE;
+
 CREATE TABLE IF NOT EXISTS customer (
     id SERIAL PRIMARY KEY, 
     users_id INTEGER UNIQUE NOT NULL REFERENCES users(id)
@@ -111,24 +117,6 @@ CREATE TABLE IF NOT EXISTS orders_movements (
     movements_status_id INTEGER NOT NULL REFERENCES movements_status(id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
--- 6. НАПОЛНЕНИЕ ДАННЫМИ (Справочники и восстановление тестовых юзеров)
-INSERT INTO roles (name) VALUES 
-    ('admin'), ('seller'), ('customer'), ('warehouse_manager') 
-ON CONFLICT (name) DO NOTHING;
-
-INSERT INTO orders_status (name) VALUES ('confirmed'), ('packed'), ('in_transit'), ('delivered') ON CONFLICT (name) DO NOTHING;
-INSERT INTO payments_status (name) VALUES ('success'), ('waiting'), ('reject') ON CONFLICT (name) DO NOTHING;
-INSERT INTO order_returns_status (name) VALUES ('success'), ('waiting'), ('reject') ON CONFLICT (name) DO NOTHING;
-INSERT INTO movements_status (name) VALUES ('pending'), ('processing'), ('in_transit'), ('delivered'), ('lost'), ('returned') ON CONFLICT (name) DO NOTHING;
-
--- Автоматическая привязка к таблицам профилей
-INSERT INTO administrator (users_id) SELECT id FROM users WHERE user_name = 'admin_user' ON CONFLICT DO NOTHING;
-INSERT INTO customer (users_id) SELECT id FROM users WHERE user_name IN ('john_doe', 'jane_smith') ON CONFLICT DO NOTHING;
-INSERT INTO warehouse_manager (users_id) SELECT id FROM users WHERE user_name = 'warehouse_mgr' ON CONFLICT DO NOTHING;
-INSERT INTO seller (users_id, inn, company_name) 
-    SELECT id, '123456789012', 'PROSTOR Global' FROM users WHERE user_name = 'seller_pro' 
-ON CONFLICT DO NOTHING;
 
 -- 7. СКЛАДСКАЯ ЛОГИКА (ТРИГГЕР)
 CREATE OR REPLACE FUNCTION fn_manage_stock_logic()
