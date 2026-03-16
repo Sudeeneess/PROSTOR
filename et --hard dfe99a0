@@ -1,0 +1,41 @@
+[33m99f1e8e[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdatabase_test[m[33m)[m HEAD@{0}: revert: Reapply "Reapply "Reapply "Reapply "hotfix""""
+[33m9fdb6bd[m HEAD@{1}: revert: Revert "Reapply "Reapply "Reapply "Reapply "hotfix"""""
+[33medfe61f[m HEAD@{2}: revert: Reapply "Reapply "Reapply "Reapply "Reapply "hotfix"""""
+[33mdb92b2f[m HEAD@{3}: revert: Revert "Reapply "Reapply "Reapply "Reapply "hotfix"""""
+[33m28fa0e0[m HEAD@{4}: revert: Reapply "Reapply "Reapply "Reapply "hotfix""""
+[33mcae9872[m HEAD@{5}: revert: Revert "Reapply "Reapply "Reapply "hotfix""""
+[33mf52ff42[m HEAD@{6}: revert: Reapply "Reapply "Reapply "hotfix"""
+[33mff9f062[m HEAD@{7}: revert: Revert "Reapply "Reapply "hotfix"""
+[33m748df03[m HEAD@{8}: revert: Reapply "Reapply "Reapply "hotfix"""
+[33m9ac5230[m HEAD@{9}: revert: Revert "Reapply "Reapply "Reapply "hotfix""""
+[33ma76a54a[m HEAD@{10}: revert: Reapply "Reapply "Reapply "hotfix"""
+[33m7b785b7[m HEAD@{11}: revert: Revert "Reapply "Reapply "hotfix"""
+[33m9f79ca7[m HEAD@{12}: revert: Reapply "Reapply "hotfix""
+[33m3def523[m HEAD@{13}: revert: Revert "Reapply "Reapply "hotfix"""
+[33m308952f[m HEAD@{14}: revert: Reapply "Reapply "Reapply "hotfix"""
+[33m06273a3[m HEAD@{15}: revert: Revert "Reapply "Reapply "hotfix"""
+[33m98ca9b7[m HEAD@{16}: revert: Reapply "Reapply "hotfix""
+[33mcfdf2cb[m HEAD@{17}: revert: Revert "Reapply "hotfix""
+[33m87f197f[m HEAD@{18}: revert: Reapply "Reapply "hotfix""
+[33m116c05d[m HEAD@{19}: revert: Revert "Reapply "hotfix""
+[33m9de46b1[m HEAD@{20}: revert: Reapply "hotfix"
+[33maf3ade4[m HEAD@{21}: revert: Revert "Reapply "hotfix""
+[33m84aa1c2[m HEAD@{22}: revert: Reapply "hotfix"
+[33m57b3c93[m[33m ([m[1;31morigin/database_test[m[33m)[m HEAD@{23}: revert: Revert "hotfix"
+[33mec25f4d[m HEAD@{24}: commit: hotfix
+[33mdfe99a0[m HEAD@{25}: commit: hotfix and added migrations
+[33m2a7a26e[m HEAD@{26}: commit: triggers fixed
+[33mf4c0840[m HEAD@{27}: commit: fixed init
+[33m278e0ba[m HEAD@{28}: commit: deleted old sql files
+[33m791a211[m HEAD@{29}: commit: added full stock management trigger (order, sale, cancel, return)
+[33m81b7644[m HEAD@{30}: commit: Deleted database directory
+[33me740924[m HEAD@{31}: commit: feat: complete database
+[33m3f61933[m[33m ([m[1;31morigin/develop[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mdevelop[m[33m)[m HEAD@{32}: checkout: moving from develop to database_test
+[33m3f61933[m[33m ([m[1;31morigin/develop[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mdevelop[m[33m)[m HEAD@{33}: pull origin develop: Merge made by the 'ort' strategy.
+[33m020bc56[m HEAD@{34}: commit: HotFix
+[33m3cdd565[m HEAD@{35}: commit: modernised database
+[33m09dc74f[m HEAD@{36}: commit: Organize database scripts
+[33m7b2fee9[m HEAD@{37}: checkout: moving from feature/database-setup to develop
+[33mac80906[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m, [m[1;32mfeature/database-setup[m[33m)[m HEAD@{38}: checkout: moving from main to feature/database-setup
+[33mac80906[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m, [m[1;32mfeature/database-setup[m[33m)[m HEAD@{39}: checkout: moving from develop to main
+[33m7b2fee9[m HEAD@{40}: clone: from https://github.com/Sudeeneess/PROSTOR.git
