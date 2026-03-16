@@ -83,13 +83,13 @@ body {
 .rating {
   color: #ffc107;
   font-size: 0.9rem;
-  margin-bottom: 0.4rem;
+  margin-top: 7px;
 }
 
 /* Кнопка */
 .add-to-cart {
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.75rem;
   background: #C0C0C0;
   color: #000000;
   border: none;
@@ -97,6 +97,7 @@ body {
   font-size: 1rem;
   cursor: pointer;
   transition: background 0.2s;
+  margin-top: 10px;
 }
 
 .add-to-cart:hover {

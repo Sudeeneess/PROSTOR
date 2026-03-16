@@ -1,4 +1,5 @@
 // import React from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
 import './index.css';
 import Header from './buyer/tsx_files/Header';
 
@@ -23,6 +24,7 @@ function App() {
   ];
 
   return (
+    <Router>
     <div className="app">
       <Header />
       
@@ -46,6 +48,7 @@ function App() {
         </div>
       </main>
     </div>
+    </Router>
   );
 }
 
