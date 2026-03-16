@@ -1,41 +1,33 @@
+// import React from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
 import './index.css';
-import { LuMenu } from "react-icons/lu";
-import { RxAvatar } from "react-icons/rx";
+import Header from './buyer/tsx_files/Header';
 
 function App() {
   const products = [
-    { id: 1, name: 'Товар 1', price: 1000, rating: 5, reviews: 10, image: '' },
-    { id: 2, name: 'Товар 2', price: 2000, rating: 4, reviews: 5, image: '' },
-    { id: 3, name: 'Товар 3', price: 3000, rating: 5, reviews: 15, image: '' },
-    { id: 4, name: 'Товар 4', price: 4000, rating: 3, reviews: 3, image: '' },
-    { id: 5, name: 'Товар 5', price: 4000, rating: 3, reviews: 3, image: '' },
-    { id: 6, name: 'Товар 6', price: 4000, rating: 3, reviews: 3, image: '' },
-    { id: 7, name: 'Товар 7', price: 4000, rating: 3, reviews: 3, image: '' },
+    { id: 1, price: '000 ₽', name: 'Название товара', rating: '5.0', reviews: '00 000' },
+    { id: 2, price: '000 ₽', name: 'Название товара', rating: '5.0', reviews: '00 000' },
+    { id: 3, price: '000 ₽', name: 'Название товара', rating: '5.0', reviews: '00 000' },
+    { id: 4, price: '000 ₽', name: 'Название товара', rating: '5.0', reviews: '00 000' },
+    { id: 5, price: '000 ₽', name: 'Название товара', rating: '5.0', reviews: '00 000' },
+    { id: 6, price: '000 ₽', name: 'Название товара', rating: '5.0', reviews: '00 000' },
+    { id: 7, price: '000 ₽', name: 'Название товара', rating: '5.0', reviews: '00 000' },
+    { id: 8, price: '000 ₽', name: 'Название товара', rating: '5.0', reviews: '00 000' },
+    { id: 9, price: '000 ₽', name: 'Название товара', rating: '5.0', reviews: '00 000' },
+    { id: 10, price: '000 ₽', name: 'Название товара', rating: '5.0', reviews: '00 000' },
+    { id: 11, price: '000 ₽', name: 'Название товара', rating: '5.0', reviews: '00 000' },
+    { id: 12, price: '000 ₽', name: 'Название товара', rating: '5.0', reviews: '00 000' },
+    { id: 13, price: '000 ₽', name: 'Название товара', rating: '5.0', reviews: '00 000' },
+    { id: 14, price: '000 ₽', name: 'Название товара', rating: '5.0', reviews: '00 000' },
+    { id: 15, price: '000 ₽', name: 'Название товара', rating: '5.0', reviews: '00 000' },
+    { id: 16, price: '000 ₽', name: 'Название товара', rating: '5.0', reviews: '00 000' },
   ];
 
   return (
+    <Router>
     <div className="app">
-      <header className="header">
-        <div className="logo">prostor</div>
-        
-        {/* Контейнер для поиска и меню по центру */}
-        <div className="header-center">
-          <div className="menu-icon">
-            <LuMenu size={40} color='#5a67d8' />
-          </div>
-          <div className="search-bar">
-            <input type="text" placeholder="Поиск товаров..." />
-          </div>
-          <div className='ava-icon'>
-            <RxAvatar size={45} color='#5a67d8' />
-          </div>
-          
-        </div>
-
-        {}
-        <div className="header-right"></div>
-      </header>
-
+      <Header />
+      
       <main className="main">
         <div className="product-grid">
           {products.map(product => (
@@ -44,12 +36,10 @@ function App() {
                 <div className="image-placeholder">📦</div>
               </div>
               <div className="product-info">
-                <div className="price">{product.price} ₽</div>
+                <div className="price">{product.price}</div>
                 <div className="name">{product.name}</div>
                 <div className="rating">
-                  {'★'.repeat(product.rating)}
-                  {'☆'.repeat(5 - product.rating)}
-                  {' '}{product.reviews} отзывов
+                  ★ {product.rating} {product.reviews} отзывов
                 </div>
                 <button className="add-to-cart">Добавить в корзину</button>
               </div>
@@ -58,6 +48,7 @@ function App() {
         </div>
       </main>
     </div>
+    </Router>
   );
 }
 

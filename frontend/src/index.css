@@ -1,5 +1,5 @@
-*{
-
+* {
+  margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
@@ -14,62 +14,6 @@ body {
   min-height: 100vh;
 }
 
-.header {
-  background: white;
-  padding: 1.10rem 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.header-center {
-  display: flex;
-  align-items: center;
-  gap: px;
-  flex: 1;
-  max-width: 1000px;
-}
-
-
-.logo {
-  font-size: 40px; 
-  font-weight: 800;
-  color: #5a67d8;
-  text-transform: uppercase;
-  margin-bottom: 5px;
-}
-
-.search-bar {
-  flex: 1;
-  max-width: 1300px;
-  margin: 0 1rem; 
-}
-
-.search-bar input {
-  width: 100%;
-  padding: 15px 15px;
-  border: 1px solid #ddd;
-  border-radius: 35px;
-  font-size: 20px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.search-bar input:focus {
-  border-color: #667eea;
-}
- 
-.menu-icon {
-  cursor: pointer;
-  color: #333;
-  margin-top: 5px; 
-  margin-left: -175px;    
-}
-.ava-icon{
-  cursor: pointer;
-}
-
 .main {
   max-width: 1200px;
   margin: 2rem auto;
@@ -78,7 +22,7 @@ body {
 
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
   gap: 2rem;
 }
 
@@ -86,7 +30,7 @@ body {
   background: white;
   border-radius: 30px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s;
 }
 
@@ -95,53 +39,67 @@ body {
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
+/* Изображение товара */
 .product-image {
-  height: 200px;
+  height: 225px;
   background: #f0f0f0;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.image-placeholder {
-  font-size: 3rem;
+.product-image img {  
+  width: 150px;        
+  height: 200px;       
+  object-fit: cover;  
 }
 
+.image-placeholder {
+  font-size: 3rem; 
+}
+
+/* Информация о товаре */
 .product-info {
-  padding: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.25rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  height: 150px;
 }
 
 .price {
   font-size: 1.25rem;
   font-weight: bold;
-  color: #667eea;
-  margin-bottom: 0.5rem;
+  color: #000000;
+  margin-bottom: 0.25rem;
 }
 
 .name {
   font-size: 1rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
   color: #333;
 }
 
 .rating {
   color: #ffc107;
   font-size: 0.9rem;
-  margin-bottom: 1rem;
+  margin-top: 7px;
 }
 
+/* Кнопка */
 .add-to-cart {
   width: 100%;
   padding: 0.75rem;
-  background: #667eea;
-  color: white;
+  background: #C0C0C0;
+  color: #000000;
   border: none;
-  border-radius: 50px;
+  border-radius: 40px;
   font-size: 1rem;
   cursor: pointer;
   transition: background 0.2s;
+  margin-top: 10px;
 }
 
 .add-to-cart:hover {
-  background: #5a67d8;
+  background: #888888;
 }
