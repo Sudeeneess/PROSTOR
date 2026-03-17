@@ -1,9 +1,3 @@
-DROP TABLE IF EXISTS orders_movements, payments, orders_items, order_returns, orders CASCADE;
-DROP TABLE IF EXISTS movements_status, payments_status, order_returns_status, orders_status CASCADE;
-DROP TABLE IF EXISTS warehouse_stock, warehouse CASCADE;
-DROP TABLE IF EXISTS product_card, products, category, size, brand CASCADE;
-DROP TABLE IF EXISTS warehouse_manager, seller, administrator, customer, users, roles CASCADE;
-
 CREATE TABLE IF NOT EXISTS customer (
     id SERIAL PRIMARY KEY, 
     users_id INTEGER UNIQUE NOT NULL REFERENCES users(id)
