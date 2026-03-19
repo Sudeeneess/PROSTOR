@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-//@RestController
+@RestController
 @RequestMapping("/api/debug")
 @RequiredArgsConstructor
 public class AuthDebugController {
