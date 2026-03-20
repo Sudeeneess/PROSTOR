@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import HeaderManager from './HeaderManager';
 import './style_main.css';
 
 interface ManagerProps {
   onLogin?: () => void;
 }
 
-const manager: React.FC<ManagerProps> = ({ onLogin }) => {
+const Manager: React.FC<ManagerProps> = ({ onLogin }) => {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  
+  const navigate = useNavigate();
 
   const handleLogin = () => {
     // Простая валидация
@@ -17,18 +21,20 @@ const manager: React.FC<ManagerProps> = ({ onLogin }) => {
       return;
     }
 
-    // реальная авторизация через API
+    // Здесь должна быть реальная авторизация через API
     console.log('Попытка входа с логином:', login);
     
     // Имитация успешного входа
     if (login.length > 0 && password.length > 0) {
       setError('');
-      // Переход в личный кабинет
+      
+      // Вызываем onLogin если он передан
       if (onLogin) {
         onLogin();
-      } else {
-        alert('Вход выполнен успешно!');
       }
+      
+      // Переход на страницу склада
+      navigate('/sklad');
     }
   };
 
@@ -38,20 +44,40 @@ const manager: React.FC<ManagerProps> = ({ onLogin }) => {
     }
   };
 
+  // Обработчик для клика по вкладкам шапки
+  const handleTabClick = (tab: 'priemka' | 'sborka' | 'otgruzka') => {
+    console.log('Клик по вкладке:', tab);
+    
+    // Показываем сообщение для всех вкладок кроме активной
+    if (tab !== 'priemka') {
+      alert('Раздел временно недоступен');
+    } else {
+      // Для активной вкладки просто скроллим к форме авторизации
+      const authBox = document.querySelector('.auth-container');
+      if (authBox) {
+        authBox.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
+  // Обработчик для клика по "Войти" в шапке
+  const handleLoginClick = () => {
+    console.log('Клик по Войти');
+    // Прокручиваем к форме авторизации
+    const authBox = document.querySelector('.auth-container');
+    if (authBox) {
+      authBox.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="container">
-      <div className="header">
-        <div className="header-title">
-          <span className="prostor">PROSTOR</span>
-          <span className="manager">Manager</span>
-        </div>
-        <div className="nav">
-          <span>Приемка</span>
-          <span>Сборка</span>
-          <span>Отгрузка</span>
-          <span className="login-bold">Войти</span>
-        </div>
-      </div>
+      {/* Используем компонент HeaderManager */}
+      <HeaderManager 
+        activeTab="priemka"
+        onTabClick={handleTabClick}
+        onLoginClick={handleLoginClick}
+      />
       
       <div className="auth-container">
         <div className="auth-box">
@@ -82,4 +108,4 @@ const manager: React.FC<ManagerProps> = ({ onLogin }) => {
   );
 };
 
-export default manager;
+export default Manager;

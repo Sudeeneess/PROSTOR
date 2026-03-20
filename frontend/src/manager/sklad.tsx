@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import HeaderManager from './HeaderManager';
 import './style_sklad.css';
 
 interface Activity {
@@ -13,6 +14,15 @@ const activities: Activity[] = [];
 
 const Dashboard: React.FC = () => {
   const [modalType, setModalType] = useState<'none' | 'priemka' | 'sborka' | 'otgruzka'>('none');
+  const [userName, setUserName] = useState<string>('И. И. Иванов');
+
+  useEffect(() => {
+    // Загружаем имя пользователя из sessionStorage
+    const storedUserName = sessionStorage.getItem('userName');
+    if (storedUserName) {
+      setUserName(storedUserName);
+    }
+  }, []);
 
   const openModal = (type: 'priemka' | 'sborka' | 'otgruzka') => {
     console.log('Кнопка временно не работает');
@@ -22,25 +32,43 @@ const Dashboard: React.FC = () => {
     setModalType('none');
   };
 
+  const handleLogout = () => {
+    sessionStorage.removeItem('userName');
+    window.location.href = '/';
+  };
+
+  const handleTabClick = (tab: 'priemka' | 'sborka' | 'otgruzka') => {
+    console.log('Клик по вкладке:', tab);
+    if (tab !== 'priemka') {
+      alert('Раздел временно недоступен');
+    }
+  };
+
+  const handleLoginClick = () => {
+    window.location.href = '/';
+  };
+
   return (
     <div className="dashboard-wrapper">
-      <header className="top-header">
-        <span className="logo">prostor</span>
-        <div className="manager">Manager</div>
-        <div className="tabs">
-          <span className="tab active">Приемка</span>
-          <span className="tab">
-            Сборка
-          </span>
-          <span className="tab">
-            Отгрузка
-          </span>
-          <span className="user">И. И. Иванов</span>
-        </div>
-      </header>
+      <HeaderManager 
+        activeTab="priemka"
+        onTabClick={handleTabClick}
+        onLoginClick={handleLoginClick}
+      />
 
       <main className="main-content">
-        <h1 className="page-title">Панель управления складом</h1>
+        <div className="content-header">
+          <h1 className="page-title">Панель управления складом</h1>
+          <div className="user-info">
+            <span className="user-name">{userName}</span>
+            <button 
+              className="logout-button"
+              onClick={handleLogout}
+            >
+              Выйти
+            </button>
+          </div>
+        </div>
 
         <section className="stats-cards">
           <div className="card">
@@ -99,7 +127,7 @@ const Dashboard: React.FC = () => {
               <div className="col executor">Исполнитель</div>
               <div className="col status">Статус</div>
             </div>
-{activities.length === 0 ? (
+            {activities.length === 0 ? (
               <div className="empty-table">
                 {Array(5).fill(null).map((_, i) => (
                   <div key={i} className="table-row empty">
@@ -129,4 +157,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard; 
+export default Dashboard;
