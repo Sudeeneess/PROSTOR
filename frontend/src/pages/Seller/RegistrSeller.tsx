@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "./Seller/Registr.css";
+import "./Seller/RegistrSeller.css";
 
 interface FormValues {
   country?: string;

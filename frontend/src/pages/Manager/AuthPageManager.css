@@ -1,17 +1,4 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: white;
-}
-
-/* Убрал container с ограничением ширины */
-
-.header {
+.manager-header {
   background-color: #e0e0e0;
   padding: 15px 30px;
   display: flex;
@@ -21,43 +8,43 @@ body {
   width: 100%; /* Добавил для уверенности */
 }
 
-.header-title {
+.manager-header-title {
   display: flex;
   align-items: baseline;
   gap: 5px;
 }
 
-.prostor {
+.manager-prostor {
   font-size: 32px;
   font-weight: bold;
   color: black;
   letter-spacing: 1px;
 }
 
-.manager {
+.manager-manager {
   font-size: 24px;
   color: white;
   font-weight: normal;
 }
 
-.nav {
+.manager-nav {
   display: flex;
   gap: 30px;
   font-size: 18px;
 }
 
-.nav span {
+.manager-nav span {
   color: black;
   font-weight: 300;
   cursor: default;
 }
 
-.nav span.login-bold {
+.manager-nav span.login-bold {
   font-weight: bold;
   color: black;
 }
 
-.auth-container {
+.manager-auth-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -65,7 +52,7 @@ body {
   width: 100%; /* Добавил для растяжения */
 }
 
-.auth-box {
+.manager-auth-box {
   width: 350px;
   padding: 30px;
   border: 1px solid #ccc; /* ВЕРНУЛ ГРАНИЦУ */
@@ -73,7 +60,7 @@ body {
   background-color: white;
 }
 
-.auth-box h2 {
+.manager-auth-box h2 {
   font-size: 24px;
   font-weight: 300;
   margin-bottom: 25px;
@@ -81,7 +68,7 @@ body {
   text-align: left;
 }
 
-.input-field {
+.manager-input-field {
   width: 100%;
   margin-bottom: 20px;
   padding: 12px 0;
@@ -94,16 +81,16 @@ body {
   background: transparent;
 }
 
-.input-field::placeholder {
+.manager-input-field::placeholder {
   color: #999;
   font-weight: 300;
 }
 
-.input-field:focus {
+.manager-input-field:focus {
   border-bottom-color: #666;
 }
 
-.login-button {
+.manager-login-button {
   width: 100%;
   padding: 12px;
   background-color: #e0e0e0;
@@ -116,11 +103,11 @@ body {
   margin-top: 15px;
 }
 
-.login-button:hover {
+.manager-login-button:hover {
   background-color: #d0d0d0;
 }
 
-.error-message {
+.manager-error-message {
   color: #d32f2f;
   font-size: 14px;
   margin-bottom: 15px;

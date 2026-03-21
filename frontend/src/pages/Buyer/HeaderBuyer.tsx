@@ -40,50 +40,50 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="header">
-      <div className="logo">prostor</div>
+    <header className="buyer-header">
+      <div className="buyer-logo">prostor</div>
       
-      <div className="header-center">
-        <div className="menu-icon">
+      <div className="buyer-header-center">
+        <div className="buyer-menu-icon">
           <LuMenu size={38} color='#000000' />
         </div>
-        <div className="search-bar">
+        <div className="buyer-search-bar">
           <input type="text" placeholder="Поиск товаров..." />
         </div>
         <div 
-          className="avatar-container"
+          className="buyer-avatar-container"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          <div className='ava-icon'>
+          <div className='buyer-ava-icon'>
             <IoPersonCircleOutline size={50} color='#000000' />
           </div>
-          <div className='basket-icon'>
+          <div className='buyer-basket-icon'>
             <FaBasketShopping size={40} color='#000000'/>
           </div>
           
           {isDropdownOpen && (
-            <div className="role-dropdown">
+            <div className="buyer-role-dropdown">
               <div 
-                className="role-item"
+                className="buyer-role-item"
                 onClick={() => handleRoleClick('buyer')}
               >
                 Войти как покупатель
               </div>
               <div 
-                className="role-item"
+                className="buyer-role-item"
                 onClick={() => handleRoleClick('seller')}
               >
                 Войти как продавец
               </div>
               <div 
-                className="role-item"
+                className="buyer-role-item"
                 onClick={() => handleRoleClick('warehouse')}
               >
                 Войти как менеджер склада
               </div>
               <div 
-                className="role-item"
+                className="buyer-role-item"
                 onClick={() => handleRoleClick('admin')}
               >
                 Войти как администратор
@@ -93,7 +93,7 @@ const Header: React.FC = () => {
         </div>
       </div>
 
-      <div className="header-right"></div>
+      <div className="buyer-header-right"></div>
     </header>
   );
 };

@@ -1,6 +1,6 @@
 import React from 'react';
 import Header from './HeaderBuyer';
-import ProductGrid from '../ProstorMain/ProductGrid';
+import ProductGrid from '../../ProstorMain/ProductGrid';
 import './MainPageBuyer.css'; 
 
 const MainPageBuyer: React.FC = () => {

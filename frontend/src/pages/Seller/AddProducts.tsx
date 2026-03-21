@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./Seller/Page_AddProducts.css"; // Изменяем путь
+import "./Seller/AddProducts.css"; 
 import { useNavigate } from "react-router-dom";
 
 interface ProductForm {
@@ -58,7 +58,6 @@ const AddingProducts: React.FC = () => {
         apiFormData.append('photo', formData.photo);
       }
 
-      // Replace with your actual API endpoint
       const response = await fetch('https://your-api-endpoint.com/products', {
         method: 'POST',
         body: apiFormData

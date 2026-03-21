@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate, Link } from "react-router-dom";
-import "./Seller/Autho.css";
+import "./Seller/AuthSeller.css";
 
 const Authorizationseller: React.FC = () => {
   const navigate = useNavigate();

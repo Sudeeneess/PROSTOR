@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import HeaderManager from './HeaderManager';
-import './style_sklad.css';
+import './WarehousePage.css';
 
 interface Activity {
   time: string;
@@ -13,7 +13,7 @@ interface Activity {
 const activities: Activity[] = [];
 
 const Dashboard: React.FC = () => {
-  const [modalType, setModalType] = useState<'none' | 'priemka' | 'sborka' | 'otgruzka'>('none');
+  // const [modalType, setModalType] = useState<'none' | 'priemka' | 'sborka' | 'otgruzka'>('none');
   const [userName, setUserName] = useState<string>('И. И. Иванов');
 
   useEffect(() => {
@@ -24,13 +24,14 @@ const Dashboard: React.FC = () => {
     }
   }, []);
 
-  const openModal = (type: 'priemka' | 'sborka' | 'otgruzka') => {
+  // const openModal = (type: 'priemka' | 'sborka' | 'otgruzka') => {
+  const openModal = () => {
     console.log('Кнопка временно не работает');
   };
 
-  const closeModal = () => {
-    setModalType('none');
-  };
+  // const closeModal = () => {
+  //   setModalType('none');
+  // };
 
   const handleLogout = () => {
     sessionStorage.removeItem('userName');
@@ -50,11 +51,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="dashboard-wrapper">
-      <HeaderManager 
-        activeTab="priemka"
-        onTabClick={handleTabClick}
-        onLoginClick={handleLoginClick}
-      />
+      <HeaderManager />
 
       <main className="main-content">
         <div className="content-header">
@@ -90,7 +87,7 @@ const Dashboard: React.FC = () => {
           <div className="action-buttons">
             <button 
               className="action-btn" 
-              onClick={() => openModal('priemka')}
+              onClick={() => openModal()}
               disabled
               style={{ opacity: 0.5, cursor: 'not-allowed' }}
             >
@@ -99,7 +96,7 @@ const Dashboard: React.FC = () => {
 
             <button 
               className="action-btn with-ring" 
-              onClick={() => openModal('sborka')}
+              onClick={() => openModal()}
               disabled
               style={{ opacity: 0.5, cursor: 'not-allowed' }}
             >
@@ -108,7 +105,7 @@ const Dashboard: React.FC = () => {
 
             <button 
               className="action-btn" 
-              onClick={() => openModal('otgruzka')}
+              onClick={() => openModal()}
               disabled
               style={{ opacity: 0.5, cursor: 'not-allowed' }}
             >
@@ -116,7 +113,6 @@ const Dashboard: React.FC = () => {
             </button>
           </div>
         </section>
-
         <section className="recent-activity">
           <h2 className="section-title">Последние активности</h2>
           <div className="activity-table">
