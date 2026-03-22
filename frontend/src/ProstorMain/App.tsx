@@ -4,8 +4,11 @@ import Header from './Header';
 import ProductGrid from './ProductGrid';
 import AuthPageBuyer from '../pages/Buyer/AuthPageBuyer'; 
 import MainPageBuyer from '../pages/Buyer/MainPageBuyer';
-import AuthPageManager from '../pages/Manager/AuthPageManager'; // Исправлен импорт
+import AuthPageManager from '../pages/Manager/AuthPageManager';
 import Warehouse from '../pages/Manager/WarehousePage';
+import PriemkaManager from '../pages/Manager/PriemkaManager';
+import SborkaManager from '../pages/Manager/SborkaManager';
+import OtgryzkaManager from '../pages/Manager/OtgryzkaManager';
 
 // Компонент для защиты маршрутов (только для авторизованных менеджеров)
 const PrivateWarehouseRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -34,25 +37,77 @@ const RedirectIfAuthenticated: React.FC<{ children: React.ReactNode }> = ({ chil
   return <>{children}</>;
 };
 
+// ДОБАВЛЕНО: Компонент для проверки авторизации покупателя
+const PrivateBuyerRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const token = localStorage.getItem('token');
+  const userRole = sessionStorage.getItem('userRole');
+  
+  // Проверяем наличие токена и правильность роли покупателя
+  if (!token || userRole !== 'buyer') {
+    // Перенаправляем на страницу авторизации покупателя
+    return <Navigate to="/auth" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+// ДОБАВЛЕНО: Компонент для перенаправления авторизованного покупателя
+const RedirectBuyerIfAuthenticated: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const token = localStorage.getItem('token');
+  const userRole = sessionStorage.getItem('userRole');
+  
+  // Если уже авторизован как покупатель, перенаправляем на страницу покупателя
+  if (token && userRole === 'buyer') {
+    return <Navigate to="/buyer" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
 // Создадим компонент-обертку для обработки навигации
 const AppContent: React.FC = () => {
   return (
     <Routes>
-      {/* Главная страница (для покупателей) */}
+      {/* Главная страница (для покупателей) - ДОБАВЛЕНА проверка авторизации */}
       <Route path="/" element={
-        <>
-          <Header />
-          <main className="main-content">
-            <ProductGrid />
-          </main>
-        </>
+        (() => {
+          const token = localStorage.getItem('token');
+          const userRole = sessionStorage.getItem('userRole');
+          
+          // Если пользователь авторизован как покупатель, перенаправляем на /buyer
+          if (token && userRole === 'buyer') {
+            return <Navigate to="/buyer" replace />;
+          }
+          // Если пользователь авторизован как менеджер, перенаправляем на /warehouse/dashboard
+          if (token && userRole === 'warehouse_manager') {
+            return <Navigate to="/warehouse/dashboard" replace />;
+          }
+          
+          // Иначе показываем главную страницу для неавторизованных
+          return (
+            <>
+              <Header />
+              <main className="main-content">
+                <ProductGrid />
+              </main>
+            </>
+          );
+        })()
       } />
       
-      {/* Страница авторизации покупателя */}
-      <Route path="/auth" element={<AuthPageBuyer />} />
+      {/* Страница авторизации покупателя - ДОБАВЛЕН RedirectBuyerIfAuthenticated */}
+      <Route path="/auth" element={
+        <RedirectBuyerIfAuthenticated>
+          <AuthPageBuyer />
+        </RedirectBuyerIfAuthenticated>
+      } />
       
-      {/* Страница покупателя после авторизации */}
-      <Route path="/buyer" element={<MainPageBuyer />} />
+      {/* Страница покупателя после авторизации - ДОБАВЛЕН PrivateBuyerRoute */}
+      <Route path="/buyer" element={
+        <PrivateBuyerRoute>
+          <MainPageBuyer />
+        </PrivateBuyerRoute>
+      } />
       
       {/* Маршруты для менеджера склада */}
       <Route path="/warehouse">
@@ -84,6 +139,10 @@ const AppContent: React.FC = () => {
           } 
         />
       </Route>
+
+      <Route path="/priemka" element={<PriemkaManager />} /> 
+      <Route path="/sborka" element={<SborkaManager />} />
+      <Route path="/otgruzka" element={<OtgryzkaManager />} />
       
       {/* Перенаправление для старых маршрутов (обратная совместимость) */}
       <Route path="/sklad" element={<Navigate to="/warehouse/dashboard" replace />} />

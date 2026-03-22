@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import HeaderManager from './HeaderManager';
 import './WarehousePage.css';
 
@@ -13,29 +14,43 @@ interface Activity {
 const activities: Activity[] = [];
 
 const Dashboard: React.FC = () => {
-  // const [modalType, setModalType] = useState<'none' | 'priemka' | 'sborka' | 'otgruzka'>('none');
+  const navigate = useNavigate();
   const [userName, setUserName] = useState<string>('И. И. Иванов');
 
   useEffect(() => {
+    // Проверяем авторизацию
+    const token = localStorage.getItem('token');
+    const role = sessionStorage.getItem('userRole');
+    
+    if (!token || role !== 'warehouse_manager') {
+      // Если не авторизован, перенаправляем на страницу авторизации
+      navigate('/auth/warehouse', { replace: true });
+      return;
+    }
+    
     // Загружаем имя пользователя из sessionStorage
     const storedUserName = sessionStorage.getItem('userName');
     if (storedUserName) {
       setUserName(storedUserName);
     }
-  }, []);
+  }, [navigate]);
 
-  // const openModal = (type: 'priemka' | 'sborka' | 'otgruzka') => {
-  const openModal = () => {
-    console.log('Кнопка временно не работает');
+  const openPriemka = () => {
+    navigate('/priemka');
   };
 
-  // const closeModal = () => {
-  //   setModalType('none');
-  // };
+  const openSborka = () => {
+    navigate('/sborka');
+  };
 
   const handleLogout = () => {
+    // Очищаем данные авторизации
+    localStorage.removeItem('token');
     sessionStorage.removeItem('userName');
-    window.location.href = '/';
+    sessionStorage.removeItem('userRole');
+    
+    // Перенаправляем на страницу авторизации менеджера
+    navigate('/auth/warehouse', { replace: true });
   };
 
   const handleTabClick = (tab: 'priemka' | 'sborka' | 'otgruzka') => {
@@ -43,10 +58,6 @@ const Dashboard: React.FC = () => {
     if (tab !== 'priemka') {
       alert('Раздел временно недоступен');
     }
-  };
-
-  const handleLoginClick = () => {
-    window.location.href = '/';
   };
 
   return (
@@ -87,32 +98,25 @@ const Dashboard: React.FC = () => {
           <div className="action-buttons">
             <button 
               className="action-btn" 
-              onClick={() => openModal()}
-              disabled
-              style={{ opacity: 0.5, cursor: 'not-allowed' }}
+              onClick={openPriemka}
             >
               <span>Приемка товара</span>
             </button>
 
             <button 
               className="action-btn with-ring" 
-              onClick={() => openModal()}
-              disabled
-              style={{ opacity: 0.5, cursor: 'not-allowed' }}
+              onClick={openSborka}
             >
               <span>Заказы на сборку</span>
             </button>
-
             <button 
               className="action-btn" 
-              onClick={() => openModal()}
-              disabled
-              style={{ opacity: 0.5, cursor: 'not-allowed' }}
-            >
-              <span>Готово к отгрузке</span>
+              onClick={() => navigate('/otgruzka')}>
+                <span>Готово к отгрузке</span>
             </button>
           </div>
         </section>
+        
         <section className="recent-activity">
           <h2 className="section-title">Последние активности</h2>
           <div className="activity-table">

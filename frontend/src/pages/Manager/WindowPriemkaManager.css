@@ -1,0 +1,245 @@
+.window-priemka-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: windowPriemkaFadeIn 0.2s ease;
+}
+
+@keyframes windowPriemkaFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.window-priemka-modal {
+  background: #ffffff;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: windowPriemkaSlideIn 0.3s ease;
+}
+
+@keyframes windowPriemkaSlideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.window-priemka-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+  border-radius: 12px 12px 0 0;
+}
+
+.window-priemka-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+  letter-spacing: 0.3px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+}
+
+.window-priemka-close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.window-priemka-close:hover {
+  background-color: #e5e7eb;
+  color: #111827;
+}
+
+.window-priemka-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  background: #ffffff;
+}
+
+.window-priemka-table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.window-priemka-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+}
+
+.window-priemka-table thead {
+  background-color: #f3f4f6;
+}
+
+.window-priemka-table th {
+  text-align: left;
+  padding: 14px 16px;
+  font-weight: 700;
+  font-size: 14px;
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
+  letter-spacing: 0.3px;
+  background-color: #f9fafb;
+}
+
+.window-priemka-table td {
+  padding: 14px 16px;
+  font-weight: 500;
+  font-size: 14px;
+  color: #1f2937;
+  border-bottom: 1px solid #f3f4f6;
+  letter-spacing: 0.2px;
+}
+
+.window-priemka-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.window-priemka-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.window-priemka-product-name {
+  font-weight: 600;
+  color: #111827;
+}
+
+.window-priemka-table td:not(.window-priemka-product-name) {
+  font-weight: 500;
+}
+
+.window-priemka-footer {
+  padding: 20px 24px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background: #f9fafb;
+  border-radius: 0 0 12px 12px;
+}
+
+.window-priemka-button {
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+  letter-spacing: 0.3px;
+}
+
+.window-priemka-complete-button {
+  background-color: #6b7280;
+  color: white;
+}
+
+.window-priemka-complete-button:hover {
+  background-color: #4b5563;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.window-priemka-draft-button {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.window-priemka-draft-button:hover {
+  background-color: #d1d5db;
+  transform: translateY(-1px);
+}
+
+/* Стили для скроллбара */
+.window-priemka-content::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.window-priemka-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.window-priemka-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.window-priemka-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 640px) {
+  .window-priemka-modal {
+    width: 95%;
+    max-height: 95vh;
+  }
+  
+  .window-priemka-header {
+    padding: 16px 20px;
+  }
+  
+  .window-priemka-title {
+    font-size: 16px;
+  }
+  
+  .window-priemka-content {
+    padding: 16px;
+  }
+  
+  .window-priemka-table th,
+  .window-priemka-table td {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+  
+  .window-priemka-footer {
+    padding: 16px 20px;
+  }
+  
+  .window-priemka-button {
+    padding: 8px 20px;
+    font-size: 13px;
+  }
+}

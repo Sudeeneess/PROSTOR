@@ -1,9 +1,10 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './HeaderManager.css';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleMenuClick = (action: string) => {
     switch(action) {
@@ -21,6 +22,15 @@ const Header: React.FC = () => {
         break;
     }
   };
+
+  // Не показываем навигацию на странице авторизации
+  if (location.pathname === '/auth/warehouse') {
+    return (
+      <header className="manager-header">
+        <div className="manager-logo">prostor</div>
+      </header>
+    );
+  }
 
   return (
     <header className="manager-header">

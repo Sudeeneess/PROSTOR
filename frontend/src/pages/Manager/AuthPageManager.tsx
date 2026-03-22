@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { BsPersonFill } from "react-icons/bs";
 import HeaderManager from './HeaderManager';
 import './AuthPageManager.css';
-// ИЗМЕНЕНИЕ: удален импорт api
 
 const AuthPageManager: React.FC = () => {
   const navigate = useNavigate();
@@ -13,6 +12,15 @@ const AuthPageManager: React.FC = () => {
     username: '',
     password: ''
   });
+
+  // Проверка, авторизован ли уже пользователь
+  React.useEffect(() => {
+    const token = localStorage.getItem('token');
+    const role = sessionStorage.getItem('userRole');
+    if (token && role === 'warehouse_manager') {
+      navigate('/warehouse', { replace: true });
+    }
+  }, [navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -25,8 +33,6 @@ const AuthPageManager: React.FC = () => {
     setLoading(true);
     setError(null);
 
-    // ИЗМЕНЕНИЕ: убрана вся логика работы с API
-    // Теперь просто проверяем, что поля не пустые
     if (!formData.username || !formData.password) {
       setError('Пожалуйста, заполните все поля');
       setLoading(false);
@@ -36,16 +42,15 @@ const AuthPageManager: React.FC = () => {
     try {
       console.log('Вход менеджера склада:', { username: formData.username });
       
-      // ИЗМЕНЕНИЕ: имитация успешной авторизации
-      // Сохраняем тестовые данные пользователя
+      // Сохраняем данные пользователя
       localStorage.setItem('token', 'test-token-manager');
       sessionStorage.setItem('userName', formData.username);
       sessionStorage.setItem('userRole', 'warehouse_manager');
       
       console.log('Вход успешен! Перенаправление на страницу склада');
       
-      // ИЗМЕНЕНИЕ: перенаправление на страницу склада
-      navigate('/warehouse');
+      // Используем replace, чтобы пользователь не мог вернуться на страницу авторизации через кнопку "Назад"
+      navigate('/warehouse', { replace: true });
       
     } catch (err) {
       console.error('Ошибка:', err);
@@ -67,7 +72,6 @@ const AuthPageManager: React.FC = () => {
             </div>
           </h2>
           
-          {/* Отображение ошибки */}
           {error && (
             <div className="error-message">
               {error}
