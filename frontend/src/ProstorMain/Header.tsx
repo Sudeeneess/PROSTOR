@@ -24,13 +24,13 @@ const Header: React.FC = () => {
         navigate('/auth');
         break;
       case 'seller':
-        navigate('/auth');
+        navigate('seller/auth');
         break;
       case 'warehouse':
-        navigate('/auth');
+        navigate('warehouse/auth');
         break;
       case 'admin':
-        navigate('/auth');
+        navigate('admin/auth');
         break;
       default:
         break;
