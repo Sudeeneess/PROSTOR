@@ -6,9 +6,6 @@ import AuthPageBuyer from '../pages/Buyer/AuthPageBuyer';
 import MainPageBuyer from '../pages/Buyer/MainPageBuyer';
 import AuthPageManager from '../pages/Manager/AuthPageManager';
 import Warehouse from '../pages/Manager/WarehousePage';
-import PriemkaManager from '../pages/Manager/PriemkaManager';
-import SborkaManager from '../pages/Manager/SborkaManager';
-import OtgryzkaManager from '../pages/Manager/OtgryzkaManager';
 
 // Компонент для защиты маршрутов (только для авторизованных менеджеров)
 const PrivateWarehouseRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -139,10 +136,6 @@ const AppContent: React.FC = () => {
           } 
         />
       </Route>
-
-      <Route path="/priemka" element={<PriemkaManager />} /> 
-      <Route path="/sborka" element={<SborkaManager />} />
-      <Route path="/otgruzka" element={<OtgryzkaManager />} />
       
       {/* Перенаправление для старых маршрутов (обратная совместимость) */}
       <Route path="/sklad" element={<Navigate to="/warehouse/dashboard" replace />} />

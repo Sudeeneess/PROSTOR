@@ -21,6 +21,16 @@
   font-weight: 775;
   color: #000000;
   text-transform: uppercase;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.manager-badge {
+  font-size: 30px;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: none;
 }
 
 /* Строка поиска (аналог main-search-bar) */

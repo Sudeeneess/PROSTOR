@@ -1,5 +1,5 @@
 /* Затемнение фона */
-.window-sborka-overlay {
+.wind-warehouse-assembling-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -14,7 +14,7 @@
 }
 
 /* Модальное окно */
-.window-sborka-modal {
+.wind-warehouse-assembling-modal {
   background-color: #ffffff;
   border-radius: 8px;
   width: 90%;
@@ -26,7 +26,7 @@
 }
 
 /* Заголовок окна */
-.window-sborka-header {
+.wind-warehouse-assembling-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -35,7 +35,7 @@
   background-color: #f8f9fa;
 }
 
-.window-sborka-title {
+.wind-warehouse-assembling-title {
   font-size: 20px;
   font-weight: 700;
   color: #2c3e50;
@@ -44,7 +44,7 @@
 }
 
 /* Кнопка закрытия */
-.window-sborka-close {
+.wind-warehouse-assembling-close {
   background: none;
   border: none;
   font-size: 28px;
@@ -61,39 +61,39 @@
   font-weight: 400;
 }
 
-.window-sborka-close:hover {
+.wind-warehouse-assembling-close:hover {
   background-color: #e9ecef;
   color: #2c3e50;
 }
 
 /* Основной контент */
-.window-sborka-content {
+.wind-warehouse-assembling-content {
   padding: 24px;
   overflow-y: auto;
   max-height: calc(90vh - 80px);
 }
 
 /* Контейнер таблицы */
-.window-sborka-table-container {
+.wind-warehouse-assembling-table-container {
   overflow-x: auto;
   margin-bottom: 24px;
 }
 
 /* Таблица */
-.window-sborka-table {
+.wind-warehouse-assembling-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
 }
 
-.window-sborka-table th,
-.window-sborka-table td {
+.wind-warehouse-assembling-table th,
+.wind-warehouse-assembling-table td {
   padding: 12px 16px;
   text-align: left;
   border-bottom: 1px solid #e9ecef;
 }
 
-.window-sborka-table th {
+.wind-warehouse-assembling-table th {
   background-color: #f8f9fa;
   font-weight: 700;
   color: #495057;
@@ -102,7 +102,7 @@
   border-bottom: 2px solid #dee2e6;
 }
 
-.window-sborka-table td {
+.wind-warehouse-assembling-table td {
   color: #212529;
   font-weight: 500;
 }
@@ -144,7 +144,7 @@
 }
 
 /* Кнопки действий */
-.window-sborka-actions {
+.wind-warehouse-assembling-actions {
   display: flex;
   gap: 12px;
   justify-content: flex-end;
@@ -154,7 +154,7 @@
 }
 
 /* Кнопка "Завершить приемку" - более темный серый */
-.window-sborka-complete-btn {
+.wind-warehouse-assembling-complete-btn {
   background-color: #495057;
   color: white;
   border: none;
@@ -167,17 +167,17 @@
   letter-spacing: 0.3px;
 }
 
-.window-sborka-complete-btn:hover {
+.wind-warehouse-assembling-complete-btn:hover {
   background-color: #343a40;
   transform: translateY(-1px);
 }
 
-.window-sborka-complete-btn:active {
+.wind-warehouse-assembling-complete-btn:active {
   transform: translateY(0);
 }
 
 /* Кнопка "Сохранить черновик" - более темный серый */
-.window-sborka-draft-btn {
+.wind-warehouse-assembling-draft-btn {
   background-color: #6c757d;
   color: white;
   border: none;
@@ -190,12 +190,12 @@
   letter-spacing: 0.3px;
 }
 
-.window-sborka-draft-btn:hover {
+.wind-warehouse-assembling-draft-btn:hover {
   background-color: #5a6268;
   transform: translateY(-1px);
 }
 
-.window-sborka-draft-btn:active {
+.wind-warehouse-assembling-draft-btn:active {
   transform: translateY(0);
 }
 
@@ -222,25 +222,25 @@
 
 /* Адаптивность для мобильных устройств */
 @media (max-width: 640px) {
-  .window-sborka-modal {
+  .wind-warehouse-assembling-modal {
     width: 95%;
     margin: 16px;
   }
 
-  .window-sborka-header {
+  .wind-warehouse-assembling-header {
     padding: 16px;
   }
 
-  .window-sborka-title {
+  .wind-warehouse-assembling-title {
     font-size: 18px;
   }
 
-  .window-sborka-content {
+  .wind-warehouse-assembling-content {
     padding: 16px;
   }
 
-  .window-sborka-table th,
-  .window-sborka-table td {
+  .wind-warehouse-assembling-table th,
+  .wind-warehouse-assembling-table td {
     padding: 8px 12px;
     font-size: 13px;
   }
@@ -251,12 +251,12 @@
     font-size: 13px;
   }
 
-  .window-sborka-actions {
+  .wind-warehouse-assembling-actions {
     flex-direction: column-reverse;
   }
 
-  .window-sborka-complete-btn,
-  .window-sborka-draft-btn {
+  .wind-warehouse-assembling-complete-btn,
+  .wind-warehouse-assembling-draft-btn {
     width: 100%;
     padding: 12px;
   }

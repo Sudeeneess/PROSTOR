@@ -1,4 +1,4 @@
-.priemka-wrapper {
+.warehouse-receiving-wrapper {
   min-height: 100vh;
   background-color: #f5f5f5;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
@@ -6,27 +6,27 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.priemka-content {
+.warehouse-receiving-content {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
 }
 
-.priemka-container {
+.warehouse-receiving-container {
   background-color: white;
   border-radius: 8px;
   padding: 24px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.priemka-header {
+.warehouse-receiving-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 24px;
 }
 
-.priemka-back-button {
+.warehouse-receiving-back-button {
   background: none;
   border: none;
   color: #666;
@@ -39,12 +39,12 @@
   order: 2;
 }
 
-.priemka-back-button:hover {
+.warehouse-receiving-back-button:hover {
   background-color: #f0f0f0;
   color: #333;
 }
 
-.priemka-title {
+.warehouse-receiving-title {
   font-size: 24px;
   font-weight: 700;
   color: #333;
@@ -53,23 +53,23 @@
   letter-spacing: -0.2px;
 }
 
-.priemka-table-container {
+.warehouse-receiving-table-container {
   overflow-x: auto;
   margin-bottom: 24px;
 }
 
-.priemka-table {
+.warehouse-receiving-table {
   width: 100%;
   border-collapse: collapse;
   background-color: white;
 }
 
-.priemka-table thead {
+.warehouse-receiving-table thead {
   background-color: #ddd;
   border-bottom: 2px solid #ddd;
 }
 
-.priemka-table th {
+.warehouse-receiving-table th {
   padding: 12px 16px;
   text-align: left;
   font-weight: 700;
@@ -78,7 +78,7 @@
   letter-spacing: 0.3px;
 }
 
-.priemka-table td {
+.warehouse-receiving-table td {
   padding: 12px 16px;
   border-bottom: 1px solid #ddd;
   color: #2c3e50;
@@ -86,69 +86,30 @@
   font-weight: 500;
 }
 
-.priemka-table tbody tr:hover {
+.warehouse-receiving-table tbody tr:hover {
   background-color: #ddd;
 }
 
-.priemka-checkbox-column {
-  width: 40px;
+/* Стили для колонки с чекбоксами */
+.warehouse-receiving-checkbox-column {
+  width: 50px;
   text-align: center;
 }
 
-.priemka-checkbox-label {
-  position: relative;
-  display: inline-block;
-  cursor: pointer;
-  font-size: 16px;
-  user-select: none;
-}
-
-.priemka-product-checkbox {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-  height: 0;
-  width: 0;
-}
-
-.priemka-checkmark {
-  position: relative;
-  display: inline-block;
-  height: 18px;
+/* Стили для чекбокса - такие же как в WarehouseShipment */
+.warehouse-receiving-checkbox {
   width: 18px;
-  background-color: #fff;
-  border: 2px solid #ddd;
-  border-radius: 3px;
-  transition: all 0.2s;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #808080;
 }
 
-.priemka-product-checkbox:checked + .priemka-checkmark {
-  background-color: #666;
-  border-color: #333;
-}
-
-.priemka-product-checkbox:checked + .priemka-checkmark:after {
-  content: '';
-  position: absolute;
-  left: 5px;
-  top: 2px;
-  width: 5px;
-  height: 10px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-}
-
-.priemka-checkbox-label:hover .priemka-checkmark {
-  border-color: #666;
-}
-
-.priemka-product-id {
+.warehouse-receiving-product-id {
   font-weight: 600;
   color: #2c3e50;
 }
 
-.priemka-status-badge {
+.warehouse-receiving-status-badge {
   display: inline-block;
   padding: 4px 12px;
   border-radius: 12px;
@@ -156,26 +117,31 @@
   font-weight: 600;
 }
 
-.priemka-status-pending {
+.warehouse-receiving-status-pending {
   background-color: #ddd;
-  color: #666;
+  color: #000000;
 }
 
-.priemka-status-partial {
+.warehouse-receiving-status-partial {
   background-color: #ddd;
-  color: #666;
+  color: #000000;
 }
 
-.priemka-action-buttons-container {
+.warehouse-receiving-status-accepted {
+  background-color: #ddd;
+  color: #000000;
+}
+
+.warehouse-receiving-action-buttons-container {
   display: flex;
   gap: 12px;
   justify-content: flex-start;
   margin-top: 24px;
   padding-top: 20px;
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid #ffffff;
 }
 
-.priemka-action-button {
+.warehouse-receiving-action-button {
   padding: 10px 20px;
   border: none;
   border-radius: 6px;
@@ -185,64 +151,64 @@
   transition: all 0.2s;
 }
 
-.priemka-action-button:hover {
+.warehouse-receiving-action-button:hover {
   transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.priemka-accept-button {
+.warehouse-receiving-accept-button {
   background-color: #6c757d;
   color: white;
 }
 
-.priemka-accept-button:hover {
-  background-color: #6c757d;
+.warehouse-receiving-accept-button:hover {
+  background-color: #5a6268;
 }
 
-.priemka-download-button {
-  background-color: #6c757d;
-  color: white;
-}
-
-.priemka-download-button:hover {
-  background-color: #6c757d;
-}
-
-.priemka-export-button {
+.warehouse-receiving-download-button {
   background-color: #6c757d;
   color: white;
 }
 
-.priemka-export-button:hover {
+.warehouse-receiving-download-button:hover {
+  background-color: #5a6268;
+}
+
+.warehouse-receiving-export-button {
+  background-color: #6c757d;
+  color: white;
+}
+
+.warehouse-receiving-export-button:hover {
   background-color: #5a6268;
 }
 
 /* Responsive design */
 @media (max-width: 768px) {
-  .priemka-content {
+  .warehouse-receiving-content {
     padding: 12px;
   }
   
-  .priemka-container {
+  .warehouse-receiving-container {
     padding: 16px;
   }
   
-  .priemka-title {
+  .warehouse-receiving-title {
     font-size: 20px;
   }
   
-  .priemka-table th,
-  .priemka-table td {
+  .warehouse-receiving-table th,
+  .warehouse-receiving-table td {
     padding: 8px 12px;
     font-size: 12px;
   }
   
-  .priemka-action-buttons-container {
+  .warehouse-receiving-action-buttons-container {
     flex-direction: column;
     gap: 8px;
   }
   
-  .priemka-action-button {
+  .warehouse-receiving-action-button {
     width: 100%;
   }
 }

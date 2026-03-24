@@ -1,5 +1,5 @@
 import React from 'react';
-import './WindowPriemkaManager.css';
+import './WindWarehouseReceiving.css';
 
 interface ProductItem {
   id: string;
@@ -9,7 +9,7 @@ interface ProductItem {
   cell: string;
 }
 
-interface WindowPriemkaManagerProps {
+interface WindWarehouseReceivingProps {
   isOpen: boolean;
   onClose: () => void;
   onComplete: () => void;
@@ -18,7 +18,7 @@ interface WindowPriemkaManagerProps {
   products: ProductItem[];
 }
 
-const WindowPriemkaManager: React.FC<WindowPriemkaManagerProps> = ({
+const WindWarehouseReceiving: React.FC<WindWarehouseReceivingProps> = ({
   isOpen,
   onClose,
   onComplete,
@@ -40,20 +40,20 @@ const WindowPriemkaManager: React.FC<WindowPriemkaManagerProps> = ({
   };
 
   return (
-    <div className="window-priemka-overlay" onClick={handleOverlayClick}>
-      <div className="window-priemka-modal">
-        <div className="window-priemka-header">
-          <h2 className="window-priemka-title">
+    <div className="wind-warehouse-receiving-overlay" onClick={handleOverlayClick}>
+      <div className="wind-warehouse-receiving-modal">
+        <div className="wind-warehouse-receiving-header">
+          <h2 className="wind-warehouse-receiving-title">
             Поставка {orderId} от {sellerName}
           </h2>
-          <button className="window-priemka-close" onClick={onClose}>
+          <button className="wind-warehouse-receiving-close" onClick={onClose}>
             ×
           </button>
         </div>
 
-        <div className="window-priemka-content">
-          <div className="window-priemka-table-container">
-            <table className="window-priemka-table">
+        <div className="wind-warehouse-receiving-content">
+          <div className="wind-warehouse-receiving-table-container">
+            <table className="wind-warehouse-receiving-table">
               <thead>
                 <tr>
                   <th>Товар</th>
@@ -65,7 +65,7 @@ const WindowPriemkaManager: React.FC<WindowPriemkaManagerProps> = ({
               <tbody>
                 {products.map((product, index) => (
                   <tr key={index}>
-                    <td className="window-priemka-product-name">{product.name}</td>
+                    <td className="wind-warehouse-receiving-product-name">{product.name}</td>
                     <td>{product.expected}</td>
                     <td>{product.accepted}</td>
                     <td>{product.cell}</td>
@@ -76,15 +76,15 @@ const WindowPriemkaManager: React.FC<WindowPriemkaManagerProps> = ({
           </div>
         </div>
 
-        <div className="window-priemka-footer">
+        <div className="wind-warehouse-receiving-footer">
           <button 
-            className="window-priemka-button window-priemka-complete-button"
+            className="wind-warehouse-receiving-button wind-warehouse-receiving-complete-button"
             onClick={handleCompleteReception}
           >
             Завершить приемку
           </button>
           <button 
-            className="window-priemka-button window-priemka-draft-button"
+            className="wind-warehouse-receiving-button wind-warehouse-receiving-draft-button"
             onClick={onClose}
           >
             Сохранить черновик
@@ -95,4 +95,4 @@ const WindowPriemkaManager: React.FC<WindowPriemkaManagerProps> = ({
   );
 };
 
-export default WindowPriemkaManager;
+export default WindWarehouseReceiving;

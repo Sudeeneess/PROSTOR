@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import './WindowSborkaManager.css';
+import './WindWarehouseAssembling.css';
 
-interface WindowSborkaManagerProps {
+interface WindWarehouseAssemblingProps {
   onClose: () => void;
   orderData?: {
     orderNumber: string;
@@ -14,7 +14,7 @@ interface WindowSborkaManagerProps {
   };
 }
 
-const WindowSborkaManager: React.FC<WindowSborkaManagerProps> = ({ 
+const WindWarehouseAssembling: React.FC<WindWarehouseAssemblingProps> = ({ 
   onClose, 
   orderData 
 }) => {
@@ -53,12 +53,12 @@ const WindowSborkaManager: React.FC<WindowSborkaManagerProps> = ({
   };
 
   return (
-    <div className="window-sborka-overlay" onClick={handleOverlayClick}>
-      <div className="window-sborka-modal">
-        <div className="window-sborka-header">
-          <h2 className="window-sborka-title">Сборка заказа</h2>
+    <div className="wind-warehouse-assembling-overlay" onClick={handleOverlayClick}>
+      <div className="wind-warehouse-assembling-modal">
+        <div className="wind-warehouse-assembling-header">
+          <h2 className="wind-warehouse-assembling-title">Сборка заказа</h2>
           <button 
-            className="window-sborka-close"
+            className="wind-warehouse-assembling-close"
             onClick={onClose}
             aria-label="Закрыть"
           >
@@ -66,9 +66,9 @@ const WindowSborkaManager: React.FC<WindowSborkaManagerProps> = ({
           </button>
         </div>
 
-        <div className="window-sborka-content">
-          <div className="window-sborka-table-container">
-            <table className="window-sborka-table">
+        <div className="wind-warehouse-assembling-content">
+          <div className="wind-warehouse-assembling-table-container">
+            <table className="wind-warehouse-assembling-table">
               <thead>
                 <tr>
                   <th>Товар</th>
@@ -82,18 +82,7 @@ const WindowSborkaManager: React.FC<WindowSborkaManagerProps> = ({
                   <tr key={index}>
                     <td className="product-name">{item.name}</td>
                     <td>{item.expected}</td>
-                    <td>
-                      <input
-                        type="number"
-                        className="accepted-input"
-                        value={item.accepted}
-                        onChange={(e) => {
-                          const newItems = [...items];
-                          newItems[index].accepted = parseInt(e.target.value) || 0;
-                          setItems(newItems);
-                        }}
-                      />
-                    </td>
+                    <td>{item.accepted}</td>
                     <td className="cell-code">{item.cell}</td>
                   </tr>
                 ))}
@@ -101,15 +90,15 @@ const WindowSborkaManager: React.FC<WindowSborkaManagerProps> = ({
             </table>
           </div>
 
-          <div className="window-sborka-actions">
+          <div className="wind-warehouse-assembling-actions">
             <button 
-              className="window-sborka-complete-btn"
+              className="wind-warehouse-assembling-complete-btn"
               onClick={handleCompleteAcceptance}
             >
               Завершить приемку
             </button>
             <button 
-              className="window-sborka-draft-btn"
+              className="wind-warehouse-assembling-draft-btn"
               onClick={handleSaveDraft}
             >
               Сохранить черновик
@@ -121,4 +110,4 @@ const WindowSborkaManager: React.FC<WindowSborkaManagerProps> = ({
   );
 };
 
-export default WindowSborkaManager;
+export default WindWarehouseAssembling;

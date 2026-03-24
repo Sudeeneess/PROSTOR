@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
-import './WindowOtgryzkaManager.css';
+import './WindWarehouseShipment.css';
 
-interface WindowOtgryzkaManagerProps {
+interface WindWarehouseShipmentProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
@@ -13,7 +13,7 @@ interface WindowOtgryzkaManagerProps {
   };
 }
 
-const WindowOtgryzkaManager: React.FC<WindowOtgryzkaManagerProps> = ({
+const WindWarehouseShipment: React.FC<WindWarehouseShipmentProps> = ({
   isOpen,
   onClose,
   onConfirm,
@@ -52,41 +52,41 @@ const WindowOtgryzkaManager: React.FC<WindowOtgryzkaManagerProps> = ({
   const totalQuantity = orderData.items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <div className="window-otgryzka-overlay">
-      <div className="window-otgryzka-modal" ref={modalRef}>
-        <div className="window-otgryzka-header">
-          <h2 className="window-otgryzka-title">Отгрузка заказа {orderData.id}</h2>
-          <button className="window-otgryzka-close" onClick={onClose}>
+    <div className="wind-warehouse-shipment-overlay">
+      <div className="wind-warehouse-shipment-modal" ref={modalRef}>
+        <div className="wind-warehouse-shipment-header">
+          <h2 className="wind-warehouse-shipment-title">Отгрузка заказа {orderData.id}</h2>
+          <button className="wind-warehouse-shipment-close" onClick={onClose}>
             ×
           </button>
         </div>
 
-        <div className="window-otgryzka-content">
-          <div className="window-otgryzka-section">
-            <h3 className="window-otgryzka-section-title">Состав заказа:</h3>
-            <table className="window-otgryzka-items-table">
+        <div className="wind-warehouse-shipment-content">
+          <div className="wind-warehouse-shipment-section">
+            <h3 className="wind-warehouse-shipment-section-title">Состав заказа:</h3>
+            <table className="wind-warehouse-shipment-items-table">
               <tbody>
                 {orderData.items.map((item, index) => (
                   <tr key={index}>
-                    <td className="window-otgryzka-item-name">{item.name}</td>
-                    <td className="window-otgryzka-item-quantity">{item.quantity} шт.</td>
+                    <td className="wind-warehouse-shipment-item-name">{item.name}</td>
+                    <td className="wind-warehouse-shipment-item-quantity">{item.quantity} шт.</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
 
-          <div className="window-otgryzka-section">
-            <h3 className="window-otgryzka-section-title">Способы доставки:</h3>
-            <div className="window-otgryzka-delivery-info">
-              <p className="window-otgryzka-delivery-method">{orderData.deliveryMethod}</p>
-              <p className="window-otgryzka-address">{orderData.address}</p>
+          <div className="wind-warehouse-shipment-section">
+            <h3 className="wind-warehouse-shipment-section-title">Способы доставки:</h3>
+            <div className="wind-warehouse-shipment-delivery-info">
+              <p className="wind-warehouse-shipment-delivery-method">{orderData.deliveryMethod}</p>
+              <p className="wind-warehouse-shipment-address">{orderData.address}</p>
             </div>
           </div>
         </div>
 
-        <div className="window-otgryzka-footer">
-          <button className="window-otgryzka-confirm-button" onClick={onConfirm}>
+        <div className="wind-warehouse-shipment-footer">
+          <button className="wind-warehouse-shipment-confirm-button" onClick={onConfirm}>
             Подтвердить отгрузку
           </button>
         </div>
@@ -95,4 +95,4 @@ const WindowOtgryzkaManager: React.FC<WindowOtgryzkaManagerProps> = ({
   );
 };
 
-export default WindowOtgryzkaManager;
+export default WindWarehouseShipment;

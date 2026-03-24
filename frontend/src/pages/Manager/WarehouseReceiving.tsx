@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import HeaderManager from './HeaderManager';
-import WindowPriemkaManager from './WindowPriemkaManager';
-import './PriemkaManager.css';
+import WindWarehouseReceiving from './WindWarehouseReceiving';
+import './WarehouseReceiving.css';
 
 interface ProductItem {
   id: string;
@@ -11,6 +10,10 @@ interface ProductItem {
   date: string;
   status: string;
   selected: boolean;
+}
+
+interface WarehouseReceivingProps {
+  onBack: () => void;
 }
 
 // Данные для всех поставок
@@ -41,9 +44,7 @@ const receptionData: Record<string, { sellerName: string; products: any[] }> = {
   }
 };
 
-const PriemkaManager: React.FC = () => {
-  const navigate = useNavigate();
-  
+const WarehouseReceiving: React.FC<WarehouseReceivingProps> = ({ onBack }) => {
   const [products, setProducts] = useState<ProductItem[]>([
     {
       id: '#S-45',
@@ -74,6 +75,17 @@ const PriemkaManager: React.FC = () => {
   const [isWindowOpen, setIsWindowOpen] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
+  // Проверка авторизации
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const role = sessionStorage.getItem('userRole');
+    
+    if (!token || role !== 'warehouse_manager') {
+      window.location.href = '/auth/warehouse';
+      return;
+    }
+  }, []);
+
   const handleSelectProduct = (id: string) => {
     setProducts(prevProducts =>
       prevProducts.map(product =>
@@ -85,13 +97,12 @@ const PriemkaManager: React.FC = () => {
   };
 
   const handleBack = () => {
-    navigate('/warehouse');
+    onBack();
   };
 
   const handleAcceptSelected = () => {
     const selectedProducts = products.filter(product => product.selected);
     if (selectedProducts.length > 0) {
-      // Берем первую выбранную поставку
       setSelectedOrderId(selectedProducts[0].id);
       setIsWindowOpen(true);
     }
@@ -104,7 +115,6 @@ const PriemkaManager: React.FC = () => {
 
   const handleCompleteReception = () => {
     if (selectedOrderId) {
-      // Обновляем статус выбранной поставки
       setProducts(prevProducts =>
         prevProducts.map(product =>
           product.id === selectedOrderId
@@ -125,7 +135,6 @@ const PriemkaManager: React.FC = () => {
 
   const hasSelectedItems = products.some(product => product.selected);
 
-  // Получаем данные для выбранной поставки
   const getWindowData = () => {
     if (selectedOrderId && receptionData[selectedOrderId]) {
       const orderData = receptionData[selectedOrderId];
@@ -141,92 +150,84 @@ const PriemkaManager: React.FC = () => {
   const windowData = getWindowData();
 
   return (
-    <div className="priemka-wrapper">
-      <HeaderManager />
-      
-      <main className="priemka-content">
-        <div className="priemka-container">
-          <div className="priemka-header">
-            <h1 className="priemka-title">Приемка товара</h1>
-            <button className="priemka-back-button" onClick={handleBack}>
-              Назад
+    <div className="warehouse-receiving-content">
+      <div className="warehouse-receiving-container">
+        <div className="warehouse-receiving-header">
+          <h1 className="warehouse-receiving-title">Приемка товара</h1>
+          <button className="warehouse-receiving-back-button" onClick={handleBack}>
+            Назад
+          </button>
+        </div>
+
+        <div className="warehouse-receiving-table-container">
+          <table className="warehouse-receiving-table">
+            <thead>
+              <tr>
+                <th className="warehouse-receiving-checkbox-column"></th>
+                <th>ID</th>
+                <th>Продавец</th>
+                <th>Товары</th>
+                <th>Дата</th>
+                <th>Статус</th>
+              </tr>
+            </thead>
+            <tbody>
+              {products.map((product) => (
+                <tr key={product.id}>
+                  <td className="warehouse-receiving-checkbox-column">
+                    <input
+                      type="checkbox"
+                      className="warehouse-receiving-checkbox"
+                      checked={product.selected}
+                      onChange={() => handleSelectProduct(product.id)}
+                      disabled={product.status === 'Принято'}
+                    />
+                  </td>
+                  <td className="warehouse-receiving-product-id">{product.id}</td>
+                  <td>{product.seller}</td>
+                  <td>{product.products}</td>
+                  <td>{product.date}</td>
+                  <td>
+                    <span className={`warehouse-receiving-status-badge ${
+                      product.status === 'Ожидает' ? 'warehouse-receiving-status-pending' : 
+                      product.status === 'Частично' ? 'warehouse-receiving-status-partial' : 
+                      'warehouse-receiving-status-accepted'
+                    }`}>
+                      {product.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {hasSelectedItems && (
+          <div className="warehouse-receiving-action-buttons-container">
+            <button 
+              className="warehouse-receiving-action-button warehouse-receiving-accept-button"
+              onClick={handleAcceptSelected}
+            >
+              Принять выбранные ({products.filter(p => p.selected).length})
+            </button>
+            <button 
+              className="warehouse-receiving-action-button warehouse-receiving-download-button"
+              onClick={handleDownloadInvoices}
+            >
+              Скачать накладные
+            </button>
+            <button 
+              className="warehouse-receiving-action-button warehouse-receiving-export-button"
+              onClick={handleExportToExcel}
+            >
+              Экспорт в Excel
             </button>
           </div>
+        )}
+      </div>
 
-          <div className="priemka-table-container">
-            <table className="priemka-table">
-              <thead>
-                <tr>
-                  <th className="priemka-checkbox-column"></th>
-                  <th>ID</th>
-                  <th>Продавец</th>
-                  <th>Товары</th>
-                  <th>Дата</th>
-                  <th>Статус</th>
-                </tr>
-              </thead>
-              <tbody>
-                {products.map((product) => (
-                  <tr key={product.id}>
-                    <td className="priemka-checkbox-column">
-                      <label className="priemka-checkbox-label">
-                        <input
-                          type="checkbox"
-                          checked={product.selected}
-                          onChange={() => handleSelectProduct(product.id)}
-                          className="priemka-product-checkbox"
-                          disabled={product.status === 'Принято'}
-                        />
-                        <span className="priemka-checkmark"></span>
-                      </label>
-                    </td>
-                    <td className="priemka-product-id">{product.id}</td>
-                    <td>{product.seller}</td>
-                    <td>{product.products}</td>
-                    <td>{product.date}</td>
-                    <td>
-                      <span className={`priemka-status-badge ${
-                        product.status === 'Ожидает' ? 'priemka-status-pending' : 
-                        product.status === 'Частично' ? 'priemka-status-partial' : 
-                        'priemka-status-accepted'
-                      }`}>
-                        {product.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {hasSelectedItems && (
-            <div className="priemka-action-buttons-container">
-              <button 
-                className="priemka-action-button priemka-accept-button"
-                onClick={handleAcceptSelected}
-              >
-                Принять выбранные ({products.filter(p => p.selected).length})
-              </button>
-              <button 
-                className="priemka-action-button priemka-download-button"
-                onClick={handleDownloadInvoices}
-              >
-                Скачать накладные
-              </button>
-              <button 
-                className="priemka-action-button priemka-export-button"
-                onClick={handleExportToExcel}
-              >
-                Экспорт в Excel
-              </button>
-            </div>
-          )}
-        </div>
-      </main>
-
-      {/* Всплывающее окно */}
       {windowData && (
-        <WindowPriemkaManager
+        <WindWarehouseReceiving
           isOpen={isWindowOpen}
           onClose={handleCloseWindow}
           onComplete={handleCompleteReception}
@@ -239,4 +240,5 @@ const PriemkaManager: React.FC = () => {
   );
 };
 
-export default PriemkaManager;
+export default WarehouseReceiving;
+export { HeaderManager };
