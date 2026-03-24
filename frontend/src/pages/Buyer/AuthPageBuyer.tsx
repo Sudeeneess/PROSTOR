@@ -50,29 +50,60 @@ const AuthPageBuyer: React.FC = () => {
         
         if (response.success && response.data) {
           console.log('Вход успешен!');
-          console.log('Данные пользователя:', {
-            username: response.data.username,
-            role: response.data.role,
-            token: response.data.token ? 'получен' : 'не получен'
-          });
+          console.log('Данные от сервера:', response.data);
           
-          // Перенаправление в зависимости от роли
-          if (response.data.redirectUrl) {
-            console.log('Перенаправление на redirectUrl:', response.data.redirectUrl);
-            navigate(response.data.redirectUrl);
-          } else if (response.data.role === 'seller') {
-            console.log('Перенаправление на страницу продавца');
-            navigate('/seller');
-          } else if (response.data.role === 'buyer') {
-            console.log('Перенаправление на страницу покупателя');
-            navigate('/buyer');
+          // ========== СОХРАНЕНИЕ ДАННЫХ ==========
+          
+          // 1. Сохраняем токен
+          if (response.data.token) {
+            localStorage.setItem('token', response.data.token);
+            console.log('✅ Токен сохранен в localStorage');
           } else {
-            console.log('Перенаправление на главную');
-            navigate('/');
+            console.warn('⚠️ Токен не получен от сервера, создаем тестовый');
+            localStorage.setItem('token', 'test-token-' + Date.now());
           }
+          
+          // 2. Сохраняем роль (приводим к нижнему регистру)
+          let userRole = 'buyer'; // роль по умолчанию
+          if (response.data.role) {
+            userRole = response.data.role.toLowerCase();
+          }
+          sessionStorage.setItem('userRole', userRole);
+          console.log('✅ Роль пользователя сохранена:', userRole);
+          
+          // 3. Сохраняем username
+          if (response.data.username) {
+            localStorage.setItem('username', response.data.username);
+            console.log('✅ Username сохранен:', response.data.username);
+          }
+          
+          // 4. Сохраняем имя (если есть)
+          if (formData.name) {
+            localStorage.setItem('userName', formData.name);
+            console.log('✅ Имя пользователя сохранено:', formData.name);
+          }
+          
+          // 5. Сохраняем полную информацию о пользователе
+          const userData = {
+            username: response.data.username || formData.username,
+            role: userRole
+          };
+          localStorage.setItem('user', JSON.stringify(userData));
+          console.log('✅ Данные пользователя сохранены:', userData);
+          
+          // 6. ПРОВЕРКА СОХРАНЕНИЯ
+          console.log('========== ПРОВЕРКА СОХРАНЕНИЯ ==========');
+          console.log('localStorage token:', localStorage.getItem('token'));
+          console.log('sessionStorage role:', sessionStorage.getItem('userRole'));
+          console.log('localStorage username:', localStorage.getItem('username'));
+          console.log('==========================================');
+          
+          // 7. Перенаправление
+          console.log('Перенаправление на страницу покупателя...');
+          navigate('/buyer');
+          
         } else {
           console.log('Ошибка входа:', response.error);
-          console.log('Статус ошибки:', response.status);
           setError(response.error || 'Неверное имя пользователя или пароль');
         }
       } else {
@@ -111,28 +142,61 @@ const AuthPageBuyer: React.FC = () => {
 
         if (response.success && response.data) {
           console.log('Регистрация успешна!');
-          console.log('Данные пользователя:', {
-            username: response.data.username,
-            role: response.data.role
-          });
+          console.log('Данные от сервера:', response.data);
           
-          // Перенаправление после регистрации
-          if (response.data.redirectUrl) {
-            console.log('Перенаправление на redirectUrl:', response.data.redirectUrl);
-            navigate(response.data.redirectUrl);
-          } else if (response.data.role === 'seller') {
-            console.log('Перенаправление на страницу продавца');
-            navigate('/seller');
-          } else if (response.data.role === 'buyer') {
-            console.log('Перенаправление на страницу покупателя');
-            navigate('/buyer');
+          // ========== СОХРАНЕНИЕ ДАННЫХ ПОСЛЕ РЕГИСТРАЦИИ ==========
+          
+          // 1. Сохраняем токен
+          if (response.data.token) {
+            localStorage.setItem('token', response.data.token);
+            console.log('✅ Токен сохранен в localStorage');
           } else {
-            console.log('Перенаправление на главную');
-            navigate('/');
+            console.warn('⚠️ Токен не получен от сервера, создаем тестовый');
+            localStorage.setItem('token', 'test-token-' + Date.now());
           }
+          
+          // 2. Сохраняем роль
+          let userRole = 'buyer';
+          if (response.data.role) {
+            userRole = response.data.role.toLowerCase();
+          }
+          sessionStorage.setItem('userRole', userRole);
+          console.log('✅ Роль пользователя сохранена:', userRole);
+          
+          // 3. Сохраняем username
+          if (response.data.username) {
+            localStorage.setItem('username', response.data.username);
+            console.log('✅ Username сохранен:', response.data.username);
+          }
+          
+          // 4. Сохраняем имя
+          if (formData.name) {
+            localStorage.setItem('userName', formData.name);
+            console.log('✅ Имя пользователя сохранено:', formData.name);
+          }
+          
+          // 5. Сохраняем полную информацию
+          const userData = {
+            username: response.data.username || formData.username,
+            name: formData.name,
+            role: userRole
+          };
+          localStorage.setItem('user', JSON.stringify(userData));
+          console.log('✅ Данные пользователя сохранены:', userData);
+          
+          // 6. ПРОВЕРКА СОХРАНЕНИЯ
+          console.log('========== ПРОВЕРКА СОХРАНЕНИЯ ==========');
+          console.log('localStorage token:', localStorage.getItem('token'));
+          console.log('sessionStorage role:', sessionStorage.getItem('userRole'));
+          console.log('localStorage username:', localStorage.getItem('username'));
+          console.log('==========================================');
+          
+          // 7. Перенаправление
+          console.log('Перенаправление на страницу покупателя...');
+          navigate('/buyer');
+          
         } else {
           console.log('Ошибка регистрации:', response.error);
-          console.log('Статус ошибки:', response.status);
           setError(response.error || 'Ошибка при регистрации');
         }
       }

@@ -40,7 +40,7 @@ const PrivateBuyerRoute: React.FC<{ children: React.ReactNode }> = ({ children }
   const userRole = sessionStorage.getItem('userRole');
   
   // Проверяем наличие токена и правильность роли покупателя
-  if (!token || userRole !== 'buyer') {
+  if (!token || userRole !== 'customer') {
     // Перенаправляем на страницу авторизации покупателя
     return <Navigate to="/auth" replace />;
   }
@@ -54,7 +54,7 @@ const RedirectBuyerIfAuthenticated: React.FC<{ children: React.ReactNode }> = ({
   const userRole = sessionStorage.getItem('userRole');
   
   // Если уже авторизован как покупатель, перенаправляем на страницу покупателя
-  if (token && userRole === 'buyer') {
+  if (token && userRole === 'customer') {
     return <Navigate to="/buyer" replace />;
   }
   
@@ -72,7 +72,7 @@ const AppContent: React.FC = () => {
           const userRole = sessionStorage.getItem('userRole');
           
           // Если пользователь авторизован как покупатель, перенаправляем на /buyer
-          if (token && userRole === 'buyer') {
+          if (token && userRole === 'customer') {
             return <Navigate to="/buyer" replace />;
           }
           // Если пользователь авторизован как менеджер, перенаправляем на /warehouse/dashboard
