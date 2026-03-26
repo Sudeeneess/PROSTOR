@@ -1,57 +1,75 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import "./Seller/RegistrSeller.css";
-
-interface FormValues {
-  country?: string;
-  orgForm?: string;
-  inn?: string;
-  fullname?: string;
-}
-
-const initialFormData: FormValues = {};
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import HeaderSeller from "./HeaderSeller";
+import "./RegistrSeller.css";
 
 const SellerEntrance: React.FC = () => {
-  const [formData, setFormData] = React.useState(initialFormData);
-  const [loading, setLoading] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
+  const navigate = useNavigate();
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
-    const { name, value } = event.target;
-    
-    // Ограничения для поля ИНН
-    if (name === 'inn') {
-      // Удаляем все нецифровые символы
-      const numericValue = value.replace(/\D/g, '');
-      // Ограничиваем длину до 12 символов
-      const truncatedValue = numericValue.slice(0, 12);
-      
-      setFormData((prev) => ({ ...prev, [name]: truncatedValue }));
+  const [formData, setFormData] = useState({
+    country: "",
+    orgForm: "",
+    inn: "",
+    fullname: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+
+    if (name === "inn") {
+      setFormData({
+        ...formData,
+        inn: value.replace(/\D/g, "").slice(0, 12),
+      });
     } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      setFormData({ ...formData, [name]: value });
     }
   };
 
-  const handleSubmit = async (event: React.FormEvent): Promise<void> => {
-    event.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    // Дополнительная проверка ИНН перед отправкой
-    if (formData.inn && formData.inn.length !== 12) {
-      setErrorMessage("ИНН должен содержать ровно 12 цифр");
+    if (formData.inn.length !== 12) {
+      setErrorMessage("ИНН должен содержать 12 цифр");
       setLoading(false);
       return;
     }
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log("Данные отправлены:", formData);
-      setSuccessMessage("Регистрация прошла успешно!");
-    } catch (err) {
-      setErrorMessage("Что-то пошло не так. Повторите попытку позже.");
+
+      const sellerProfile = {
+        country: formData.country,
+        orgForm: formData.orgForm,
+        inn: formData.inn,
+        fio: formData.fullname,
+      };
+
+      // ✅ сохраняем профиль
+      localStorage.setItem("sellerProfile", JSON.stringify(sellerProfile));
+
+      // ✅ создаём авторизацию
+      localStorage.setItem("token", "seller-token-" + Date.now());
+      sessionStorage.setItem("userRole", "seller");
+
+      setSuccessMessage("Регистрация успешна!");
+
+      // ✅ сразу в личный кабинет
+      setTimeout(() => {
+        navigate("/seller/dashboard");
+      }, 1000);
+
+    } catch {
+      setErrorMessage("Ошибка регистрации");
     } finally {
       setLoading(false);
     }
@@ -59,103 +77,71 @@ const SellerEntrance: React.FC = () => {
 
   return (
     <div className="prostor-seller-app">
-      <header className="header-section">
-        <div className="logo-text">
-          <span className="logo-prostor">prostor</span>
-          <span className="logo-seller">Seller</span>
-        </div>
-        <nav className="navigation-bar">
-          <Link to="/" className="navigation-link">Главная</Link>
-          <Link to="/products" className="navigation-link">Товары</Link>
-          <Link to="/orders" className="navigation-link">Заказы</Link>
-          <Link to="/profile" className="navigation-link">Профиль</Link>
-        </nav>
-      </header>
+      <HeaderSeller />
 
-      <section className="content-section">
-        <form onSubmit={handleSubmit} className="auth-form">
-          <div className="auth-form-header">Регистрация</div>
+      <main className="content-section">
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <div className="auth-form-header">Регистрация продавца</div>
+
           <div className="form-container">
-            <div className="form-row">
-              <div className="form-field">
-                <label className="label-text" htmlFor="country">Страна:</label>
-                <select
-                  id="country"
-                  name="country"
-                  value={formData.country || ''}
-                  onChange={handleChange}
-                  className="input-select"
-                  required
-                >
-                  <option value=""></option>
-                  <option value="RU">Россия</option>
-                  <option value="KZ">Казахстан</option>
-                </select>
-              </div>
-            </div>
-            
-            <div className="form-row">
-              <div className="form-field">
-                <label className="label-text" htmlFor="orgForm">Организация:</label>
-                <select
-                  id="orgForm"
-                  name="orgForm"
-                  value={formData.orgForm || ''}
-                  onChange={handleChange}
-                  className="input-select"
-                  required
-                >
-                  <option value=""></option>
-                  <option value="IP">Индивидуальный предприниматель</option>
-                  <option value="OOO">Общество с ограниченной ответственностью</option>
-                  <option value="AO">Акционерное общество</option>
-                </select>
-              </div>
-            </div>
+            <select
+              name="country"
+              value={formData.country}
+              onChange={handleChange}
+              required
+              className="input-select"
+            >
+              <option value="">Страна</option>
+              <option value="RU">Россия</option>
+              <option value="KZ">Казахстан</option>
+            </select>
 
-            <div className="form-field">
-              <label className="label-text" htmlFor="inn">ИНН:</label>
-              <input
-                type="text"
-                id="inn"
-                name="inn"
-                value={formData.inn || ''}
-                onChange={handleChange}
-                className="input-field"
-                required
-                maxLength={12}
-                pattern="\d*"
-                inputMode="numeric"
-              />
-            </div>
+            <select
+              name="orgForm"
+              value={formData.orgForm}
+              onChange={handleChange}
+              required
+              className="input-select"
+            >
+              <option value="">Выберите форму организации</option>
+              <option value="IP">Индивидуальный предприниматель</option>
+              <option value="OOO">Общество с ограниченной ответственностью</option>
+              <option value="AO">Акционерное общество</option>
+            </select>
 
-            <div className="form-field">
-              <label className="label-text" htmlFor="fullname">ФИО:</label>
-              <input
-                type="text"
-                id="fullname"
-                name="fullname"
-                value={formData.fullname || ''}
-                onChange={handleChange}
-                className="input-field"
-                required
-              />
-            </div>
+            <input
+              type="text"
+              name="inn"
+              placeholder="ИНН"
+              value={formData.inn}
+              onChange={handleChange}
+              className="input-field"
+              required
+            />
 
-            <div className="button-section">
-              <button type="submit" className="save-button" disabled={loading}>
-                {loading ? 'Регистрация...' : 'Зарегистрироваться'}
-              </button>
-            </div>
+            <input
+              type="text"
+              name="fullname"
+              placeholder="ФИО"
+              value={formData.fullname}
+              onChange={handleChange}
+              className="input-field"
+              required
+            />
+
+            <button className="save-button" disabled={loading}>
+              {loading ? "Регистрация..." : "Зарегистрироваться"}
+            </button>
           </div>
 
           {errorMessage && <p className="error-message">{errorMessage}</p>}
           {successMessage && <p className="success-message">{successMessage}</p>}
+
           <div className="login-footer">
-          Уже есть аккаунт? <Link to="/authorization">Войти</Link>
+            Уже есть аккаунт? <Link to="/seller/auth">Войти</Link>
           </div>
         </form>
-      </section>
+      </main>
     </div>
   );
 };
