@@ -1,0 +1,67 @@
+.orders-page {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.orders-container {
+  padding: 30px 40px;
+}
+
+.orders-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.orders-header h1 {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  color: #666;
+}
+
+.back-button:hover {
+  color: #000;
+}
+
+/* 🔥 ГЛАВНОЕ ИЗМЕНЕНИЕ */
+.orders-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 220px); /* 2 в ряд */
+  gap: 25px;
+}
+
+/* 🔥 УВЕЛИЧЕННЫЕ КАРТОЧКИ */
+.order-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  width: 220px;
+  height: 70px;
+
+  padding: 0 20px;
+  border-radius: 16px;
+
+  background-color: #e9e9e9;
+
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.order-card:hover {
+  background-color: #dcdcdc;
+}
+
+.order-count {
+  font-weight: 600;
+  font-size: 16px;
+}

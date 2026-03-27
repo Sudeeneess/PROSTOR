@@ -11,6 +11,7 @@ import SellerEntrance from '../pages/Seller/RegistrSeller';
 import PersonalSeller from '../pages/Seller/PersonalSeller';
 import AddingProducts from '../pages/Seller/AddProducts';
 import ProductSeller from '../pages/Seller/ProductSeller';
+import OrdersSeller from '../pages/Seller/OrdersSeller';
 
 // Компонент для защиты маршрутов (только для авторизованных менеджеров)
 const PrivateWarehouseRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -152,6 +153,11 @@ const AppContent: React.FC = () => {
         <PrivateSellerRoute>
           <ProductSeller />
         </PrivateSellerRoute>
+      } />
+      <Route path="/seller/orders" element={
+      <PrivateSellerRoute>
+      <OrdersSeller />
+      </PrivateSellerRoute>
       } />
       
       <Route path="/seller" element={<Navigate to="/seller/auth" replace />} />
