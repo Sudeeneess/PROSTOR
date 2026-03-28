@@ -4,6 +4,7 @@ import Header from './Header';
 import ProductGrid from './ProductGrid';
 import AuthPageBuyer from '../pages/Buyer/AuthPageBuyer'; 
 import MainPageBuyer from '../pages/Buyer/MainPageBuyer';
+import ProfilePage from '../pages/Buyer/AccountBuyer'; // Импорт страницы профиля
 import AuthPageManager from '../pages/Manager/AuthPageManager';
 import Warehouse from '../pages/Manager/WarehousePage';
 
@@ -34,7 +35,7 @@ const RedirectIfAuthenticated: React.FC<{ children: React.ReactNode }> = ({ chil
   return <>{children}</>;
 };
 
-// ДОБАВЛЕНО: Компонент для проверки авторизации покупателя
+// Компонент для проверки авторизации покупателя
 const PrivateBuyerRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const token = localStorage.getItem('token');
   const userRole = sessionStorage.getItem('userRole');
@@ -48,7 +49,7 @@ const PrivateBuyerRoute: React.FC<{ children: React.ReactNode }> = ({ children }
   return <>{children}</>;
 };
 
-// ДОБАВЛЕНО: Компонент для перенаправления авторизованного покупателя
+// Компонент для перенаправления авторизованного покупателя
 const RedirectBuyerIfAuthenticated: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const token = localStorage.getItem('token');
   const userRole = sessionStorage.getItem('userRole');
@@ -61,11 +62,25 @@ const RedirectBuyerIfAuthenticated: React.FC<{ children: React.ReactNode }> = ({
   return <>{children}</>;
 };
 
+// Компонент для защиты маршрута профиля (требует авторизации покупателя)
+const PrivateProfileRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const token = localStorage.getItem('token');
+  const userRole = sessionStorage.getItem('userRole');
+  
+  // Проверяем наличие токена и правильность роли покупателя
+  if (!token || userRole !== 'customer') {
+    // Перенаправляем на страницу авторизации покупателя
+    return <Navigate to="/auth" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
 // Создадим компонент-обертку для обработки навигации
 const AppContent: React.FC = () => {
   return (
     <Routes>
-      {/* Главная страница (для покупателей) - ДОБАВЛЕНА проверка авторизации */}
+      {/* Главная страница (для покупателей) - проверка авторизации */}
       <Route path="/" element={
         (() => {
           const token = localStorage.getItem('token');
@@ -92,18 +107,25 @@ const AppContent: React.FC = () => {
         })()
       } />
       
-      {/* Страница авторизации покупателя - ДОБАВЛЕН RedirectBuyerIfAuthenticated */}
+      {/* Страница авторизации покупателя */}
       <Route path="/auth" element={
         <RedirectBuyerIfAuthenticated>
           <AuthPageBuyer />
         </RedirectBuyerIfAuthenticated>
       } />
       
-      {/* Страница покупателя после авторизации - ДОБАВЛЕН PrivateBuyerRoute */}
+      {/* Страница покупателя после авторизации (главная страница покупателя) */}
       <Route path="/buyer" element={
         <PrivateBuyerRoute>
           <MainPageBuyer />
         </PrivateBuyerRoute>
+      } />
+      
+      {/* ДОБАВЛЕНО: Страница профиля покупателя */}
+      <Route path="/profile" element={
+        <PrivateProfileRoute>
+          <ProfilePage />
+        </PrivateProfileRoute>
       } />
       
       {/* Маршруты для менеджера склада */}
