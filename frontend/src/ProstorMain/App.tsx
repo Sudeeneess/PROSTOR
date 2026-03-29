@@ -6,6 +6,8 @@ import AuthPageBuyer from '../pages/Buyer/AuthPageBuyer';
 import MainPageBuyer from '../pages/Buyer/MainPageBuyer';
 import AuthPageManager from '../pages/Manager/AuthPageManager';
 import Warehouse from '../pages/Manager/WarehousePage';
+import Admin from '../pages/Admin/AdminPage';
+
 
 // Компонент для защиты маршрутов (только для авторизованных менеджеров)
 const PrivateWarehouseRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -136,6 +138,7 @@ const AppContent: React.FC = () => {
           } 
         />
       </Route>
+      <Route path="/admin" element={<Admin />} />
       
       {/* Перенаправление для старых маршрутов (обратная совместимость) */}
       <Route path="/sklad" element={<Navigate to="/warehouse/dashboard" replace />} />

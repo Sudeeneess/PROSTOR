@@ -95,7 +95,7 @@ const WindWarehouseAssembling: React.FC<WindWarehouseAssemblingProps> = ({
               className="wind-warehouse-assembling-complete-btn"
               onClick={handleCompleteAcceptance}
             >
-              Завершить приемку
+              Завершить сборку
             </button>
             <button 
               className="wind-warehouse-assembling-draft-btn"
