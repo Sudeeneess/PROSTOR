@@ -153,10 +153,6 @@ public class OrderService {
         return toResponse(updatedOrder);
     }
 
-    /**
-     * Подтверждение заказа с атомарным резервированием товаров
-     * Исправлена проблема race condition при параллельных подтверждениях
-     */
     @Transactional
     public OrderResponse confirmOrder(Integer orderId) {
         log.info("Confirming order with id: {}", orderId);
@@ -170,10 +166,7 @@ public class OrderService {
 
         List<OrderItem> items = orderItemRepository.findByOrderId(orderId);
 
-        // ========== КРИТИЧЕСКАЯ ЧАСТЬ: АТОМАРНОЕ РЕЗЕРВИРОВАНИЕ ТОВАРОВ ==========
-        // Проходим по всем товарам в заказе
         for (OrderItem item : items) {
-            // 1. Проверяем общее наличие товара на всех складах
             int totalAvailable = warehouseStockService.getTotalAvailableQuantity(item.getProduct().getId());
 
             log.debug("Product: {}, available: {}, requested: 1",
@@ -184,26 +177,21 @@ public class OrderService {
                         "' отсутствует на складе. Доступно: " + totalAvailable);
             }
 
-            // 2. Атомарное резервирование товара (одним SQL-запросом)
             boolean reserved = warehouseStockService.reserveProduct(item.getProduct().getId(), 1);
 
             if (!reserved) {
-                // Если не удалось зарезервировать — откатываем всю транзакцию
                 throw new IllegalStateException("Не удалось зарезервировать товар '" +
                         item.getProduct().getName() + "'. Возможно, он уже был зарезервирован другим заказом.");
             }
 
             log.debug("Successfully reserved product: {}", item.getProduct().getName());
         }
-        // ========== КОНЕЦ КРИТИЧЕСКОЙ ЧАСТИ ==========
 
-        // Если все товары успешно зарезервированы — обновляем статусы позиций
         for (OrderItem item : items) {
             item.setIsOrdered(true);
             orderItemRepository.save(item);
         }
 
-        // Обновляем статус всего заказа
         OrdersStatus confirmed = ordersStatusRepository.findByName("CONFIRMED")
                 .orElseThrow(() -> new EntityNotFoundException("Статус CONFIRMED не найден"));
         order.setOrdersStatus(confirmed);
@@ -228,11 +216,9 @@ public class OrderService {
 
         List<OrderItem> items = orderItemRepository.findByOrderId(orderId);
 
-        // Если заказ был подтвержден, нужно вернуть резервирование товаров
         if ("CONFIRMED".equalsIgnoreCase(currentStatus)) {
             for (OrderItem item : items) {
                 if (item.getIsOrdered() && !item.getIsFinalized()) {
-                    // Возвращаем товар на склад (отменяем резервирование)
                     boolean released = warehouseStockService.releaseProduct(item.getProduct().getId(), 1);
                     if (released) {
                         log.debug("Released product: {}", item.getProduct().getName());
@@ -242,7 +228,6 @@ public class OrderService {
                 }
             }
         } else {
-            // Если заказ был в статусе PENDING, просто снимаем флаг isOrdered
             for (OrderItem item : items) {
                 if (item.getIsOrdered() && !item.getIsFinalized()) {
                     item.setIsOrdered(false);

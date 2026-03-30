@@ -137,22 +137,11 @@ public class WarehouseStockService {
         log.info("Stock deleted successfully with id: {}", id);
     }
 
-    // ==================== МЕТОДЫ ДЛЯ РЕЗЕРВИРОВАНИЯ ====================
-
-    /**
-     * Получить общее количество товара на всех складах
-     */
     public int getTotalAvailableQuantity(Integer productId) {
         Integer total = stockRepository.getTotalQuantityByProductId(productId);
         return total != null ? total : 0;
     }
 
-    /**
-     * Атомарное резервирование товара
-     * @param productId ID товара
-     * @param quantity количество для резервирования
-     * @return true если резервирование успешно, false если недостаточно товара
-     */
     @Transactional
     public boolean reserveProduct(Integer productId, int quantity) {
         log.debug("Reserving product: productId={}, quantity={}", productId, quantity);
@@ -168,12 +157,6 @@ public class WarehouseStockService {
         }
     }
 
-    /**
-     * Атомарное освобождение товара (отмена резервирования)
-     * @param productId ID товара
-     * @param quantity количество для освобождения
-     * @return true если освобождение успешно
-     */
     @Transactional
     public boolean releaseProduct(Integer productId, int quantity) {
         log.debug("Releasing product: productId={}, quantity={}", productId, quantity);

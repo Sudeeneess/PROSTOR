@@ -30,9 +30,7 @@ public class AdminController {
 
     private final AdministratorRepository administratorRepository;
     private final UserRepository userRepository;
-    private final UserService userService;  // <-- ДОБАВИТЬ
-
-    // ==================== Статистика и системная информация ====================
+    private final UserService userService;
 
     @GetMapping("/dashboard/stats")
     public ResponseEntity<Map<String, Object>> getAdminStats() {
@@ -66,8 +64,6 @@ public class AdminController {
         health.put("database", userRepository.count() > 0 ? "Connected" : "No data");
         return ResponseEntity.ok(health);
     }
-
-    // ==================== Управление пользователями ====================
 
     @GetMapping("/users")
     public ResponseEntity<List<UserResponse>> getAllUsers() {
@@ -114,7 +110,6 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
-    // ==================== Управление администраторами ====================
 
     @GetMapping("/admins")
     public ResponseEntity<List<AdministratorDto>> getAllAdmins() {

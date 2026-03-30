@@ -28,8 +28,6 @@ public class WarehouseController {
     private final WarehouseService warehouseService;
     private final WarehouseStockService warehouseStockService;
 
-    // ==================== Управление складами ====================
-
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE_MANAGER')")
     public ResponseEntity<Page<WarehouseResponse>> getAll(@PageableDefault(size = 20) Pageable pageable) {
@@ -67,8 +65,6 @@ public class WarehouseController {
         warehouseService.delete(id);
         return ResponseEntity.noContent().build();
     }
-
-    // ==================== Управление остатками на складе ====================
 
     @GetMapping("/stocks")
     @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE_MANAGER')")

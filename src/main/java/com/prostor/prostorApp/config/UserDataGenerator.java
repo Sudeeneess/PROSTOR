@@ -29,7 +29,6 @@ public class UserDataGenerator implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // ГЛАВНАЯ ПРОВЕРКА: если в БД уже есть пользователи — ничего не делаем
         if (userRepository.count() > 0) {
             log.info("Database already contains {} users. Skipping test data generation.",
                     userRepository.count());
@@ -40,13 +39,11 @@ public class UserDataGenerator implements CommandLineRunner {
         log.warn("GENERATING TEST USERS (FIRST RUN ONLY)");
         log.warn("========================================");
 
-        // Создаем роли, если их нет
         createRoleIfNotExists("ADMIN");
         createRoleIfNotExists("CUSTOMER");
         createRoleIfNotExists("SELLER");
         createRoleIfNotExists("WAREHOUSE_MANAGER");
 
-        // Создаем тестовых пользователей
         createUserWithRole("admin_user", "admin123", "ADMIN", "11111111111");
         createUserWithRole("john_doe", "cust123", "CUSTOMER", "22222222222");
         createUserWithRole("jane_smith", "cust123", "CUSTOMER", "33333333333");
@@ -70,7 +67,6 @@ public class UserDataGenerator implements CommandLineRunner {
     }
 
     private void createUserWithRole(String username, String rawPassword, String roleName, String phone) {
-        // Дополнительная проверка на случай, если пользователь уже существует
         if (userRepository.findByUserName(username).isPresent()) {
             log.debug("User {} already exists, skipping", username);
             return;
@@ -89,7 +85,6 @@ public class UserDataGenerator implements CommandLineRunner {
         User savedUser = userRepository.save(user);
         log.debug("Created user: {} with role: {}", username, roleName);
 
-        // Создаем связующие записи для ADMIN и WAREHOUSE_MANAGER
         if ("ADMIN".equals(roleName)) {
             if (!administratorRepository.existsByUserId(savedUser.getId())) {
                 Administrator admin = new Administrator();
