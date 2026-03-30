@@ -31,6 +31,7 @@ const Header: React.FC = () => {
         break;
       case 'admin':
         navigate('admin/');
+
         break;
       default:
         break;
