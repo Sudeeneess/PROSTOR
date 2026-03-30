@@ -1,5 +1,7 @@
 package com.prostor.prostorApp.modules.auth.service;
 
+import com.prostor.prostorApp.modules.admin.model.Administrator;
+import com.prostor.prostorApp.modules.admin.repository.AdministratorRepository;
 import com.prostor.prostorApp.modules.auth.dto.RegisterRequest;
 import com.prostor.prostorApp.modules.auth.dto.RegisterResponse;
 import com.prostor.prostorApp.modules.user.model.*;
@@ -22,10 +24,14 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final CustomerRepository customerRepository;
     private final SellerRepository sellerRepository;
+    private final AdministratorRepository administratorRepository;
+    private final WarehouseManagerRepository warehouseManagerRepository;
     private final PasswordEncoder passwordEncoder;
 
     private static final String ROLE_CUSTOMER = "CUSTOMER";
     private static final String ROLE_SELLER = "SELLER";
+    private static final String ROLE_ADMIN = "ADMIN";
+    private static final String ROLE_WAREHOUSE_MANAGER = "WAREHOUSE_MANAGER";
 
     public RegisterResponse register(RegisterRequest request) {
         String roleName = request.getRole().toUpperCase();
@@ -89,19 +95,39 @@ public class AuthService {
     private void createRoleSpecificRecord(User user, RegisterRequest request) {
         String roleName = user.getRole().getName().toUpperCase();
 
-        if (ROLE_CUSTOMER.equals(roleName)) {
-            Customer customer = new Customer();
-            customer.setUser(user);
-            customerRepository.save(customer);
-            log.debug("Создана запись Customer для user: {}", user.getUserName());
-        }
-        else if (ROLE_SELLER.equals(roleName)) {
-            Seller seller = new Seller();
-            seller.setUser(user);
-            seller.setInn(request.getInn());
-            seller.setCompanyName(request.getCompanyName());
-            sellerRepository.save(seller);
-            log.debug("Создана запись Seller для user: {}, компания: {}", user.getUserName(), request.getCompanyName());
+        switch (roleName) {
+            case ROLE_CUSTOMER:
+                Customer customer = new Customer();
+                customer.setUser(user);
+                customerRepository.save(customer);
+                log.debug("Создана запись Customer для user: {}", user.getUserName());
+                break;
+
+            case ROLE_SELLER:
+                Seller seller = new Seller();
+                seller.setUser(user);
+                seller.setInn(request.getInn());
+                seller.setCompanyName(request.getCompanyName());
+                sellerRepository.save(seller);
+                log.debug("Создана запись Seller для user: {}, компания: {}", user.getUserName(), request.getCompanyName());
+                break;
+
+            case ROLE_ADMIN:
+                Administrator admin = new Administrator();
+                admin.setUser(user);
+                administratorRepository.save(admin);
+                log.debug("Создана запись Administrator для user: {}", user.getUserName());
+                break;
+
+            case ROLE_WAREHOUSE_MANAGER:
+                WarehouseManager wm = new WarehouseManager();
+                wm.setUser(user);
+                warehouseManagerRepository.save(wm);
+                log.debug("Создана запись WarehouseManager для user: {}", user.getUserName());
+                break;
+
+            default:
+                log.warn("Неизвестная роль: {}, запись не создана", roleName);
         }
     }
 }

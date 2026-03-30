@@ -28,6 +28,8 @@ app:
   security:
     cors:
       allowed-origins: "http://localhost:3001,http://localhost:3000"
+  commission:
+    rate: 0.10  # комиссия
 
 server:
   port: 8080

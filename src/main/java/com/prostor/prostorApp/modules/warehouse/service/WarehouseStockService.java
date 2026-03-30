@@ -10,12 +10,14 @@ import com.prostor.prostorApp.modules.warehouse.repository.WarehouseRepository;
 import com.prostor.prostorApp.modules.warehouse.repository.WarehouseStockRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -39,19 +41,21 @@ public class WarehouseStockService {
         return response;
     }
 
-       private WarehouseStock toEntity(WarehouseStockRequest request) {
+    private WarehouseStock toEntity(WarehouseStockRequest request) {
         if (request == null) return null;
         WarehouseStock stock = new WarehouseStock();
         stock.setQuantity(request.getQuantity());
         return stock;
     }
 
-      private void updateEntity(WarehouseStock stock, WarehouseStockRequest request) {
+    private void updateEntity(WarehouseStock stock, WarehouseStockRequest request) {
         if (request == null) return;
         stock.setQuantity(request.getQuantity());
     }
 
     public List<WarehouseStockResponse> getAll(Integer warehouseId, Integer productId) {
+        log.debug("Getting stocks: warehouseId={}, productId={}", warehouseId, productId);
+
         List<WarehouseStock> stocks;
         if (warehouseId != null && productId != null) {
             stocks = stockRepository.findByWarehouseIdAndProductId(warehouseId, productId)
@@ -67,6 +71,7 @@ public class WarehouseStockService {
     }
 
     public WarehouseStockResponse getById(Integer id) {
+        log.debug("Getting stock by id: {}", id);
         return stockRepository.findById(id)
                 .map(this::toResponse)
                 .orElseThrow(() -> new EntityNotFoundException("WarehouseStock not found with id: " + id));
@@ -74,6 +79,8 @@ public class WarehouseStockService {
 
     @Transactional
     public WarehouseStockResponse create(WarehouseStockRequest request) {
+        log.info("Creating stock: warehouseId={}, productId={}", request.getWarehouseId(), request.getProductId());
+
         Warehouse warehouse = warehouseRepository.findById(request.getWarehouseId())
                 .orElseThrow(() -> new EntityNotFoundException("Warehouse not found with id: " + request.getWarehouseId()));
         Product product = productRepository.findById(request.getProductId())
@@ -86,13 +93,18 @@ public class WarehouseStockService {
         WarehouseStock stock = toEntity(request);
         stock.setWarehouse(warehouse);
         stock.setProduct(product);
+        stock.setReservedQuantity(0);
+        stock.setSoldQuantity(0);
 
         WarehouseStock saved = stockRepository.save(stock);
+        log.info("Stock created successfully with id: {}", saved.getId());
         return toResponse(saved);
     }
 
     @Transactional
     public WarehouseStockResponse update(Integer id, WarehouseStockRequest request) {
+        log.info("Updating stock with id: {}", id);
+
         WarehouseStock existing = stockRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("WarehouseStock not found with id: " + id));
 
@@ -109,14 +121,71 @@ public class WarehouseStockService {
 
         updateEntity(existing, request);
         WarehouseStock updated = stockRepository.save(existing);
+        log.info("Stock updated successfully with id: {}", updated.getId());
         return toResponse(updated);
     }
 
     @Transactional
     public void delete(Integer id) {
+        log.info("Deleting stock with id: {}", id);
+
         if (!stockRepository.existsById(id)) {
             throw new EntityNotFoundException("WarehouseStock not found with id: " + id);
         }
         stockRepository.deleteById(id);
+
+        log.info("Stock deleted successfully with id: {}", id);
+    }
+
+    // ==================== МЕТОДЫ ДЛЯ РЕЗЕРВИРОВАНИЯ ====================
+
+    /**
+     * Получить общее количество товара на всех складах
+     */
+    public int getTotalAvailableQuantity(Integer productId) {
+        Integer total = stockRepository.getTotalQuantityByProductId(productId);
+        return total != null ? total : 0;
+    }
+
+    /**
+     * Атомарное резервирование товара
+     * @param productId ID товара
+     * @param quantity количество для резервирования
+     * @return true если резервирование успешно, false если недостаточно товара
+     */
+    @Transactional
+    public boolean reserveProduct(Integer productId, int quantity) {
+        log.debug("Reserving product: productId={}, quantity={}", productId, quantity);
+
+        int updated = stockRepository.reserveProduct(productId, quantity);
+
+        if (updated > 0) {
+            log.debug("Successfully reserved {} units of product {}", quantity, productId);
+            return true;
+        } else {
+            log.warn("Failed to reserve {} units of product {} - insufficient stock", quantity, productId);
+            return false;
+        }
+    }
+
+    /**
+     * Атомарное освобождение товара (отмена резервирования)
+     * @param productId ID товара
+     * @param quantity количество для освобождения
+     * @return true если освобождение успешно
+     */
+    @Transactional
+    public boolean releaseProduct(Integer productId, int quantity) {
+        log.debug("Releasing product: productId={}, quantity={}", productId, quantity);
+
+        int updated = stockRepository.releaseProduct(productId, quantity);
+
+        if (updated > 0) {
+            log.debug("Successfully released {} units of product {}", quantity, productId);
+            return true;
+        } else {
+            log.warn("Failed to release {} units of product {}", quantity, productId);
+            return false;
+        }
     }
 }

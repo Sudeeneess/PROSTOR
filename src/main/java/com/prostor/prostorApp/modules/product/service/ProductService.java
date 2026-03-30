@@ -10,13 +10,15 @@ import com.prostor.prostorApp.modules.user.model.Seller;
 import com.prostor.prostorApp.modules.user.repository.SellerRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -26,7 +28,6 @@ public class ProductService {
     private final SellerRepository sellerRepository;
     private final CategoryRepository categoryRepository;
 
-    // Преобразование Product -> ProductResponse
     private ProductResponse toResponse(Product product) {
         if (product == null) return null;
         ProductResponse response = new ProductResponse();
@@ -40,31 +41,48 @@ public class ProductService {
         return response;
     }
 
-    // Создание Product из ProductRequest (без связей)
     private Product toEntity(ProductRequest request) {
         if (request == null) return null;
         Product product = new Product();
         product.setName(request.getName());
         product.setPrice(request.getPrice());
+        product.setCreatedAt(LocalDateTime.now());
         return product;
     }
 
+    private void updateEntity(Product product, ProductRequest request) {
+        if (request == null) return;
+        product.setName(request.getName());
+        product.setPrice(request.getPrice());
+    }
+
     public Page<ProductResponse> getAll(Pageable pageable) {
+        log.debug("Getting all products with pagination");
         return productRepository.findAll(pageable).map(this::toResponse);
     }
 
+    public Page<ProductResponse> getProductsBySeller(Integer sellerId, Pageable pageable) {
+        log.debug("Getting products by seller id: {}", sellerId);
+        return productRepository.findBySellerId(sellerId, pageable)
+                .map(this::toResponse);
+    }
+
     public Page<ProductResponse> filter(Integer categoryId, Integer sellerId,
-                                        double minPrice, double maxPrice,
+                                        Double minPrice, Double maxPrice,
                                         String name, Pageable pageable) {
-        if (name != null && !name.isEmpty()) {
-            return productRepository.findByNameContainingIgnoreCase(name, pageable)
-                    .map(this::toResponse);
-        }
-        return productRepository.filterProducts(categoryId, sellerId, minPrice, maxPrice, pageable)
+        log.debug("Filtering products: categoryId={}, sellerId={}, minPrice={}, maxPrice={}, name={}",
+                categoryId, sellerId, minPrice, maxPrice, name);
+
+        Double min = (minPrice != null && minPrice > 0) ? minPrice : null;
+        Double max = (maxPrice != null && maxPrice > 0) ? maxPrice : null;
+        String searchName = (name != null && !name.trim().isEmpty()) ? name.trim() : null;
+
+        return productRepository.filterProducts(categoryId, sellerId, min, max, searchName, pageable)
                 .map(this::toResponse);
     }
 
     public ProductResponse getById(Integer id) {
+        log.debug("Getting product by id: {}", id);
         return productRepository.findById(id)
                 .map(this::toResponse)
                 .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + id));
@@ -72,13 +90,17 @@ public class ProductService {
 
     @Transactional
     public ProductResponse create(ProductRequest request) {
+        log.info("Creating new product: {}", request.getName());
+
         Seller seller = sellerRepository.findById(request.getSellerId())
                 .orElseThrow(() -> new EntityNotFoundException("Seller not found with id: " + request.getSellerId()));
+
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + request.getCategoryId()));
 
         if (productRepository.existsByNameAndSellerId(request.getName(), request.getSellerId())) {
-            throw new IllegalArgumentException("Product with this name already exists for this seller");
+            throw new IllegalArgumentException("Product with name '" + request.getName() +
+                    "' already exists for this seller");
         }
 
         Product product = toEntity(request);
@@ -92,11 +114,14 @@ public class ProductService {
         }
 
         Product saved = productRepository.save(product);
+        log.info("Product created successfully with id: {}", saved.getId());
         return toResponse(saved);
     }
 
     @Transactional
     public ProductResponse update(Integer id, ProductRequest request) {
+        log.info("Updating product with id: {}", id);
+
         Product existing = productRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + id));
 
@@ -122,23 +147,29 @@ public class ProductService {
             existing.setParent(null);
         }
 
+        if (!existing.getName().equals(request.getName()) &&
+                productRepository.existsByNameAndSellerId(request.getName(), existing.getSeller().getId())) {
+            throw new IllegalArgumentException("Product with name '" + request.getName() +
+                    "' already exists for this seller");
+        }
+
         existing.setName(request.getName());
         existing.setPrice(request.getPrice());
 
-        if (!existing.getName().equals(request.getName()) &&
-                productRepository.existsByNameAndSellerId(request.getName(), existing.getSeller().getId())) {
-            throw new IllegalArgumentException("Product with this name already exists for this seller");
-        }
-
         Product updated = productRepository.save(existing);
+        log.info("Product updated successfully with id: {}", updated.getId());
         return toResponse(updated);
     }
 
     @Transactional
     public void delete(Integer id) {
+        log.info("Deleting product with id: {}", id);
+
         if (!productRepository.existsById(id)) {
             throw new EntityNotFoundException("Product not found with id: " + id);
         }
         productRepository.deleteById(id);
+
+        log.info("Product deleted successfully with id: {}", id);
     }
 }

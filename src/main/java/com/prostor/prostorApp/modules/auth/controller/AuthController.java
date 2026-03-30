@@ -46,21 +46,13 @@ public class AuthController {
 
         String token = jwtTokenProvider.generateToken(userDetails.getUsername(), role);
 
-        String redirectUrl = switch (role) {
-            case "ADMIN" -> "/admin/dashboard";
-            case "SELLER" -> "/seller/dashboard";
-            case "WAREHOUSE_MANAGER" -> "/warehouse/dashboard";
-            default -> "/customer/dashboard";
-        };
-
         log.info("Успешный вход: {}, роль: {}", userDetails.getUsername(), role);
 
         return ResponseEntity.ok(new LoginResponse(
                 token,
                 userDetails.getUsername(),
                 role,
-                jwtTokenProvider.getExpirationMs(),
-                redirectUrl
+                jwtTokenProvider.getExpirationMs()
         ));
     }
 

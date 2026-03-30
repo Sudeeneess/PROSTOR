@@ -8,29 +8,28 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     Page<Product> findByCategoryId(Integer categoryId, Pageable pageable);
-
+    Page<Product> findBySellerId(Integer sellerId, Pageable pageable);
     List<Product> findBySellerId(Integer sellerId);
-
-    Page<Product> findByNameContainingIgnoreCase(String name, Pageable pageable);
-
     Page<Product> findByPriceBetween(double minPrice, double maxPrice, Pageable pageable);
+    Page<Product> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
     @Query("SELECT p FROM Product p WHERE " +
             "(:categoryId IS NULL OR p.category.id = :categoryId) AND " +
             "(:sellerId IS NULL OR p.seller.id = :sellerId) AND " +
             "(:minPrice IS NULL OR p.price >= :minPrice) AND " +
-            "(:maxPrice IS NULL OR p.price <= :maxPrice)")
+            "(:maxPrice IS NULL OR p.price <= :maxPrice) AND " +
+            "(:name IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%')))")
     Page<Product> filterProducts(@Param("categoryId") Integer categoryId,
                                  @Param("sellerId") Integer sellerId,
-                                 @Param("minPrice") double minPrice,
-                                 @Param("maxPrice") double maxPrice,
+                                 @Param("minPrice") Double minPrice,
+                                 @Param("maxPrice") Double maxPrice,
+                                 @Param("name") String name,
                                  Pageable pageable);
 
     boolean existsByNameAndSellerId(String name, Integer sellerId);

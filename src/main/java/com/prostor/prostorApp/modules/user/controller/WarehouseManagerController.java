@@ -1,4 +1,5 @@
-package com.prostor.prostorApp.modules.warehouse.controller;
+package com.prostor.prostorApp.modules.user.controller;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -9,20 +10,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/seller")
-public class SellerController {
+@RequestMapping("/api/warehouse")
+public class WarehouseManagerController {
 
     @GetMapping("/dashboard")
-    @PreAuthorize("hasRole('SELLER')")
-    public ResponseEntity<Map<String, String>> getSellerDashboard(
+    @PreAuthorize("hasRole('WAREHOUSE_MANAGER')")
+    public ResponseEntity<Map<String, String>> getWarehouseDashboard(
             @AuthenticationPrincipal UserDetails userDetails) {
 
         Map<String, String> response = new HashMap<>();
-        response.put("role", "SELLER");
+        response.put("role", "WAREHOUSE_MANAGER");
         response.put("username", userDetails.getUsername());
-        response.put("message", "Добро пожаловать в панель продавца");
+        response.put("message", "Добро пожаловать в панель управления складом");
         response.put("status", "ready");
-        response.put("redirect", "/seller/dashboard");
+        response.put("redirect", "/warehouse/dashboard");
 
         return ResponseEntity.ok(response);
     }
