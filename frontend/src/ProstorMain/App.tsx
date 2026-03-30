@@ -6,29 +6,31 @@ import AuthPageBuyer from '../pages/Buyer/AuthPageBuyer';
 import MainPageBuyer from '../pages/Buyer/MainPageBuyer';
 import AuthPageManager from '../pages/Manager/AuthPageManager';
 import Warehouse from '../pages/Manager/WarehousePage';
+import Authorizationseller from '../pages/Seller/AuthSeller';
+import SellerEntrance from '../pages/Seller/RegistrSeller'; 
+import PersonalSeller from '../pages/Seller/PersonalSeller';
+import AddingProducts from '../pages/Seller/AddProducts';
+import ProductSeller from '../pages/Seller/ProductSeller';
+import OrdersSeller from '../pages/Seller/OrdersSeller';
 import Admin from '../pages/Admin/AdminPage';
-
 
 // Компонент для защиты маршрутов (только для авторизованных менеджеров)
 const PrivateWarehouseRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const token = localStorage.getItem('token');
   const userRole = sessionStorage.getItem('userRole');
   
-  // Проверяем наличие токена и правильность роли
   if (!token || userRole !== 'warehouse_manager') {
-    // Перенаправляем на страницу авторизации менеджера
     return <Navigate to="/warehouse/auth" replace />;
   }
   
   return <>{children}</>;
 };
 
-// Компонент для проверки, авторизован ли менеджер (для перенаправления со страницы входа)
+// Компонент для проверки, авторизован ли менеджер
 const RedirectIfAuthenticated: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const token = localStorage.getItem('token');
   const userRole = sessionStorage.getItem('userRole');
   
-  // Если уже авторизован как менеджер, перенаправляем на страницу склада
   if (token && userRole === 'warehouse_manager') {
     return <Navigate to="/warehouse/dashboard" replace />;
   }
@@ -36,53 +38,72 @@ const RedirectIfAuthenticated: React.FC<{ children: React.ReactNode }> = ({ chil
   return <>{children}</>;
 };
 
-// ДОБАВЛЕНО: Компонент для проверки авторизации покупателя
+// Компонент для проверки авторизации покупателя
 const PrivateBuyerRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const token = localStorage.getItem('token');
   const userRole = sessionStorage.getItem('userRole');
   
-  // Проверяем наличие токена и правильность роли покупателя
-  if (!token || userRole !== 'buyer') {
-    // Перенаправляем на страницу авторизации покупателя
+  if (!token || userRole !== 'customer') {
     return <Navigate to="/auth" replace />;
   }
   
   return <>{children}</>;
 };
 
-// ДОБАВЛЕНО: Компонент для перенаправления авторизованного покупателя
+// Компонент для перенаправления авторизованного покупателя
 const RedirectBuyerIfAuthenticated: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const token = localStorage.getItem('token');
   const userRole = sessionStorage.getItem('userRole');
   
-  // Если уже авторизован как покупатель, перенаправляем на страницу покупателя
-  if (token && userRole === 'buyer') {
+  if (token && userRole === 'customer') {
     return <Navigate to="/buyer" replace />;
   }
   
   return <>{children}</>;
 };
 
-// Создадим компонент-обертку для обработки навигации
+// КОМПОНЕНТЫ ДЛЯ ПРОДАВЦА
+const PrivateSellerRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const token = localStorage.getItem('token');
+  const userRole = sessionStorage.getItem('userRole');
+  
+  if (!token || userRole !== 'seller') {
+    return <Navigate to="/seller/auth" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+const RedirectSellerIfAuthenticated: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const token = localStorage.getItem('token');
+  const userRole = sessionStorage.getItem('userRole');
+  
+  if (token && userRole === 'seller') {
+    return <Navigate to="/seller/dashboard" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
 const AppContent: React.FC = () => {
   return (
     <Routes>
-      {/* Главная страница (для покупателей) - ДОБАВЛЕНА проверка авторизации */}
+      {/* Главная страница */}
       <Route path="/" element={
         (() => {
           const token = localStorage.getItem('token');
           const userRole = sessionStorage.getItem('userRole');
           
-          // Если пользователь авторизован как покупатель, перенаправляем на /buyer
-          if (token && userRole === 'buyer') {
+          if (token && userRole === 'customer') {
             return <Navigate to="/buyer" replace />;
           }
-          // Если пользователь авторизован как менеджер, перенаправляем на /warehouse/dashboard
           if (token && userRole === 'warehouse_manager') {
             return <Navigate to="/warehouse/dashboard" replace />;
           }
+          if (token && userRole === 'seller') {
+            return <Navigate to="/seller/dashboard" replace />;
+          }
           
-          // Иначе показываем главную страницу для неавторизованных
           return (
             <>
               <Header />
@@ -94,23 +115,56 @@ const AppContent: React.FC = () => {
         })()
       } />
       
-      {/* Страница авторизации покупателя - ДОБАВЛЕН RedirectBuyerIfAuthenticated */}
+      {/* Страница авторизации покупателя */}
       <Route path="/auth" element={
         <RedirectBuyerIfAuthenticated>
           <AuthPageBuyer />
         </RedirectBuyerIfAuthenticated>
       } />
       
-      {/* Страница покупателя после авторизации - ДОБАВЛЕН PrivateBuyerRoute */}
+      {/* Страница покупателя после авторизации */}
       <Route path="/buyer" element={
         <PrivateBuyerRoute>
           <MainPageBuyer />
         </PrivateBuyerRoute>
       } />
       
+      {/* МАРШРУТЫ ДЛЯ ПРОДАВЦА */}
+      <Route path="/seller/auth" element={
+        <RedirectSellerIfAuthenticated>
+          <Authorizationseller />
+        </RedirectSellerIfAuthenticated>
+      } />
+      
+      <Route path="/seller/register" element={<SellerEntrance />} />
+      
+      <Route path="/seller/dashboard" element={
+        <PrivateSellerRoute>
+          <PersonalSeller />
+        </PrivateSellerRoute>
+      } />
+      
+      <Route path="/seller/add-products" element={ 
+        <PrivateSellerRoute>
+          <AddingProducts />
+        </PrivateSellerRoute>
+      } />
+      
+      <Route path="/seller/products" element={
+        <PrivateSellerRoute>
+          <ProductSeller />
+        </PrivateSellerRoute>
+      } />
+      <Route path="/seller/orders" element={
+      <PrivateSellerRoute>
+      <OrdersSeller />
+      </PrivateSellerRoute>
+      } />
+      
+      <Route path="/seller" element={<Navigate to="/seller/auth" replace />} />
+      
       {/* Маршруты для менеджера склада */}
       <Route path="/warehouse">
-        {/* Страница авторизации менеджера */}
         <Route 
           path="auth" 
           element={
@@ -120,7 +174,6 @@ const AppContent: React.FC = () => {
           } 
         />
         
-        {/* Страница склада (требует авторизации) */}
         <Route 
           path="dashboard" 
           element={
@@ -130,7 +183,6 @@ const AppContent: React.FC = () => {
           } 
         />
         
-        {/* Перенаправление с /warehouse на соответствующую страницу */}
         <Route 
           path="" 
           element={
@@ -138,13 +190,15 @@ const AppContent: React.FC = () => {
           } 
         />
       </Route>
-      <Route path="/admin" element={<Admin />} />
       
-      {/* Перенаправление для старых маршрутов (обратная совместимость) */}
+      {/* Маршрут для администратора - БЕЗ ПРОВЕРКИ АВТОРИЗАЦИИ */}
+      <Route path="/admin" element={<Admin />} />
+     
+      {/* Перенаправление для старых маршрутов */}
       <Route path="/sklad" element={<Navigate to="/warehouse/dashboard" replace />} />
       <Route path="/warehouse-manager" element={<Navigate to="/warehouse/dashboard" replace />} />
       
-      {/* Обработка 404 - перенаправление на главную */}
+      {/* Обработка 404 */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

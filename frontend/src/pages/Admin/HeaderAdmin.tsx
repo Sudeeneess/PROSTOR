@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './HeaderAdmin.css';
 
 interface HeaderAdminProps {
@@ -8,7 +8,7 @@ interface HeaderAdminProps {
 
 const HeaderAdmin: React.FC<HeaderAdminProps> = ({ onMenuItemChange }) => {
   const navigate = useNavigate();
-  const location = useLocation();
+  
 
   const handleMenuClick = (menuItem: string) => {
     switch(menuItem) {

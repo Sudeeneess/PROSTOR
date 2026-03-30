@@ -35,7 +35,7 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
     firstName: '',
     lastName: '',
     email: '',
-    roleConfirmed: false,
+    role: 'Менеджер',
   });
 
   const handleSelectUser = (id: number) => {
@@ -46,7 +46,7 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
 
   const openModal = () => {
     setShowModal(true);
-    setNewUser({ firstName: '', lastName: '', email: '', roleConfirmed: false });
+    setNewUser({ firstName: '', lastName: '', email: '', role: 'Менеджер' });
   };
 
   const closeModal = () => {
@@ -62,20 +62,20 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
   };
 
   const handleInvite = () => {
-    if (newUser.firstName && newUser.lastName && newUser.email && newUser.roleConfirmed) {
+    if (newUser.firstName && newUser.lastName && newUser.email) {
       const newUserId = Math.max(...users.map(u => u.id), 0) + 1;
       const newUserObj: User = {
         id: newUserId,
         name: `${newUser.lastName} ${newUser.firstName.charAt(0)}.`,
         email: newUser.email,
-        role: 'Менеджер склада',
+        role: newUser.role,
         status: 'Активен',
       };
       setUsers([...users, newUserObj]);
       closeModal();
       showNotification('Вы пригласили нового пользователя!');
     } else {
-      alert('Пожалуйста, заполните все поля и подтвердите должность');
+      alert('Пожалуйста, заполните все поля');
     }
   };
 
@@ -238,14 +238,17 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
                       onChange={e => setNewUser({ ...newUser, email: e.target.value })}
                     />
                   </div>
-                  <div className="form-group role-confirmation">
-                    <label>Должность: Менеджер</label>
-                    <input
-                      type="checkbox"
-                      className="role-checkbox"
-                      checked={newUser.roleConfirmed}
-                      onChange={e => setNewUser({ ...newUser, roleConfirmed: e.target.checked })}
-                    />
+                  <div className="form-group">
+                    <label>Должность:</label>
+                    <select
+                      value={newUser.role}
+                      onChange={e => setNewUser({ ...newUser, role: e.target.value })}
+                      className="role-select"
+                    >
+                      <option value="Менеджер">Менеджер</option>
+                      <option value="Продавец">Продавец</option>
+                      <option value="Покупатель">Покупатель</option>
+                    </select>
                   </div>
                 </div>
                 <div className="modal-footer">
