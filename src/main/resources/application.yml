@@ -13,7 +13,7 @@
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     show-sql: true
-    open-in-view: false  # Добавьте эту строку (хорошая практика)
+    open-in-view: false
 
   flyway:
     enabled: true

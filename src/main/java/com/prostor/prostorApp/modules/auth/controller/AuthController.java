@@ -2,10 +2,14 @@ package com.prostor.prostorApp.modules.auth.controller;
 
 import com.prostor.prostorApp.modules.auth.dto.LoginRequest;
 import com.prostor.prostorApp.modules.auth.dto.LoginResponse;
+import com.prostor.prostorApp.modules.auth.dto.RegisterRequest;
+import com.prostor.prostorApp.modules.auth.dto.RegisterResponse;
+import com.prostor.prostorApp.modules.auth.service.AuthService;
 import com.prostor.prostorApp.security.JwtTokenProvider;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,10 +26,11 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+    private final AuthService authService;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
-        log.info("Login attempt for user: {}", loginRequest.getUsername());
+        log.info("Попытка входа: {}", loginRequest.getUsername());
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
@@ -48,7 +53,7 @@ public class AuthController {
             default -> "/customer/dashboard";
         };
 
-        log.info("User {} logged in successfully with role {}", userDetails.getUsername(), role);
+        log.info("Успешный вход: {}, роль: {}", userDetails.getUsername(), role);
 
         return ResponseEntity.ok(new LoginResponse(
                 token,
@@ -57,5 +62,16 @@ public class AuthController {
                 jwtTokenProvider.getExpirationMs(),
                 redirectUrl
         ));
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
+        log.info("Попытка регистрации: username={}, role={}", request.getUsername(), request.getRole());
+
+        RegisterResponse response = authService.register(request);
+
+        log.info("Успешная регистрация: username={}, role={}", response.getUsername(), response.getRole());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
