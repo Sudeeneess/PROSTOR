@@ -1,0 +1,168 @@
+/* ===== ОБЩИЙ ФОН С КАРТИНКОЙ ===== */
+.seller-page {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* фоновая картинка */
+.seller-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("/public/bg.jpg") center/cover no-repeat;
+  z-index: -2;
+}
+
+/* градиент сверху */
+.seller-page::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(90deg, #c86dd7, #3023ae);
+  z-index: -1;
+}
+
+/* ===== КОНТЕЙНЕР ===== */
+.seller-wrapper {
+  display: flex;
+  justify-content: space-between;
+  padding: 80px 80px 40px;
+}
+
+/* ===== ЛЕВАЯ ЧАСТЬ ===== */
+.left-block {
+  width: 50%;
+  color: #111;
+}
+
+.left-block h1 {
+  font-size: 46px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+/* PROSTOR - черный цвет */
+.brand-name {
+  color: #000000;
+  font-weight: 700;
+}
+
+/* для вашего бизнеса - серый цвет */
+.brand-subtitle {
+  color: #666666;
+  font-weight: 500;
+}
+
+.desc {
+  max-width: 420px;
+  font-size: 16px;
+  color: #444;
+  line-height: 1.5;
+  margin-bottom: 25px;
+}
+
+/* кнопка - УВЕЛИЧЕННАЯ */
+.start-btn {
+  background: #e5e5e5;
+  border: none;
+  padding: 18px 38px;
+  border-radius: 30px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 30px;
+  transition: all 0.2s ease;
+}
+
+.start-btn:hover {
+  background: #d5d5d5;
+  transform: scale(1.02);
+}
+
+/* список преимуществ */
+.benefits {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-size: 16px;
+}
+
+/* ===== ПРАВАЯ КАРТОЧКА ===== */
+.right-block {
+  width: 38%;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 25px;
+  padding: 25px;
+  border: 1px solid #2c2c2c;
+}
+
+/* заголовок */
+.right-block h2 {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+/* шаги */
+.steps div {
+  margin-bottom: 14px;
+}
+
+.steps b {
+  font-size: 15px;
+}
+
+.steps p {
+  font-size: 13px;
+  color: #555;
+  margin-top: 3px;
+}
+
+/* ===== БЛОК ОТЗЫВА (КАК НА СКРИНЕ) ===== */
+.review {
+  margin-top: 20px;
+  background: #dcdcdc;
+  padding: 12px 18px;
+  border-radius: 25px;
+  font-size: 13px;
+  width: fit-content;
+}
+
+/* подпись */
+.review span {
+  display: block;
+  margin-top: 5px;
+  font-size: 11px;
+  color: #555;
+}
+
+/* ===== FAQ ===== */
+.faq {
+  margin-top: 20px;
+}
+
+.faq h3 {
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+
+/* округлые блоки как на макете */
+.faq-item {
+  background: #e3e3e3;
+  border-radius: 25px;
+  padding: 12px 15px;
+  margin-bottom: 10px;
+}
+
+.faq-item b {
+  font-size: 13px;
+}
+
+.faq-item p {
+  font-size: 12px;
+  color: #555;
+  margin-top: 4px;
+}

@@ -13,6 +13,7 @@ import AddingProducts from '../pages/Seller/AddProducts';
 import ProductSeller from '../pages/Seller/ProductSeller';
 import OrdersSeller from '../pages/Seller/OrdersSeller';
 import Admin from '../pages/Admin/AdminPage';
+import MainSeller from "../pages/Seller/MainSeller";
 
 // Компонент для защиты маршрутов (только для авторизованных менеджеров)
 const PrivateWarehouseRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -130,6 +131,8 @@ const AppContent: React.FC = () => {
       } />
       
       {/* МАРШРУТЫ ДЛЯ ПРОДАВЦА */}
+      <Route path="/seller/start" element={<MainSeller />} />
+
       <Route path="/seller/auth" element={
         <RedirectSellerIfAuthenticated>
           <Authorizationseller />
