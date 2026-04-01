@@ -1,0 +1,226 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f5f6fa;
+  color: #1f2937;
+}
+
+.dashboard-wrapper {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #f0f1f5 100%, #e8eaf0 100%);
+}
+
+/* Шапка — серая */
+.top-header {
+  background: #6e747f;  /* сплошной серый цвет */
+  color: white;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-weight: 500;
+}
+
+.logo {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.8px;
+  text-transform: lowercase;
+  color: white;  /* белый текст для контраста */
+}
+
+.manager {
+  font-size: 22px;
+  font-weight: 700;
+  color: white;
+}
+
+.tabs {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-left: auto;
+}
+
+.tab {
+  font-size: 15px;
+  padding: 8px 4px;
+  cursor: pointer;
+  color: black;
+  opacity: 0.85;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.tab:hover {
+  opacity: 1;
+}
+
+.tab.active {
+  opacity: 1;
+  border-bottom: 3px black;
+  font-weight: 600;
+}
+
+
+/* Если какая-то из них станет активной на своей странице */
+.tab[href="/sborka"].active,
+.tab[href="/otgruzka"].active {
+  font-weight: 500;
+  opacity: 1;
+  border-bottom: 3px black;
+}
+
+.user {
+  margin-left: 24px;
+  font-weight: 500;
+  color: black;
+  opacity: 0.95;
+  white-space: nowrap;
+}
+
+/* Основной контент */
+.main-content {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 28px 32px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 20px 0 36px 0;
+  color: #111827;
+}
+
+/* Карточки статистики */
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 52px;
+}
+
+.card {
+  background: #4b5563;
+  color: white;
+  border-radius: 16px;
+  padding: 28px 24px;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(75, 85, 99, 0.28);
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 500;
+  opacity: 0.92;
+  margin-bottom: 10px;
+  color: #f3f4f6;
+}
+
+.card-value {
+  font-size: 52px;
+  font-weight: 800;
+  line-height: 1;
+  color: white;
+}
+
+/* Быстрые действия */
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 24px 0;
+  color: #111827;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 16px;
+}
+
+.action-btn {
+  flex: 1;
+  height: 72px;
+  background: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  box-shadow: 0 5px 15px rgba(107, 114, 128, 0.35);
+}
+
+.action-btn.with-ring {
+  position: relative;
+}
+
+.icon {
+  font-size: 26px;
+  line-height: 1;
+}
+
+/* Таблица активностей */
+.recent-activity {
+  margin-top: 52px;
+}
+
+.activity-table {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 100px 2.2fr 1.6fr 1.3fr 1fr;
+  background: #e5e7eb;
+  padding: 16px 28px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #4b5563;
+  border-bottom: 1px solid #d1d5db;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 100px 2.2fr 1.6fr 1.3fr 1fr;
+  padding: 18px 28px;
+  font-size: 14.5px;
+  border-bottom: 1px solid #f3f4f6;
+  color: #1f2937;
+}
+
+.table-row.empty {
+  height: 58px;
+  background: #f3f4f6;
+}
+
+.top-header a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Логотип */
+.logo {
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: -0.8px;
+  text-transform: lowercase;
+  color: rgb(16, 11, 11);
+  cursor: pointer;
+}
+
+.logo:hover {
+  opacity: 0.9;
+}

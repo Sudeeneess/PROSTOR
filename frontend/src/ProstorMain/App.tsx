@@ -22,9 +22,11 @@ import OrdersSeller from '../pages/Seller/OrdersSeller';
 import MainSeller from "../pages/Seller/MainSeller";
 
 // Admin
+import AuthorizationAdmin from '../pages/Admin/AuthAdmin'; // ✅ ДОБАВИЛИ
 import Admin from '../pages/Admin/AdminPage';
 import UsersAdmin from '../pages/Admin/UsersAdmin';
 import ProductAdmin from '../pages/Admin/ProductAdmin';
+import RegistrAdmin from '../pages/Admin/RegistrAdmin';
 
 // ==================== PROTECTED ROUTES ====================
 
@@ -97,6 +99,29 @@ const RedirectSellerIfAuthenticated: React.FC<{ children: React.ReactNode }> = (
   return <>{children}</>;
 };
 
+// ✅ ADMIN
+const PrivateAdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const token = localStorage.getItem('token');
+  const userRole = sessionStorage.getItem('userRole');
+
+  if (!token || userRole !== 'admin') {
+    return <Navigate to="/admin/auth" replace />; // ✅ исправили
+  }
+
+  return <>{children}</>;
+};
+
+const RedirectAdminIfAuthenticated: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const token = localStorage.getItem('token');
+  const userRole = sessionStorage.getItem('userRole');
+
+  if (token && userRole === 'admin') {
+    return <Navigate to="/admin" replace />;
+  }
+
+  return <>{children}</>;
+};
+
 // ==================== APP ====================
 
 const AppContent: React.FC = () => {
@@ -117,6 +142,9 @@ const AppContent: React.FC = () => {
           }
           if (token && userRole === 'seller') {
             return <Navigate to="/seller/dashboard" replace />;
+          }
+          if (token && userRole === 'admin') {
+            return <Navigate to="/admin" replace />;
           }
 
           return (
@@ -204,9 +232,39 @@ const AppContent: React.FC = () => {
       </Route>
 
       {/* ==================== ADMIN ==================== */}
-      <Route path="/admin" element={<Admin />} />
-      <Route path="/admin/users" element={<UsersAdmin onBack={() => {}} />} />
-      <Route path="/admin/products" element={<ProductAdmin />} />
+
+      {/* 🔐 Авторизация */}
+      <Route path="/admin/auth" element={
+        <RedirectAdminIfAuthenticated>
+          <AuthorizationAdmin />
+        </RedirectAdminIfAuthenticated>
+      } />
+
+      {/* Регистрация */}
+      <Route path="/admin/register" element={
+        <RedirectAdminIfAuthenticated>
+          <RegistrAdmin />
+        </RedirectAdminIfAuthenticated>
+      } />
+
+      {/* Dashboard */}
+      <Route path="/admin" element={
+        <PrivateAdminRoute>
+          <Admin />
+        </PrivateAdminRoute>
+      } />
+
+      <Route path="/admin/users" element={
+        <PrivateAdminRoute>
+          <UsersAdmin onBack={() => {}} />
+        </PrivateAdminRoute>
+      } />
+
+      <Route path="/admin/products" element={
+        <PrivateAdminRoute>
+          <ProductAdmin />
+        </PrivateAdminRoute>
+      } />
 
       {/* Redirects */}
       <Route path="/sklad" element={<Navigate to="/warehouse/dashboard" replace />} />
