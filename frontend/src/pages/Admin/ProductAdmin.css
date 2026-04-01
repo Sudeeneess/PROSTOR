@@ -1,0 +1,81 @@
+.product-container {
+  padding: 30px 60px;
+  font-family: Arial, sans-serif;
+}
+
+.product-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.product-header h2 {
+  margin: 0;
+}
+
+.back-link {
+  color: #888;
+  cursor: pointer;
+}
+
+.tabs {
+  margin: 20px 0;
+  display: flex;
+  gap: 20px;
+}
+
+.tabs button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #666;
+  border-bottom: 2px solid transparent;
+  padding-bottom: 4px;
+}
+
+.tabs button.active {
+  color: #000;
+  border-bottom: 2px solid #000;
+}
+
+.product-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fafafa;
+}
+
+.product-table th,
+.product-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+  font-size: 14px;
+}
+
+.product-table th {
+  background: #f0f0f0;
+  font-weight: 600;
+}
+
+.product-table tr:hover {
+  background: #f9f9f9;
+}
+
+.actions {
+  margin-top: 15px;
+  display: flex;
+  gap: 20px;
+}
+
+.actions button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+}
+
+.actions button:hover {
+  text-decoration: underline;
+}
