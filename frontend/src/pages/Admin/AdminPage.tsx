@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // ✅ REMOVED - not being used
 import './AdminPage.css';
 import HeaderAdmin from './HeaderAdmin';
-import UsersAdmin from './UsersAdmin'; // Импортируем компонент
+import UsersAdmin from './UsersAdmin';
+import ProductAdmin from './ProductAdmin';
 
 const AdminPage: React.FC = () => {
-  const navigate = useNavigate();
-  const [currentPage, setCurrentPage] = useState<'admin' | 'users'>('admin');
+  // const navigate = useNavigate(); // ✅ REMOVED - not being used
+  const [currentPage, setCurrentPage] = useState<'admin' | 'users' | 'products'>('admin');
   
   // Static data for the table
   const recentActions = [
@@ -16,23 +17,28 @@ const AdminPage: React.FC = () => {
   ];
 
   const handleUsersClick = () => {
-    setCurrentPage('users'); // Переключаем на страницу пользователей
+    setCurrentPage('users');
   };
 
   const handleProductsClick = () => {
-    navigate('/products'); // Навигация на страницу товаров
+    setCurrentPage('products');
   };
 
   const handleBackToAdmin = () => {
-    setCurrentPage('admin'); // Возврат на админ-панель
+    setCurrentPage('admin');
   };
 
-  // Если мы на странице пользователей - показываем UsersAdmin
+  // IF WE ARE ON USERS PAGE - SHOW UsersAdmin
   if (currentPage === 'users') {
     return <UsersAdmin onBack={handleBackToAdmin} />;
   }
 
-  // Иначе показываем админ-панель
+  // IF WE ARE ON PRODUCTS PAGE - SHOW ProductAdmin
+  if (currentPage === 'products') {
+    return <ProductAdmin />;
+  }
+
+  // OTHERWISE SHOW ADMIN PANEL
   return (
     <>
       <HeaderAdmin />

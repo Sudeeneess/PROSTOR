@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './UsersAdmin.css';
 import HeaderAdmin from './HeaderAdmin';
 import WindEditAdmin from './WindEditAdmin';
@@ -12,7 +13,7 @@ interface User {
 }
 
 interface UsersAdminProps {
-  onBack: () => void;
+  onBack?: () => void;
 }
 
 const initialUsers: User[] = [
@@ -22,21 +23,59 @@ const initialUsers: User[] = [
   { id: 18, name: 'Кузнецов А.', email: 'kuzn@mail.ru', role: 'Покупатель', status: 'Активен' },
 ];
 
+// Ключ для localStorage
+const USERS_STORAGE_KEY = 'app_users';
+
+// Функция загрузки пользователей из localStorage
+const loadUsersFromStorage = (): User[] => {
+  try {
+    const storedUsers = localStorage.getItem(USERS_STORAGE_KEY);
+    if (storedUsers) {
+      return JSON.parse(storedUsers);
+    }
+  } catch (error) {
+    console.error('Ошибка при загрузке пользователей:', error);
+  }
+  return initialUsers;
+};
+
+// Функция сохранения пользователей в localStorage
+const saveUsersToStorage = (users: User[]) => {
+  try {
+    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+  } catch (error) {
+    console.error('Ошибка при сохранении пользователей:', error);
+  }
+};
+
 const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
-  const [users, setUsers] = useState<User[]>(initialUsers);
+  const navigate = useNavigate();
+
+  // Загружаем пользователей из localStorage при инициализации
+  const [users, setUsers] = useState<User[]>(() => loadUsersFromStorage());
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showToast, setShowToast] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string>('');
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const [selectedUserForEdit, setSelectedUserForEdit] = useState<User | null>(null);
-  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<'all' | 'active'>('all');
   const [newUser, setNewUser] = useState({
     firstName: '',
     lastName: '',
     email: '',
-    role: 'Менеджер',
+    role: 'Менеджер склада',
   });
+
+  // Сохраняем пользователей в localStorage при каждом изменении
+  useEffect(() => {
+    saveUsersToStorage(users);
+  }, [users]);
+
+  // Фильтруем пользователей в зависимости от активной вкладки
+  const filteredUsers = activeTab === 'all' 
+    ? users 
+    : users.filter(user => user.status === 'Активен');
 
   const handleSelectUser = (id: number) => {
     setSelectedUsers(prev =>
@@ -46,7 +85,7 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
 
   const openModal = () => {
     setShowModal(true);
-    setNewUser({ firstName: '', lastName: '', email: '', role: 'Менеджер' });
+    setNewUser({ firstName: '', lastName: '', email: '', role: 'Менеджер склада' });
   };
 
   const closeModal = () => {
@@ -80,74 +119,81 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
   };
 
   const handleEdit = () => {
-    console.log('Edit button clicked, selectedUsers:', selectedUsers);
-    
     if (selectedUsers.length === 0) {
-      alert('Пожалуйста, выберите пользователя для редактирования');
+      alert('Пожалуйста, выберите пользователя');
       return;
     }
-    
+
     if (selectedUsers.length > 1) {
-      alert('Пожалуйста, выберите только одного пользователя для редактирования');
+      alert('Выберите только одного пользователя');
       return;
     }
-    
+
     const userToEdit = users.find(user => user.id === selectedUsers[0]);
-    console.log('User to edit:', userToEdit);
-    
+
     if (userToEdit) {
       setSelectedUserForEdit(userToEdit);
       setShowEditModal(true);
-    } else {
-      alert('Пользователь не найден');
     }
   };
 
   const handleSaveUser = async (updatedUser: User) => {
-    console.log('Saving updated user:', updatedUser);
-    setIsSaving(true);
-    
-    // Имитация асинхронной операции сохранения
+    // Имитация задержки сохранения
     await new Promise(resolve => setTimeout(resolve, 500));
-    
-    try {
-      setUsers(prevUsers => 
-        prevUsers.map(user => 
-          user.id === updatedUser.id ? updatedUser : user
-        )
-      );
-      setSelectedUsers([]);
-      setShowEditModal(false);
-      showNotification('Пользователь успешно обновлен!');
-    } catch (error) {
-      console.error('Error saving user:', error);
-      alert('Произошла ошибка при сохранении пользователя');
-    } finally {
-      setIsSaving(false);
+
+    setUsers(prev =>
+      prev.map(user =>
+        user.id === updatedUser.id ? updatedUser : user
+      )
+    );
+
+    setSelectedUsers([]);
+    setShowEditModal(false);
+    showNotification('Пользователь обновлен!');
+  };
+
+  const handleBack = () => {
+    if (onBack) {
+      onBack(); // Используем пропс если он передан
+    } else {
+      navigate(-1); // Иначе возвращаемся на предыдущую страницу
     }
   };
 
-  const handleGoBack = () => {
-    onBack();
+  const handleTabChange = (tab: 'all' | 'active') => {
+    setActiveTab(tab);
+    setSelectedUsers([]);
   };
 
   return (
     <>
+      {/* Убираем передачу пропса - просто рендерим HeaderAdmin без параметров */}
       <HeaderAdmin />
+
       <div className="UsersAdmin">
         <div className="users-container">
           <div className="users-header">
             <h1>Пользователи</h1>
-            <button className="back-button" onClick={handleGoBack}>
+            <button className="back-button" onClick={handleBack}>
               Назад
             </button>
           </div>
 
           <div className="tabs">
-            <button className="tab active">Все пользователи</button>
-            <button className="tab">Активные</button>
+            <button 
+              className={`tab ${activeTab === 'all' ? 'active' : ''}`}
+              onClick={() => handleTabChange('all')}
+            >
+              Все пользователи
+            </button>
+            <button 
+              className={`tab ${activeTab === 'active' ? 'active' : ''}`}
+              onClick={() => handleTabChange('active')}
+            >
+              Активные
+            </button>
           </div>
-
+          
           <div className="table-wrapper">
             <table className="users-table">
               <thead>
@@ -161,12 +207,8 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
                 </tr>
               </thead>
               <tbody>
-                {users.map(user => (
-                  <tr 
-                    key={user.id} 
-                    onClick={() => handleSelectUser(user.id)}
-                    style={{ cursor: 'pointer' }}
-                  >
+                {filteredUsers.map(user => (
+                  <tr key={user.id}>
                     <td className="checkbox-cell" onClick={(e) => e.stopPropagation()}>
                       <input
                         type="checkbox"
@@ -181,78 +223,85 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
                     <td>{user.status}</td>
                   </tr>
                 ))}
+                {filteredUsers.length === 0 && (
+                  <tr>
+                    <td colSpan={6} style={{ textAlign: 'center', padding: '40px' }}>
+                      Нет пользователей для отображения
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
 
-          {selectedUsers.length > 0 && (
-            <div className="edit-button-container">
-              <button 
-                className="edit-button" 
-                onClick={handleEdit}
-                disabled={isSaving}
-              >
-                {isSaving ? 'Сохранение...' : `Редактировать пользователя ${selectedUsers.length === 1 ? `(${selectedUsers.length})` : ''}`}
-              </button>
-            </div>
-          )}
-
-          <div className="invite-button-container">
+          {/* Кнопки действий как на скриншоте */}
+          <div className="action-buttons">
+            <button className="edit-button" onClick={handleEdit}>
+              Редактировать пользователя
+            </button>
             <button className="invite-button" onClick={openModal}>
               Пригласить сотрудника
             </button>
           </div>
 
+          {/* Модальное окно для приглашения с крестиком */}
           {showModal && (
             <div className="modal-overlay" onClick={closeModal}>
-              <div className="modal-content" onClick={e => e.stopPropagation()}>
-                <div className="modal-header">
-                  <h2>Пригласить сотрудника</h2>
-                  <button className="close-button" onClick={closeModal}>
-                    ✕
+              <div className="invite-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-header-with-close">
+                  <h2 className="modal-title">Данные нового сотрудника</h2>
+                  <button className="modal-close-button" onClick={closeModal}>
+                    ×
                   </button>
                 </div>
-                <div className="modal-body">
-                  <h3>Данные нового сотрудника</h3>
+                
+                <div className="modal-form">
                   <div className="form-group">
                     <label>Имя:</label>
                     <input
                       type="text"
+                      placeholder="Введите имя"
                       value={newUser.firstName}
-                      onChange={e => setNewUser({ ...newUser, firstName: e.target.value })}
+                      onChange={(e) => setNewUser({...newUser, firstName: e.target.value})}
                     />
                   </div>
+                  
                   <div className="form-group">
                     <label>Фамилия:</label>
                     <input
                       type="text"
+                      placeholder="Введите фамилию"
                       value={newUser.lastName}
-                      onChange={e => setNewUser({ ...newUser, lastName: e.target.value })}
+                      onChange={(e) => setNewUser({...newUser, lastName: e.target.value})}
                     />
                   </div>
+                  
                   <div className="form-group">
                     <label>Email:</label>
                     <input
                       type="email"
+                      placeholder="example@mail.ru"
                       value={newUser.email}
-                      onChange={e => setNewUser({ ...newUser, email: e.target.value })}
+                      onChange={(e) => setNewUser({...newUser, email: e.target.value})}
                     />
                   </div>
+                  
                   <div className="form-group">
                     <label>Должность:</label>
                     <select
                       value={newUser.role}
-                      onChange={e => setNewUser({ ...newUser, role: e.target.value })}
+                      onChange={(e) => setNewUser({...newUser, role: e.target.value})}
                       className="role-select"
                     >
                       <option value="Менеджер">Менеджер</option>
-                      <option value="Продавец">Продавец</option>
                       <option value="Покупатель">Покупатель</option>
+                      <option value="Продавец">Продавец</option>
                     </select>
                   </div>
                 </div>
-                <div className="modal-footer">
-                  <button className="invite-submit-button" onClick={handleInvite}>
+                
+                <div className="modal-actions">
+                  <button className="submit-button" onClick={handleInvite}>
                     Отправить приглашение
                   </button>
                 </div>
@@ -260,25 +309,19 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
             </div>
           )}
 
-          {showToast && (
-            <div className="toast">
-              {toastMessage}
-              <button className="toast-close" onClick={() => setShowToast(false)}>
-                ✕
-              </button>
-            </div>
-          )}
-
           <WindEditAdmin
             isOpen={showEditModal}
-            onClose={() => {
-              console.log('Closing edit modal');
-              setShowEditModal(false);
-              setSelectedUserForEdit(null);
-            }}
+            onClose={() => setShowEditModal(false)}
             userData={selectedUserForEdit}
             onSave={handleSaveUser}
           />
+
+          {/* Toast уведомление */}
+          {showToast && (
+            <div className="toast-notification">
+              {toastMessage}
+            </div>
+          )}
         </div>
       </div>
     </>
