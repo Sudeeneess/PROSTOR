@@ -1,0 +1,213 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #f0f2f5;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+}
+
+.AdminPage-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+.AdminPage-metrics {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  justify-content: flex-start;
+}
+
+.AdminPage-metric-card {
+  background-color: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem 2rem;
+  flex: 0 1 auto; 
+  min-width: 180px; 
+  text-align: center;
+  transition: all 0.2s ease;
+  border: 1px solid #e9ecef;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.AdminPage-metric-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a2c3e;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  order: 1;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.02);
+}
+
+.AdminPage-metric-value {
+  display: block;
+  font-size: 2.6rem;
+  font-weight: 600; 
+  color: #4a5b6e; 
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  order: 2;
+  text-shadow: none; 
+}
+
+
+.AdminPage-recent-actions {
+  background-color: #ffffff;
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  border: 1px solid #edf2f7;
+  overflow: hidden;
+}
+
+.AdminPage-section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1f2d3d;
+  padding: 1.25rem 1.5rem 0.75rem 1.5rem;
+  margin: 0;
+  letter-spacing: -0.2px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #f0f4f9;
+}
+
+.AdminPage-table-wrapper {
+  overflow-x: auto;
+  padding: 0 0.25rem 0.25rem 0.25rem;
+}
+
+
+.AdminPage-actions-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.9rem;
+  min-width: 500px;
+}
+
+.AdminPage-actions-table th {
+  text-align: left;
+  padding: 1rem 1.5rem;
+  background-color: #fafcfd;
+  font-weight: 600;
+  color: #2c3f55;
+  border-bottom: 1px solid #e9edf2;
+  font-size: 0.85rem;
+  letter-spacing: 0.3px;
+}
+
+.AdminPage-actions-table td {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #f0f4fa;
+  color: #1f2e3e;
+  font-weight: 500;
+  background-color: #ffffff;
+}
+
+.AdminPage-actions-table tr:last-child td {
+  border-bottom: none;
+}
+
+
+.AdminPage-actions-table td:first-child,
+.AdminPage-actions-table th:first-child {
+  font-weight: 500;
+  color: #4a4d4f;
+}
+
+.AdminPage-actions-table td:nth-child(2) {
+  font-weight: 500;
+  color: #1f2022;
+}
+
+.AdminPage-actions-table td:nth-child(3) {
+  font-weight: 500;
+  color: #3b3f44;
+}
+
+.AdminPage-status-success {
+  color: #2c3e50;
+  font-weight: 600;
+  background-color: #d6d6d6;
+  display: inline-block;
+  padding: 0.2rem 0.8rem;
+  border-radius: 2rem;
+  font-size: 0.8rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+
+.AdminPage-actions-table td:last-child {
+  background-color: transparent;
+  padding: 0.75rem 1.5rem;
+}
+
+.AdminPage-actions-table tr td:last-child {
+  padding-top: 0.7rem;
+  padding-bottom: 0.7rem;
+}
+
+
+.AdminPage-recent-actions {
+  border-radius: 1rem;
+}
+
+.AdminPage-actions-table thead tr:first-child th:first-child {
+  border-top-left-radius: 0.75rem;
+}
+
+.AdminPage-actions-table thead tr:first-child th:last-child {
+  border-top-right-radius: 0.75rem;
+}
+
+.AdminPage-actions-table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 0.75rem;
+}
+
+.AdminPage-actions-table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 0.75rem;
+}
+
+
+@media (max-width: 640px) {
+  .AdminPage-container {
+    padding: 0 1rem;
+    margin: 1rem auto;
+  }
+
+  .AdminPage-metrics {
+    justify-content: center; 
+  }
+
+  .AdminPage-metric-card {
+    padding: 1rem 1rem;
+    min-width: 140px;
+  }
+
+  .AdminPage-metric-value {
+    font-size: 1.8rem;
+    font-weight: 600;
+  }
+
+  .AdminPage-metric-label {
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+  }
+
+  .AdminPage-section-title {
+    padding: 1rem 1rem 0.5rem 1rem;
+  }
+
+  .AdminPage-actions-table th,
+  .AdminPage-actions-table td {
+    padding: 0.75rem 1rem;
+  }
+}

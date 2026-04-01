@@ -1,0 +1,81 @@
+.admin-prod-container {
+  padding: 30px 60px;
+  font-family: Arial, sans-serif;
+}
+
+.admin-prod-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-prod-header h2 {
+  margin: 0;
+}
+
+.admin-prod-back-link {
+  color: #888;
+  cursor: pointer;
+}
+
+.admin-prod-tabs {
+  margin: 20px 0;
+  display: flex;
+  gap: 20px;
+}
+
+.admin-prod-tabs button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #666;
+  border-bottom: 2px solid transparent;
+  padding-bottom: 4px;
+}
+
+.admin-prod-tabs button.admin-prod-active {
+  color: #000;
+  border-bottom: 2px solid #000;
+}
+
+.admin-prod-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fafafa;
+}
+
+.admin-prod-table th,
+.admin-prod-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+  font-size: 14px;
+}
+
+.admin-prod-table th {
+  background: #f0f0f0;
+  font-weight: 600;
+}
+
+.admin-prod-table tr:hover {
+  background: #f9f9f9;
+}
+
+.admin-prod-actions {
+  margin-top: 15px;
+  display: flex;
+  gap: 20px;
+}
+
+.admin-prod-actions button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+}
+
+.admin-prod-actions button:hover {
+  text-decoration: underline;
+}

@@ -14,29 +14,14 @@ import AddingProducts from '../pages/Seller/AddProducts';
 import ProductSeller from '../pages/Seller/ProductSeller';
 import OrdersSeller from '../pages/Seller/OrdersSeller';
 
-// Компонент для защиты маршрутов (только для авторизованных менеджеров)
-const PrivateWarehouseRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const token = localStorage.getItem('token');
-  const userRole = sessionStorage.getItem('userRole');
-  
-  if (!token || userRole !== 'warehouse_manager') {
-    return <Navigate to="/warehouse/auth" replace />;
-  }
-  
-  return <>{children}</>;
-};
+// Admin imports
+import AuthorizationAdmin from '../pages/Admin/AuthAdmin';
+import Admin from '../pages/Admin/AdminPage';
+import UsersAdmin from '../pages/Admin/UsersAdmin';
+import ProductAdmin from '../pages/Admin/ProductAdmin';
+import RegistrAdmin from '../pages/Admin/RegistrAdmin';
 
-// Компонент для проверки, авторизован ли менеджер
-const RedirectIfAuthenticated: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const token = localStorage.getItem('token');
-  const userRole = sessionStorage.getItem('userRole');
-  
-  if (token && userRole === 'warehouse_manager') {
-    return <Navigate to="/warehouse/dashboard" replace />;
-  }
-  
-  return <>{children}</>;
-};
+// ==================== КОМПОНЕНТЫ ДЛЯ ПОКУПАТЕЛЯ ====================
 
 // Компонент для проверки авторизации покупателя
 const PrivateBuyerRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -74,7 +59,8 @@ const PrivateProfileRoute: React.FC<{ children: React.ReactNode }> = ({ children
   return <>{children}</>;
 };
 
-// КОМПОНЕНТЫ ДЛЯ ПРОДАВЦА
+// ==================== КОМПОНЕНТЫ ДЛЯ ПРОДАВЦА ====================
+
 const PrivateSellerRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const token = localStorage.getItem('token');
   const userRole = sessionStorage.getItem('userRole');
@@ -97,6 +83,56 @@ const RedirectSellerIfAuthenticated: React.FC<{ children: React.ReactNode }> = (
   return <>{children}</>;
 };
 
+// ==================== КОМПОНЕНТЫ ДЛЯ МЕНЕДЖЕРА СКЛАДА ====================
+
+// Компонент для защиты маршрутов (только для авторизованных менеджеров)
+const PrivateWarehouseRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const token = localStorage.getItem('token');
+  const userRole = sessionStorage.getItem('userRole');
+  
+  if (!token || userRole !== 'warehouse_manager') {
+    return <Navigate to="/warehouse/auth" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+// Компонент для проверки, авторизован ли менеджер
+const RedirectIfAuthenticated: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const token = localStorage.getItem('token');
+  const userRole = sessionStorage.getItem('userRole');
+  
+  if (token && userRole === 'warehouse_manager') {
+    return <Navigate to="/warehouse/dashboard" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+// ==================== КОМПОНЕНТЫ ДЛЯ АДМИНИСТРАТОРА ====================
+
+const PrivateAdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const token = localStorage.getItem('token');
+  const userRole = sessionStorage.getItem('userRole');
+
+  if (!token || userRole !== 'admin') {
+    return <Navigate to="/admin/auth" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+const RedirectAdminIfAuthenticated: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const token = localStorage.getItem('token');
+  const userRole = sessionStorage.getItem('userRole');
+
+  if (token && userRole === 'admin') {
+    return <Navigate to="/admin" replace />;
+  }
+
+  return <>{children}</>;
+};
+
 // Создадим компонент-обертку для обработки навигации
 const AppContent: React.FC = () => {
   return (
@@ -115,6 +151,9 @@ const AppContent: React.FC = () => {
           }
           if (token && userRole === 'seller') {
             return <Navigate to="/seller/dashboard" replace />;
+          }
+          if (token && userRole === 'admin') {
+            return <Navigate to="/admin" replace />;
           }
           
           return (
@@ -149,36 +188,13 @@ const AppContent: React.FC = () => {
         </PrivateProfileRoute>
       } />
       
-      {/* Маршруты для менеджера склада */}
-      <Route path="/warehouse">
-        <Route 
-          path="auth" 
-          element={
-            <RedirectIfAuthenticated>
-              <AuthPageManager />
-            </RedirectIfAuthenticated>
-          } 
-        />
-        
-        <Route 
-          path="dashboard" 
-          element={
-            <PrivateWarehouseRoute>
-              <Warehouse />
-            </PrivateWarehouseRoute>
-          } 
-        />
-        
-        <Route 
-          path="" 
-          element={
-            <Navigate to="/warehouse/auth" replace />
-          } 
-        />
-      </Route>
-      
       {/* Маршруты для продавца */}
       <Route path="/seller">
+        {/* <Route 
+          path="start" 
+          element={<MainSeller />}
+        /> */}
+        
         <Route 
           path="auth" 
           element={
@@ -216,7 +232,7 @@ const AppContent: React.FC = () => {
         />
         
         <Route 
-          path="add-product" 
+          path="add-products" 
           element={
             <PrivateSellerRoute>
               <AddingProducts />
@@ -240,6 +256,69 @@ const AppContent: React.FC = () => {
           } 
         />
       </Route>
+      
+      {/* Маршруты для менеджера склада */}
+      <Route path="/warehouse">
+        <Route 
+          path="auth" 
+          element={
+            <RedirectIfAuthenticated>
+              <AuthPageManager />
+            </RedirectIfAuthenticated>
+          } 
+        />
+        
+        <Route 
+          path="dashboard" 
+          element={
+            <PrivateWarehouseRoute>
+              <Warehouse />
+            </PrivateWarehouseRoute>
+          } 
+        />
+        
+        <Route 
+          path="" 
+          element={
+            <Navigate to="/warehouse/auth" replace />
+          } 
+        />
+      </Route>
+      
+      {/* ==================== МАРШРУТЫ ДЛЯ АДМИНИСТРАТОРА ==================== */}
+      
+      {/* Авторизация */}
+      <Route path="/admin/auth" element={
+        <RedirectAdminIfAuthenticated>
+          <AuthorizationAdmin />
+        </RedirectAdminIfAuthenticated>
+      } />
+
+      {/* Регистрация */}
+      <Route path="/admin/register" element={
+        <RedirectAdminIfAuthenticated>
+          <RegistrAdmin />
+        </RedirectAdminIfAuthenticated>
+      } />
+
+      {/* Dashboard */}
+      <Route path="/admin" element={
+        <PrivateAdminRoute>
+          <Admin />
+        </PrivateAdminRoute>
+      } />
+
+      <Route path="/admin/users" element={
+        <PrivateAdminRoute>
+          <UsersAdmin onBack={() => {}} />
+        </PrivateAdminRoute>
+      } />
+
+      <Route path="/admin/products" element={
+        <PrivateAdminRoute>
+          <ProductAdmin />
+        </PrivateAdminRoute>
+      } />
       
       {/* Перенаправление для старых маршрутов */}
       <Route path="/sklad" element={<Navigate to="/warehouse/dashboard" replace />} />

@@ -76,20 +76,20 @@ const SellerEntrance: React.FC = () => {
   };
 
   return (
-    <div className="prostor-seller-app">
+    <div className="seller-reg-app">
       <HeaderSeller />
 
-      <main className="content-section">
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <div className="auth-form-header">Регистрация продавца</div>
+      <main className="seller-reg-content-section">
+        <form className="seller-reg-auth-form" onSubmit={handleSubmit}>
+          <div className="seller-reg-auth-form-header">Регистрация продавца</div>
 
-          <div className="form-container">
+          <div className="seller-reg-form-container">
             <select
               name="country"
               value={formData.country}
               onChange={handleChange}
               required
-              className="input-select"
+              className="seller-reg-input-select"
             >
               <option value="">Страна</option>
               <option value="RU">Россия</option>
@@ -101,7 +101,7 @@ const SellerEntrance: React.FC = () => {
               value={formData.orgForm}
               onChange={handleChange}
               required
-              className="input-select"
+              className="seller-reg-input-select"
             >
               <option value="">Выберите форму организации</option>
               <option value="IP">Индивидуальный предприниматель</option>
@@ -115,7 +115,7 @@ const SellerEntrance: React.FC = () => {
               placeholder="ИНН"
               value={formData.inn}
               onChange={handleChange}
-              className="input-field"
+              className="seller-reg-input-field"
               required
             />
 
@@ -125,19 +125,21 @@ const SellerEntrance: React.FC = () => {
               placeholder="ФИО"
               value={formData.fullname}
               onChange={handleChange}
-              className="input-field"
+              className="seller-reg-input-field"
               required
             />
 
-            <button className="save-button" disabled={loading}>
-              {loading ? "Регистрация..." : "Зарегистрироваться"}
-            </button>
+            <div className="seller-reg-button-section">
+              <button className="seller-reg-save-button" disabled={loading}>
+                {loading ? "Регистрация..." : "Зарегистрироваться"}
+              </button>
+            </div>
           </div>
 
-          {errorMessage && <p className="error-message">{errorMessage}</p>}
-          {successMessage && <p className="success-message">{successMessage}</p>}
+          {errorMessage && <p className="seller-reg-error-message">{errorMessage}</p>}
+          {successMessage && <p className="seller-reg-success-message">{successMessage}</p>}
 
-          <div className="login-footer">
+          <div className="seller-reg-login-footer">
             Уже есть аккаунт? <Link to="/seller/auth">Войти</Link>
           </div>
         </form>

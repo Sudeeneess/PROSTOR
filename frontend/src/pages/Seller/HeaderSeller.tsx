@@ -14,18 +14,18 @@ const HeaderSeller: React.FC = () => {
   };
 
   return (
-    <header className="header-section">
-      <div className="logo-text">
-        <span className="logo-prostor">prostor</span>
-        <span className="logo-seller">Seller</span>
+    <header className="seller-header-section">
+      <div className="seller-header-logo-text">
+        <span className="seller-header-logo-prostor">prostor</span>
+        <span className="seller-header-logo-seller">Seller</span>
       </div>
-      <nav className="navigation-bar">
-        <Link to="/" className="navigation-link">На главную</Link>
-        <button onClick={handleProductsClick} className="navigation-button">
+      <nav className="seller-header-navigation-bar">
+        <Link to="/" className="seller-header-navigation-link">На главную</Link>
+        <button onClick={handleProductsClick} className="seller-header-navigation-button">
           Товары
         </button>
-        <Link to="/seller/orders" className="navigation-link">Заказы</Link>
-        <button onClick={handlePersonalClick} className="navigation-button">
+        <Link to="/seller/orders" className="seller-header-navigation-link">Заказы</Link>
+        <button onClick={handlePersonalClick} className="seller-header-navigation-button">
           Личный кабинет
         </button>
       </nav>

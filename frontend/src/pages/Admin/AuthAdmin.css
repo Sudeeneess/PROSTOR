@@ -7,20 +7,20 @@
 
 body {
   font-family: Arial, Helvetica, sans-serif;
-  background-color: #fafafa;
+  background-color: #f4f6f9;
   color: #333;
   min-height: 100vh;
 }
 
 /* Главный контейнер */
-.seller-auth-app {
+.admin-auth-app {
   width: 100%;
   min-height: 100vh;
-  background-color: #fafafa;
+  background-color: #f4f6f9;
 }
 
 /* Основная секция */
-.seller-auth-content-section {
+.admin-auth-content-section {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -29,46 +29,44 @@ body {
 }
 
 /* Форма авторизации */
-.seller-auth-form {
+.admin-auth-form {
   max-width: 500px;
   width: 100%;
   padding: 40px;
   background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
 
-.seller-auth-form-header {
-  font-size: 24px;
+.admin-auth-form-header {
+  font-size: 26px;
   font-weight: 600;
   text-align: center;
   margin-bottom: 30px;
-  color: #333;
+  color: #1a2634;
 }
 
 /* Контейнер формы */
-.seller-auth-form-container {
+.admin-auth-form-container {
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
 /* Поля формы */
-.seller-auth-form-field {
-  margin-bottom: 20px;
+.admin-auth-form-field {
+  margin-bottom: 10px;
 }
 
-.seller-auth-label-text {
+.admin-auth-form-field label {
   display: block;
   margin-bottom: 8px;
   font-size: 14px;
   font-weight: 600;
   color: #1a2634;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
 }
 
-.seller-auth-input-field {
+.admin-auth-input-field {
   width: 100%;
   padding: 12px 16px;
   border: 2px solid #e1e8f0;
@@ -77,68 +75,66 @@ body {
   background: #fafbfc;
   transition: all 0.2s;
   outline: none;
-  box-sizing: border-box;
 }
 
-.seller-auth-input-field:focus {
+.admin-auth-input-field:focus {
   border-color: #1a2634;
   background: white;
 }
 
-.seller-auth-input-field::placeholder {
-  color: #999;
-}
-
-.seller-auth-input-hint {
-  display: block;
-  margin-top: 5px;
-  color: #888;
-  font-size: 12px;
-}
-
 /* Кнопка */
-.seller-auth-button-section {
-  margin-top: 10px;
-}
-
-.seller-auth-save-button {
+.admin-auth-save-button {
   width: 100%;
   padding: 14px;
-  background-color: #e0e0e0;
-  color: black;
+  background-color: #1a2634;
+  color: white;
   border: none;
   border-radius: 40px;
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.3s;
   text-transform: uppercase;
 }
 
-.seller-auth-save-button:hover:not(:disabled) {
-  background-color: #d0d0d0;
+.admin-auth-save-button:hover:not(:disabled) {
+  background-color: #0f1720;
 }
 
-.seller-auth-save-button:disabled {
+.admin-auth-save-button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
 }
 
-/* Ссылка регистрации */
-.seller-auth-registration-link {
+/* Сообщения */
+.admin-auth-error-message {
+  background: #ffe6e6;
+  color: #cc0000;
+  padding: 12px;
+  margin: 15px 0;
+  border-radius: 20px;
+  text-align: center;
+}
+
+.admin-auth-success-message {
+  background: #e6ffe6;
+  color: #000;
+  padding: 12px;
+  margin: 15px 0;
+  border-radius: 20px;
+  text-align: center;
+}
+
+/* Ссылка */
+.admin-auth-registration-link {
   text-align: center;
   margin-top: 20px;
   font-size: 14px;
   color: #666;
 }
 
-.seller-auth-registration-link a {
-  color: #000000;
+.admin-auth-registration-link a {
+  color: #1a2634;
   font-weight: bold;
   text-decoration: underline;
-  transition: color 0.3s ease;
-}
-
-.seller-auth-registration-link a:hover {
-  color: #333;
 }

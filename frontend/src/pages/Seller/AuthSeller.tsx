@@ -12,8 +12,6 @@ const Authorizationseller: React.FC = () => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -31,8 +29,6 @@ const Authorizationseller: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setErrorMessage(null);
-    setSuccessMessage(null);
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -49,61 +45,58 @@ const Authorizationseller: React.FC = () => {
       localStorage.setItem("token", "seller-token-" + Date.now());
       sessionStorage.setItem("userRole", "seller");
 
-      setSuccessMessage("Авторизация успешна!");
-
-      setTimeout(() => {
-        navigate("/seller/dashboard");
-      }, 1000);
+      // Перенаправление без показа сообщения
+      navigate("/seller/dashboard");
 
     } catch {
-      setErrorMessage("Ошибка авторизации");
+      // Ошибка обрабатывается, но не показывается пользователю
+      console.error("Ошибка авторизации");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="prostor-seller-app">
+    <div className="seller-auth-app">
       <HeaderSeller />
 
-      <main className="content-section">
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <div className="auth-form-header">Авторизация продавца</div>
+      <main className="seller-auth-content-section">
+        <form className="seller-auth-form" onSubmit={handleSubmit}>
+          <div className="seller-auth-form-header">Авторизация продавца</div>
 
-          <div className="form-container">
-            <div className="form-field">
-              <label>ИНН</label>
+          <div className="seller-auth-form-container">
+            <div className="seller-auth-form-field">
+              <label className="seller-auth-label-text">ИНН</label>
               <input
                 type="text"
                 name="inn"
                 value={formData.inn}
                 onChange={handleInputChange}
-                className="input-field"
+                className="seller-auth-input-field"
                 required
               />
             </div>
 
-            <div className="form-field">
-              <label>ФИО</label>
+            <div className="seller-auth-form-field">
+              <label className="seller-auth-label-text">ФИО</label>
               <input
                 type="text"
                 name="fio"
                 value={formData.fio}
                 onChange={handleInputChange}
-                className="input-field"
+                className="seller-auth-input-field"
                 required
               />
             </div>
 
-            <button className="save-button" disabled={isLoading}>
-              {isLoading ? "Вход..." : "Войти"}
-            </button>
+            <div className="seller-auth-button-section">
+              <button className="seller-auth-save-button" disabled={isLoading}>
+                {isLoading ? "Вход..." : "Войти"}
+              </button>
+            </div>
           </div>
 
-          {errorMessage && <p className="error-message">{errorMessage}</p>}
-          {successMessage && <p className="success-message">{successMessage}</p>}
-
-          <div className="registration-link">
+          <div className="seller-auth-registration-link">
             Нет аккаунта? <Link to="/seller/register">Регистрация</Link>
           </div>
         </form>

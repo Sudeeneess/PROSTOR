@@ -11,14 +11,14 @@ body {
 }
 
 /* СТРАНИЦА */
-.page {
+.seller-products-page {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
 /* ФОРМА */
-.form-card {
+.seller-products-form-card {
   width: 66.666%;
   max-width: 1000px;
   min-width: 300px;
@@ -37,20 +37,20 @@ body {
 }
 
 /* ЗАГОЛОВОК И КНОПКА НАЗАД */
-.form-header {
+.seller-products-form-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 40px;
 }
 
-.form-title {
+.seller-products-form-title {
   font-size: 28px;
   font-weight: 600;
   color: #333;
 }
 
-.back-button {
+.seller-products-back-button {
   background: none;
   border: none;
   font-size: 16px;
@@ -65,7 +65,7 @@ body {
 }
 
 /* СЕТКА */
-.form-grid {
+.seller-products-form-grid {
   flex: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -73,7 +73,7 @@ body {
 }
 
 /* UPLOAD - КВАДРАТ ДЛЯ ФОТО */
-.upload {
+.seller-products-upload {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -90,13 +90,13 @@ body {
   position: relative;
 }
 
-.upload:hover {
+.seller-products-upload:hover {
   background: #f5f5f5;
   border-color: #aaa;
 }
 
 /* ПРЕВЬЮ ИЗОБРАЖЕНИЯ ВНУТРИ КВАДРАТА */
-.preview {
+.seller-products-preview {
   width: 100%;
   height: 100%;
   object-fit: contain;
@@ -127,7 +127,7 @@ textarea {
 }
 
 /* КНОПКИ */
-.btn {
+.seller-products-btn {
   width: 100%;
   padding: 18px;
   border-radius: 20px;
@@ -140,22 +140,10 @@ textarea {
 }
 
 /* СОХРАНИТЬ */
-.save {
+.seller-products-save {
   background: #dcdcdc;
 }
 
-.save:hover {
+.seller-products-save:hover {
   background: #c0c0c0;
 }
-
-/* УДАЛИТЬ */
-.delete {
-  background: white;
-  border: 1px solid #ccc;
-}
-
-.delete:hover {
-  background: #f5f5f5;
-  border-color: #aaa;
-}
-

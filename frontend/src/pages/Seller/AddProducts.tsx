@@ -105,24 +105,24 @@ const AddingProducts: React.FC = () => {
   };
 
   return (
-    <div className="page">
+    <div className="seller-products-page">
       <HeaderSeller />
 
-      <div className="form-card">
-        <div className="form-header">
-          <div className="form-title">Добавление товара</div>
-          <button className="back-button" onClick={handleBack}>
+      <div className="seller-products-form-card">
+        <div className="seller-products-form-header">
+          <div className="seller-products-form-title">Добавление товара</div>
+          <button className="seller-products-back-button" onClick={handleBack}>
             ← Назад
           </button>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="form-grid">
+          <div className="seller-products-form-grid">
             {/* LEFT */}
             <div>
-              <label className="upload">
+              <label className="seller-products-upload">
                 {photoPreview ? (
-                  <img src={photoPreview} className="preview" alt="Preview" />
+                  <img src={photoPreview} className="seller-products-preview" alt="Preview" />
                 ) : (
                   <span>+ Загрузить фото</span>
                 )}
@@ -134,7 +134,7 @@ const AddingProducts: React.FC = () => {
                 />
               </label>
 
-              <button type="submit" className="btn-save">
+              <button type="submit" className="seller-products-btn seller-products-save">
                 Сохранить товар
               </button>
             </div>

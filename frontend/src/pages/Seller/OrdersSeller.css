@@ -1,25 +1,25 @@
-.orders-page {
+.seller-orders-page {
   background-color: #f5f5f5;
   min-height: 100vh;
 }
 
-.orders-container {
+.seller-orders-container {
   padding: 30px 40px;
 }
 
-.orders-header {
+.seller-orders-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
 }
 
-.orders-header h1 {
+.seller-orders-header h1 {
   font-size: 28px;
   font-weight: 600;
 }
 
-.back-button {
+.seller-orders-back-button {
   background: none;
   border: none;
   font-size: 14px;
@@ -27,19 +27,19 @@
   color: #666;
 }
 
-.back-button:hover {
+.seller-orders-back-button:hover {
   color: #000;
 }
 
 /* 🔥 ГЛАВНОЕ ИЗМЕНЕНИЕ */
-.orders-grid {
+.seller-orders-grid {
   display: grid;
   grid-template-columns: repeat(2, 220px); /* 2 в ряд */
   gap: 25px;
 }
 
 /* 🔥 УВЕЛИЧЕННЫЕ КАРТОЧКИ */
-.order-card {
+.seller-orders-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -57,11 +57,11 @@
   transition: 0.2s;
 }
 
-.order-card:hover {
+.seller-orders-card:hover {
   background-color: #dcdcdc;
 }
 
-.order-count {
+.seller-orders-count {
   font-weight: 600;
   font-size: 16px;
 }

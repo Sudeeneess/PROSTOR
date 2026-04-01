@@ -233,20 +233,20 @@ const AuthPageBuyer: React.FC = () => {
   };
 
   return (
-    <div className="auth-page">
+    <div className="buyer-auth-page">
       <Header />
-      <div className="auth-container">
-        <div className="auth-card">
-          <h2 className="auth-title">
+      <div className="buyer-auth-container">
+        <div className="buyer-auth-card">
+          <h2 className="buyer-auth-title">
             {isLogin ? 'Авторизация' : 'Регистрация'}
-            <div className="title-icon">
+            <div className="buyer-auth-title-icon">
               <BsPersonFill size={28} color='#000000' />
             </div>
           </h2>
           
           {/* Отображение ошибки */}
           {error && (
-            <div className="error-message">
+            <div className="buyer-auth-error-message">
               {error}
             </div>
           )}
@@ -255,7 +255,7 @@ const AuthPageBuyer: React.FC = () => {
             {!isLogin ? (
               // Форма регистрации
               <>
-                <div className="form-group">
+                <div className="buyer-auth-form-group">
                   <input
                     type="text"
                     id="name"
@@ -268,7 +268,7 @@ const AuthPageBuyer: React.FC = () => {
                   />
                 </div>
 
-                <div className="form-group">
+                <div className="buyer-auth-form-group">
                   <input
                     type="text"
                     id="username"
@@ -281,7 +281,7 @@ const AuthPageBuyer: React.FC = () => {
                   />
                 </div>
 
-                <div className="form-group">
+                <div className="buyer-auth-form-group">
                   <input
                     type="password"
                     id="password"
@@ -294,7 +294,7 @@ const AuthPageBuyer: React.FC = () => {
                   />
                 </div>
 
-                <div className="form-group">
+                <div className="buyer-auth-form-group">
                   <input
                     type="password"
                     id="confirmPassword"
@@ -310,7 +310,7 @@ const AuthPageBuyer: React.FC = () => {
             ) : (
               // Форма входа
               <>
-                <div className="form-group">
+                <div className="buyer-auth-form-group">
                   <input
                     type="text"
                     id="username"
@@ -323,7 +323,7 @@ const AuthPageBuyer: React.FC = () => {
                   />
                 </div>
 
-                <div className="form-group">
+                <div className="buyer-auth-form-group">
                   <input
                     type="password"
                     id="password"
@@ -340,20 +340,20 @@ const AuthPageBuyer: React.FC = () => {
 
             <button 
               type="submit" 
-              className="submit-button"
+              className="buyer-auth-submit-button"
               disabled={loading}
             >
               {loading ? 'Загрузка...' : (isLogin ? 'Войти' : 'Создать аккаунт')}
             </button>
           </form>
 
-          <div className="auth-footer">
+          <div className="buyer-auth-footer">
             {isLogin ? (
               <p>
                 У вас нет аккаунта?{' '}
                 <button 
                   onClick={switchToRegister} 
-                  className="link-button"
+                  className="buyer-auth-link-button"
                   disabled={loading}
                 >
                   Создать аккаунт
@@ -364,7 +364,7 @@ const AuthPageBuyer: React.FC = () => {
                 Уже есть аккаунт?{' '}
                 <button 
                   onClick={switchToLogin} 
-                  className="link-button"
+                  className="buyer-auth-link-button"
                   disabled={loading}
                 >
                   Войти

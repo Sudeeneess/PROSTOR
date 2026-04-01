@@ -123,28 +123,28 @@ const ProductSeller: React.FC = () => {
   };
 
   return (
-    <div className="seller-container">
+    <div className="seller-prod-container">
       <HeaderSeller />
 
-      <div className="content">
-        <div className="top-bar">
+      <div className="seller-prod-content">
+        <div className="seller-prod-top-bar">
           <h2>Мои товары</h2>
-          <button className="add-btn" onClick={addNewProduct}>
+          <button className="seller-prod-add-btn" onClick={addNewProduct}>
             + Добавить товар
           </button>
         </div>
 
         {products.length === 0 ? (
-          <div className="empty-state">
+          <div className="seller-prod-empty-state">
             <p>У вас пока нет товаров</p>
-            <button onClick={addNewProduct} className="add-first-btn">
+            <button onClick={addNewProduct} className="seller-prod-add-first-btn">
               Добавить первый товар
             </button>
           </div>
         ) : (
           <>
-            <div className="table">
-              <div className="table-header">
+            <div className="seller-prod-table">
+              <div className="seller-prod-table-header">
                 <span>Название</span>
                 <span>Описание</span>
                 <span>Артикул</span>
@@ -153,46 +153,46 @@ const ProductSeller: React.FC = () => {
               </div>
 
               {products.map((product) => (
-                <div key={product.id} className="table-row">
+                <div key={product.id} className="seller-prod-table-row">
                   <input
                     type="text"
                     value={product.name}
                     readOnly
-                    className="readonly-input"
+                    className="seller-prod-readonly-input"
                   />
                   <input
                     type="text"
                     value={product.description}
                     readOnly
-                    className="readonly-input"
+                    className="seller-prod-readonly-input"
                   />
                   <input
                     type="text"
                     value={product.sku}
                     readOnly
-                    className="readonly-input"
+                    className="seller-prod-readonly-input"
                   />
                   <input
                     type="text"
                     value={product.price}
                     readOnly
-                    className="readonly-input"
+                    className="seller-prod-readonly-input"
                   />
                   <input
                     type="checkbox"
                     checked={product.selected}
                     onChange={() => toggleSelect(product.id)}
-                    className="checkbox-input"
+                    className="seller-prod-checkbox-input"
                   />
                 </div>
               ))}
             </div>
 
-            <div className="actions">
-              <button className="delete-btn" onClick={deleteSelected}>
+            <div className="seller-prod-actions">
+              <button className="seller-prod-delete-btn" onClick={deleteSelected}>
                 🗑 Удалить выбранные
               </button>
-              <button className="edit-btn" onClick={openEditModal}>
+              <button className="seller-prod-edit-btn" onClick={openEditModal}>
                 ✏ Редактировать выбранный
               </button>
             </div>
@@ -201,12 +201,12 @@ const ProductSeller: React.FC = () => {
       </div>
 
       {isEditModalOpen && editingProduct && (
-        <div className="modal-overlay">
-          <div className="modal-content">
+        <div className="seller-prod-modal-overlay">
+          <div className="seller-prod-modal-content">
             <h2>Редактирование товара</h2>
             
-            <div className="edit-form">
-              <div className="form-group">
+            <div className="seller-prod-edit-form">
+              <div className="seller-prod-form-group">
                 <label>Название товара:</label>
                 <input
                   type="text"
@@ -214,23 +214,23 @@ const ProductSeller: React.FC = () => {
                   onChange={(e) =>
                     setEditingProduct({ ...editingProduct, name: e.target.value })
                   }
-                  className="edit-input"
+                  className="seller-prod-edit-input"
                 />
               </div>
 
-              <div className="form-group">
+              <div className="seller-prod-form-group">
                 <label>Описание:</label>
                 <textarea
                   value={editingProduct.description}
                   onChange={(e) =>
                     setEditingProduct({ ...editingProduct, description: e.target.value })
                   }
-                  className="edit-textarea"
+                  className="seller-prod-edit-textarea"
                   rows={3}
                 />
               </div>
 
-              <div className="form-group">
+              <div className="seller-prod-form-group">
                 <label>Артикул:</label>
                 <input
                   type="text"
@@ -238,11 +238,11 @@ const ProductSeller: React.FC = () => {
                   onChange={(e) =>
                     setEditingProduct({ ...editingProduct, sku: e.target.value })
                   }
-                  className="edit-input"
+                  className="seller-prod-edit-input"
                 />
               </div>
 
-              <div className="form-group">
+              <div className="seller-prod-form-group">
                 <label>Цена (₽):</label>
                 <input
                   type="number"
@@ -250,13 +250,13 @@ const ProductSeller: React.FC = () => {
                   onChange={(e) =>
                     setEditingProduct({ ...editingProduct, price: e.target.value })
                   }
-                  className="edit-input"
+                  className="seller-prod-edit-input"
                 />
               </div>
             </div>
 
-            <div className="modal-buttons">
-              <button onClick={saveEditedProduct} className="save-btn">
+            <div className="seller-prod-modal-buttons">
+              <button onClick={saveEditedProduct} className="seller-prod-save-btn">
                 Сохранить изменения
               </button>
               <button 
@@ -264,7 +264,7 @@ const ProductSeller: React.FC = () => {
                   setIsEditModalOpen(false);
                   setEditingProduct(null);
                 }} 
-                className="cancel-btn"
+                className="seller-prod-cancel-btn"
               >
                 Отмена
               </button>
