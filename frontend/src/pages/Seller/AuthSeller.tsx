@@ -12,6 +12,7 @@ const Authorizationseller: React.FC = () => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -24,11 +25,28 @@ const Authorizationseller: React.FC = () => {
     } else {
       setFormData({ ...formData, fio: value });
     }
+    
+    // Очищаем ошибку при вводе
+    if (error) setError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
+
+    // Валидация
+    if (!formData.inn || !formData.fio) {
+      setError("Пожалуйста, заполните все поля");
+      setIsLoading(false);
+      return;
+    }
+
+    if (formData.inn.length < 10) {
+      setError("ИНН должен содержать 10 или 12 цифр");
+      setIsLoading(false);
+      return;
+    }
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -45,11 +63,11 @@ const Authorizationseller: React.FC = () => {
       localStorage.setItem("token", "seller-token-" + Date.now());
       sessionStorage.setItem("userRole", "seller");
 
-      // Перенаправление без показа сообщения
+      // Перенаправление
       navigate("/seller/dashboard");
 
     } catch {
-      // Ошибка обрабатывается, но не показывается пользователю
+      setError("Произошла ошибка при входе");
       console.error("Ошибка авторизации");
     } finally {
       setIsLoading(false);
@@ -57,12 +75,20 @@ const Authorizationseller: React.FC = () => {
   };
 
   return (
-    <div className="seller-auth-app">
+    <div className="seller-auth-page">
       <HeaderSeller />
 
       <main className="seller-auth-content-section">
         <form className="seller-auth-form" onSubmit={handleSubmit}>
-          <div className="seller-auth-form-header">Авторизация продавца</div>
+          <div className="seller-auth-form-header">
+            Авторизация продавца
+          </div>
+
+          {error && (
+            <div className="seller-auth-error-message">
+              {error}
+            </div>
+          )}
 
           <div className="seller-auth-form-container">
             <div className="seller-auth-form-field">
@@ -72,8 +98,10 @@ const Authorizationseller: React.FC = () => {
                 name="inn"
                 value={formData.inn}
                 onChange={handleInputChange}
-                className="seller-auth-input-field"
+                className={`seller-auth-input-field ${error && !formData.inn ? 'seller-auth-error' : ''}`}
+                placeholder="Введите 10 или 12 цифр"
                 required
+                disabled={isLoading}
               />
             </div>
 
@@ -84,14 +112,19 @@ const Authorizationseller: React.FC = () => {
                 name="fio"
                 value={formData.fio}
                 onChange={handleInputChange}
-                className="seller-auth-input-field"
+                className={`seller-auth-input-field ${error && !formData.fio ? 'seller-auth-error' : ''}`}
+                placeholder="Иванов Иван Иванович"
                 required
+                disabled={isLoading}
               />
             </div>
 
             <div className="seller-auth-button-section">
-              <button className="seller-auth-save-button" disabled={isLoading}>
-                {isLoading ? "Вход..." : "Войти"}
+              <button 
+                className={`seller-auth-save-button ${isLoading ? 'seller-auth-loading' : ''}`}
+                disabled={isLoading}
+              >
+                {isLoading ? "Загрузка..." : "Войти"}
               </button>
             </div>
           </div>
