@@ -45,29 +45,29 @@ const HeaderAdmin: React.FC<HeaderAdminProps> = ({ onMenuItemChange }) => {
   };
 
   return (
-    <header className="admin-header">
-      <div className="admin-logo">
+    <header className="admin-header-container">
+      <div className="admin-header-logo">
         prostor
-        <span className="admin-badge">Admin</span>
+        <span className="admin-header-badge">Admin</span>
       </div>
 
-      <div className="admin-menu">
+      <div className="admin-header-menu">
         <button
-          className="admin-menu-item"
+          className="admin-header-menu-item"
           onClick={() => handleMenuClick('main')}
         >
           Главная
         </button>
 
         <button
-          className="admin-menu-item"
+          className="admin-header-menu-item"
           onClick={() => handleMenuClick('users')}
         >
           Пользователи
         </button>
 
         <button
-          className="admin-menu-item"
+          className="admin-header-menu-item"
           onClick={() => handleMenuClick('products')}
         >
           Товары

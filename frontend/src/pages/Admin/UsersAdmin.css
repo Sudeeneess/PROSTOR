@@ -1,17 +1,17 @@
-.UsersAdmin * {
+.admin-users-container * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-.UsersAdmin body {
+.admin-users-container body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
   background-color: #f5f5f5;
   color: #1a1a1a;
   line-height: 1.5;
 }
 
-.UsersAdmin .users-container {
+.admin-users-container .admin-users-main-container {
   max-width: 1200px;
   margin: 2rem auto;
   background: white;
@@ -20,7 +20,7 @@
   padding: 1.5rem;
 }
 
-.UsersAdmin .users-header {
+.admin-users-container .admin-users-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -29,14 +29,14 @@
   border-bottom: 1px solid #e0e0e0;
 }
 
-.UsersAdmin .users-header h1 {
+.admin-users-container .admin-users-header h1 {
   font-size: 1.75rem;
   font-weight: 600;
   color: #1a1a1a;
   letter-spacing: -0.01em;
 }
 
-.UsersAdmin .back-button {
+.admin-users-container .admin-users-back-button {
   background: none;
   border: none;
   font-size: 0.9rem;
@@ -48,18 +48,18 @@
   font-weight: 500;
 }
 
-.UsersAdmin .back-button:hover {
+.admin-users-container .admin-users-back-button:hover {
   background: #f0f0f0;
 }
 
-.UsersAdmin .tabs {
+.admin-users-container .admin-users-tabs {
   display: flex;
   gap: 1rem;
   margin-bottom: 1.5rem;
   border-bottom: 1px solid #e0e0e0;
 }
 
-.UsersAdmin .tab {
+.admin-users-container .admin-users-tab {
   background: none;
   border: none;
   padding: 0.75rem 1rem;
@@ -70,38 +70,38 @@
   transition: all 0.2s;
 }
 
-.UsersAdmin .tab.active {
+.admin-users-container .admin-users-tab.admin-users-active {
   color: #676767;
   border-bottom: 2px solid #676767;
   margin-bottom: -1px;
 }
 
-.UsersAdmin .tab:hover:not(.active) {
+.admin-users-container .admin-users-tab:hover:not(.admin-users-active) {
   color: #333;
 }
 
 /* Исправленные стили таблицы с аккуратными границами */
-.UsersAdmin .table-wrapper {
+.admin-users-container .admin-users-table-wrapper {
   overflow-x: auto;
   margin-bottom: 1.5rem;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
 }
 
-.UsersAdmin .users-table {
+.admin-users-container .admin-users-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
 }
 
-.UsersAdmin .users-table th,
-.UsersAdmin .users-table td {
+.admin-users-container .admin-users-table th,
+.admin-users-container .admin-users-table td {
   padding: 1rem 0.75rem;
   text-align: left;
   border-bottom: 1px solid #e8e8e8;
 }
 
-.UsersAdmin .users-table th {
+.admin-users-container .admin-users-table th {
   background-color: #fafafa;
   font-weight: 600;
   color: #333;
@@ -111,27 +111,27 @@
   border-bottom: 2px solid #e0e0e0;
 }
 
-.UsersAdmin .users-table tbody tr:hover {
+.admin-users-container .admin-users-table tbody tr:hover {
   background-color: #fafafa;
   transition: background-color 0.2s ease;
 }
 
-.UsersAdmin .users-table tbody tr:last-child td {
+.admin-users-container .admin-users-table tbody tr:last-child td {
   border-bottom: none;
 }
 
-.UsersAdmin .users-table td {
+.admin-users-container .admin-users-table td {
   color: #1a1a1a;
   font-weight: 500;
 }
 
-.UsersAdmin .checkbox-cell {
+.admin-users-container .admin-users-checkbox-cell {
   width: 40px;
   text-align: center;
 }
 
 /* Серые чекбоксы - полностью кастомные */
-.UsersAdmin .checkbox-cell input[type="checkbox"] {
+.admin-users-container .admin-users-checkbox-cell input[type="checkbox"] {
   width: 18px;
   height: 18px;
   cursor: pointer;
@@ -146,12 +146,12 @@
   margin: 0;
 }
 
-.UsersAdmin .checkbox-cell input[type="checkbox"]:checked {
+.admin-users-container .admin-users-checkbox-cell input[type="checkbox"]:checked {
   background-color: #9ca3af;
   border-color: #9ca3af;
 }
 
-.UsersAdmin .checkbox-cell input[type="checkbox"]:checked::after {
+.admin-users-container .admin-users-checkbox-cell input[type="checkbox"]:checked::after {
   content: '✓';
   position: absolute;
   color: white;
@@ -160,22 +160,22 @@
   top: -1px;
 }
 
-.UsersAdmin .checkbox-cell input[type="checkbox"]:hover {
+.admin-users-container .admin-users-checkbox-cell input[type="checkbox"]:hover {
   border-color: #6b7280;
 }
 
-.UsersAdmin .checkbox-cell input[type="checkbox"]:focus {
+.admin-users-container .admin-users-checkbox-cell input[type="checkbox"]:focus {
   outline: none;
   box-shadow: 0 0 0 2px rgba(156, 163, 175, 0.3);
 }
 
 /* Для Firefox */
-.UsersAdmin .checkbox-cell input[type="checkbox"] {
+.admin-users-container .admin-users-checkbox-cell input[type="checkbox"] {
   color-scheme: light;
 }
 
 /* Кнопки действий как на скриншоте */
-.UsersAdmin .action-buttons {
+.admin-users-container .admin-users-action-buttons {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
@@ -184,8 +184,8 @@
   border-top: 1px solid #e0e0e0;
 }
 
-.UsersAdmin .edit-button,
-.UsersAdmin .invite-button {
+.admin-users-container .admin-users-edit-button,
+.admin-users-container .admin-users-invite-button {
   background-color: #676767;
   color: white;
   border: none;
@@ -197,25 +197,25 @@
   transition: all 0.2s;
 }
 
-.UsersAdmin .edit-button:hover,
-.UsersAdmin .invite-button:hover {
+.admin-users-container .admin-users-edit-button:hover,
+.admin-users-container .admin-users-invite-button:hover {
   background-color: #4a4a4a;
   transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.UsersAdmin .edit-button:active,
-.UsersAdmin .invite-button:active {
+.admin-users-container .admin-users-edit-button:active,
+.admin-users-container .admin-users-invite-button:active {
   transform: translateY(0);
 }
 
-.UsersAdmin .edit-button:disabled {
+.admin-users-container .admin-users-edit-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
 /* Модальное окно для приглашения с крестиком */
-.UsersAdmin .modal-overlay {
+.admin-users-container .admin-users-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -229,18 +229,18 @@
   backdrop-filter: blur(2px);
 }
 
-.UsersAdmin .invite-modal {
+.admin-users-container .admin-users-invite-modal {
   background: white;
   border-radius: 12px;
   padding: 32px;
   width: 90%;
   max-width: 500px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  animation: UsersAdmin-modalFadeIn 0.2s ease;
+  animation: admin-users-modalFadeIn 0.2s ease;
   position: relative;
 }
 
-@keyframes UsersAdmin-modalFadeIn {
+@keyframes admin-users-modalFadeIn {
   from {
     opacity: 0;
     transform: scale(0.95);
@@ -252,21 +252,21 @@
 }
 
 /* Заголовок с крестиком */
-.UsersAdmin .modal-header-with-close {
+.admin-users-container .admin-users-modal-header-with-close {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
 }
 
-.UsersAdmin .modal-title {
+.admin-users-container .admin-users-modal-title {
   font-size: 24px;
   font-weight: 600;
   color: #1a1a1a;
   margin: 0;
 }
 
-.UsersAdmin .modal-close-button {
+.admin-users-container .admin-users-modal-close-button {
   background: none;
   border: none;
   font-size: 32px;
@@ -283,40 +283,40 @@
   border-radius: 4px;
 }
 
-.UsersAdmin .modal-close-button:hover {
+.admin-users-container .admin-users-modal-close-button:hover {
   color: #333;
   background-color: #f0f0f0;
   transform: scale(1.1);
 }
 
-.UsersAdmin .modal-close-button:active {
+.admin-users-container .admin-users-modal-close-button:active {
   transform: scale(0.95);
 }
 
 /* Форма в модальном окне */
-.UsersAdmin .modal-form {
+.admin-users-container .admin-users-modal-form {
   display: flex;
   flex-direction: column;
   gap: 20px;
   margin-bottom: 32px;
 }
 
-.UsersAdmin .form-group {
+.admin-users-container .admin-users-form-group {
   display: flex;
   flex-direction: column;
   gap: 8px;
   margin-bottom: 0;
 }
 
-.UsersAdmin .form-group label {
+.admin-users-container .admin-users-form-group label {
   font-size: 14px;
   font-weight: 500;
   color: #4a5568;
   margin-bottom: 0;
 }
 
-.UsersAdmin .form-group input,
-.UsersAdmin .role-select {
+.admin-users-container .admin-users-form-group input,
+.admin-users-container .admin-users-role-select {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid #e2e8f0;
@@ -326,18 +326,18 @@
   font-family: inherit;
 }
 
-.UsersAdmin .form-group input:focus,
-.UsersAdmin .role-select:focus {
+.admin-users-container .admin-users-form-group input:focus,
+.admin-users-container .admin-users-role-select:focus {
   outline: none;
   border-color: #676767;
   box-shadow: 0 0 0 3px rgba(103, 103, 103, 0.1);
 }
 
-.UsersAdmin .form-group input::placeholder {
+.admin-users-container .admin-users-form-group input::placeholder {
   color: #cbd5e0;
 }
 
-.UsersAdmin .role-select {
+.admin-users-container .admin-users-role-select {
   background-color: white;
   cursor: pointer;
   appearance: none;
@@ -348,12 +348,12 @@
 }
 
 /* Кнопка отправки */
-.UsersAdmin .modal-actions {
+.admin-users-container .admin-users-modal-actions {
   display: flex;
   justify-content: center;
 }
 
-.UsersAdmin .submit-button {
+.admin-users-container .admin-users-submit-button {
   background-color: #676767;
   color: white;
   border: none;
@@ -367,18 +367,18 @@
   max-width: 250px;
 }
 
-.UsersAdmin .submit-button:hover {
+.admin-users-container .admin-users-submit-button:hover {
   background-color: #4a4a4a;
   transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.UsersAdmin .submit-button:active {
+.admin-users-container .admin-users-submit-button:active {
   transform: translateY(0);
 }
 
 /* Toast Notification */
-.UsersAdmin .toast-notification {
+.admin-users-container .admin-users-toast-notification {
   position: fixed;
   bottom: 2rem;
   left: 50%;
@@ -391,10 +391,10 @@
   font-weight: 500;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 1100;
-  animation: UsersAdmin-toastSlideUp 0.3s ease;
+  animation: admin-users-toastSlideUp 0.3s ease;
 }
 
-@keyframes UsersAdmin-toastSlideUp {
+@keyframes admin-users-toastSlideUp {
   from {
     opacity: 0;
     transform: translateX(-50%) translateY(20px);
@@ -407,48 +407,48 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .UsersAdmin .users-container {
+  .admin-users-container .admin-users-main-container {
     margin: 1rem;
     padding: 1rem;
   }
 
-  .UsersAdmin .users-table th,
-  .UsersAdmin .users-table td {
+  .admin-users-container .admin-users-table th,
+  .admin-users-container .admin-users-table td {
     padding: 0.75rem 0.5rem;
     font-size: 0.8rem;
   }
 
-  .UsersAdmin .action-buttons {
+  .admin-users-container .admin-users-action-buttons {
     flex-direction: column-reverse;
     gap: 0.75rem;
   }
 
-  .UsersAdmin .edit-button,
-  .UsersAdmin .invite-button {
+  .admin-users-container .admin-users-edit-button,
+  .admin-users-container .admin-users-invite-button {
     width: 100%;
   }
 
-  .UsersAdmin .invite-modal {
+  .admin-users-container .admin-users-invite-modal {
     padding: 24px;
     width: 95%;
     margin: 1rem;
   }
 
-  .UsersAdmin .modal-header-with-close {
+  .admin-users-container .admin-users-modal-header-with-close {
     margin-bottom: 20px;
   }
   
-  .UsersAdmin .modal-title {
+  .admin-users-container .admin-users-modal-title {
     font-size: 20px;
   }
   
-  .UsersAdmin .modal-close-button {
+  .admin-users-container .admin-users-modal-close-button {
     font-size: 28px;
     width: 28px;
     height: 28px;
   }
 
-  .UsersAdmin .submit-button {
+  .admin-users-container .admin-users-submit-button {
     max-width: 100%;
   }
 }

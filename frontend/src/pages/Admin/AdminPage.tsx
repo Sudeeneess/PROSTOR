@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // ✅ REMOVED - not being used
 import './AdminPage.css';
 import HeaderAdmin from './HeaderAdmin';
 import UsersAdmin from './UsersAdmin';

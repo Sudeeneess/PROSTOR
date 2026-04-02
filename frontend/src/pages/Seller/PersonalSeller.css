@@ -1,19 +1,19 @@
 /* Общий контейнер */
-.personal-container {
+.seller-personal-container {
   max-width: 1200px;
   margin: 40px auto;
   padding: 0 40px;
 }
 
 /* Заголовок */
-.personal-title {
+.seller-personal-title {
   font-size: 26px;
   font-weight: 600;
   margin-bottom: 32px;
 }
 
 /* Плашка профиля */
-.profile-card {
+.seller-personal-profile-card {
   width: 520px;
   background: #f7f7f7;
   border-radius: 20px;
@@ -26,14 +26,14 @@
 }
 
 /* Левая часть */
-.profile-info {
+.seller-personal-profile-info {
   display: flex;
   align-items: center;
   gap: 18px;
 }
 
 /* Аватар */
-.profile-avatar {
+.seller-personal-profile-avatar {
   width: 56px;
   height: 56px;
   border-radius: 50%;
@@ -47,24 +47,24 @@
 }
 
 /* Текст профиля */
-.profile-text {
+.seller-personal-profile-text {
   display: flex;
   flex-direction: column;
 }
 
-.profile-name {
+.seller-personal-profile-name {
   font-size: 17px;
   font-weight: 600;
 }
 
-.profile-inn {
+.seller-personal-profile-inn {
   font-size: 14px;
   color: #777;
   margin-top: 2px;
 }
 
 /* Кнопка редактирования */
-.edit-profile-btn {
+.seller-personal-edit-profile-btn {
   background: none;
   border: none;
   font-size: 14px;
@@ -72,12 +72,12 @@
   cursor: pointer;
 }
 
-.edit-profile-btn:hover {
+.seller-personal-edit-profile-btn:hover {
   text-decoration: underline;
 }
 
 /* Кнопка добавления товаров */
-.add-product-btn {
+.seller-personal-add-product-btn {
   width: 300px;
   padding: 16px;
   border-radius: 32px;
@@ -92,13 +92,14 @@
   margin-left: -32px;
   margin-bottom: 48px;
 }
+
 /* Меню */
-.menu-links {
+.seller-personal-menu-links {
   max-width: 300px;
   margin-left: -32px;
 }
 
-.menu-link {
+.seller-personal-menu-link {
   display: block;
   width: 300px;
   padding: 16px;
@@ -115,7 +116,7 @@
 }
 
 /* Модальное окно */
-.modal-overlay {
+.seller-personal-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -128,7 +129,7 @@
   z-index: 1000;
 }
 
-.modal-content {
+.seller-personal-modal-content {
   background: #ffffff;
   border-radius: 16px;
   padding: 32px;
@@ -137,15 +138,15 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
-.modal-content h2 {
+.seller-personal-modal-content h2 {
   font-size: 22px;
   font-weight: 600;
   margin-bottom: 24px;
   color: #333;
 }
 
-.modal-input,
-.modal-select {
+.seller-personal-modal-input,
+.seller-personal-modal-select {
   width: 100%;
   padding: 12px 16px;
   margin-bottom: 16px;
@@ -158,13 +159,13 @@
   box-sizing: border-box;
 }
 
-.modal-input:focus,
-.modal-select:focus {
+.seller-personal-modal-input:focus,
+.seller-personal-modal-select:focus {
   border-color: #999;
   background: #ffffff;
 }
 
-.modal-select {
+.seller-personal-modal-select {
   cursor: pointer;
   appearance: none;
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -173,14 +174,14 @@
   background-size: 16px;
 }
 
-.modal-buttons {
+.seller-personal-modal-buttons {
   display: flex;
   gap: 12px;
   margin-top: 8px;
 }
 
-.modal-save-btn,
-.modal-cancel-btn {
+.seller-personal-modal-save-btn,
+.seller-personal-modal-cancel-btn {
   flex: 1;
   padding: 12px;
   border: none;
@@ -191,21 +192,21 @@
   transition: all 0.2s;
 }
 
-.modal-save-btn {
+.seller-personal-modal-save-btn {
   background: #e0e0e0;
   color: #333;
 }
 
-.modal-save-btn:hover {
+.seller-personal-modal-save-btn:hover {
   background: #d0d0d0;
 }
 
-.modal-cancel-btn {
+.seller-personal-modal-cancel-btn {
   background: #f5f5f5;
   color: #666;
   border: 1px solid #ddd;
 }
 
-.modal-cancel-btn:hover {
+.seller-personal-modal-cancel-btn:hover {
   background: #e8e8e8;
 }

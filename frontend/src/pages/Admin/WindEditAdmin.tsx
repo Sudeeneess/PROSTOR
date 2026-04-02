@@ -90,21 +90,21 @@ const WindEditAdmin: React.FC<WindEditAdminProps> = ({
   if (!isOpen || !editedUser) return null;
 
   return (
-    <div className="wind-edit-overlay" onClick={onClose}>
-      <div className="wind-edit-modal" onClick={e => e.stopPropagation()}>
-        <div className="wind-edit-header">
+    <div className="admin-wind-edit-overlay" onClick={onClose}>
+      <div className="admin-wind-edit-modal" onClick={e => e.stopPropagation()}>
+        <div className="admin-wind-edit-header">
           <h2>Информация о пользователе</h2>
-          <button className="wind-edit-close" onClick={onClose}>
+          <button className="admin-wind-edit-close" onClick={onClose}>
             ✕
           </button>
         </div>
 
-        <div className="wind-edit-content">
-          <div className="user-info-section">
+        <div className="admin-wind-edit-content">
+          <div className="admin-wind-edit-user-info-section">
             <h3>Пользователь</h3>
             
-            <div className="form-row">
-              <div className="form-group">
+            <div className="admin-wind-edit-form-row">
+              <div className="admin-wind-edit-form-group">
                 <label>Фамилия:</label>
                 <input
                   type="text"
@@ -117,7 +117,7 @@ const WindEditAdmin: React.FC<WindEditAdminProps> = ({
                 />
               </div>
               
-              <div className="form-group">
+              <div className="admin-wind-edit-form-group">
                 <label>Имя:</label>
                 <input
                   type="text"
@@ -131,7 +131,7 @@ const WindEditAdmin: React.FC<WindEditAdminProps> = ({
               </div>
             </div>
 
-            <div className="form-group">
+            <div className="admin-wind-edit-form-group">
               <label>Email:</label>
               <input
                 type="email"
@@ -141,7 +141,7 @@ const WindEditAdmin: React.FC<WindEditAdminProps> = ({
               />
             </div>
 
-            <div className="form-group">
+            <div className="admin-wind-edit-form-group">
               <label>Должность:</label>
               <input
                 type="text"
@@ -152,17 +152,17 @@ const WindEditAdmin: React.FC<WindEditAdminProps> = ({
             </div>
           </div>
 
-          <div className="actions-section">
+          <div className="admin-wind-edit-actions-section">
             <h3>Действия:</h3>
-            <div className="action-buttons">
+            <div className="admin-wind-edit-action-buttons">
               <button 
-                className={`action-button block-button ${pendingActions.block ? 'active' : ''}`}
+                className={`admin-wind-edit-action-button admin-wind-edit-block-button ${pendingActions.block ? 'admin-wind-edit-active' : ''}`}
                 onClick={handleBlock}
               >
                 Заблокировать 
               </button>
               <button 
-                className={`action-button delete-button ${pendingActions.delete ? 'active' : ''}`}
+                className={`admin-wind-edit-action-button admin-wind-edit-delete-button ${pendingActions.delete ? 'admin-wind-edit-active' : ''}`}
                 onClick={handleDelete}
               >
                 Удалить 
@@ -171,8 +171,8 @@ const WindEditAdmin: React.FC<WindEditAdminProps> = ({
           </div>
         </div>
 
-        <div className="wind-edit-footer">
-          <button className="save-button" onClick={handleSave}>
+        <div className="admin-wind-edit-footer">
+          <button className="admin-wind-edit-save-button" onClick={handleSave}>
             Сохранить изменения
           </button>
         </div>

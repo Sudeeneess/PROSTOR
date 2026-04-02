@@ -1,0 +1,110 @@
+/* Общие настройки */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #fafafa;
+  color: #333;
+  min-height: 100vh;
+}
+
+/* Контейнер */
+.admin-reg-app {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #fafafa;
+}
+
+/* Центрирование */
+.admin-reg-content-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 80px);
+  padding: 40px 20px;
+}
+
+/* Форма */
+.admin-reg-auth-form {
+  max-width: 500px;
+  width: 100%;
+  padding: 40px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.admin-reg-auth-form-header {
+  font-size: 24px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* Поля */
+.admin-reg-form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.admin-reg-input-field,
+.admin-reg-input-select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e1e8f0;
+  border-radius: 12px;
+  font-size: 16px;
+  background: #fafbfc;
+  outline: none;
+}
+
+.admin-reg-input-field:focus,
+.admin-reg-input-select:focus {
+  border-color: #1a2634;
+  background: white;
+}
+
+/* Кнопка */
+.admin-reg-save-button {
+  width: 100%;
+  padding: 14px;
+  background-color: #e0e0e0;
+  border: none;
+  border-radius: 40px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.admin-reg-save-button:hover:not(:disabled) {
+  background-color: #d0d0d0;
+}
+
+/* Сообщения */
+.admin-reg-error-message {
+  background: #ffe6e6;
+  color: #cc0000;
+  padding: 12px;
+  margin-top: 15px;
+  border-radius: 20px;
+  text-align: center;
+}
+
+.admin-reg-success-message {
+  background: #e6ffe6;
+  color: #000;
+  padding: 12px;
+  margin-top: 15px;
+  border-radius: 20px;
+  text-align: center;
+}
+
+/* Ссылка */
+.admin-reg-login-footer {
+  text-align: center;
+  margin-top: 20px;
+}

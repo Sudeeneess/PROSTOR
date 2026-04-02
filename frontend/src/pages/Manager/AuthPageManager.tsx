@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BsPersonFill } from "react-icons/bs";
 import HeaderManager from './HeaderManager';
-import './AuthPageManager.css';
+import './AuthPageManager.css'; // Тот же файл с новыми стилями
 
 const AuthPageManager: React.FC = () => {
   const navigate = useNavigate();
@@ -61,25 +61,25 @@ const AuthPageManager: React.FC = () => {
   };
 
   return (
-    <div className="auth-page">
+    <div className="manager-auth-page">
       <HeaderManager />
-      <div className="auth-container">
-        <div className="auth-card">
-          <h2 className="auth-title">
+      <div className="manager-auth-container">
+        <div className="manager-auth-card">
+          <h2 className="manager-auth-title">
             Менеджера склада
-            <div className="title-icon">
+            <span className="manager-auth-title-icon">
               <BsPersonFill size={28} color='#000000' />
-            </div>
+            </span>
           </h2>
           
           {error && (
-            <div className="error-message">
+            <div className="manager-auth-error-message">
               {error}
             </div>
           )}
           
           <form onSubmit={handleSubmit}>
-            <div className="form-group">
+            <div className="manager-auth-form-group">
               <input
                 type="text"
                 id="username"
@@ -92,7 +92,7 @@ const AuthPageManager: React.FC = () => {
               />
             </div>
 
-            <div className="form-group">
+            <div className="manager-auth-form-group">
               <input
                 type="password"
                 id="password"
@@ -107,7 +107,7 @@ const AuthPageManager: React.FC = () => {
 
             <button 
               type="submit" 
-              className="submit-button"
+              className={`manager-auth-submit-button ${loading ? 'manager-auth-loading' : ''}`}
               disabled={loading}
             >
               {loading ? 'Загрузка...' : 'Войти'}

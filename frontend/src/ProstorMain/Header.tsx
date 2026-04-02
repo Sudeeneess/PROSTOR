@@ -30,8 +30,7 @@ const Header: React.FC = () => {
         navigate('warehouse/auth');
         break;
       case 'admin':
-        navigate('admin/');
-
+        navigate('admin/auth');
         break;
       default:
         break;

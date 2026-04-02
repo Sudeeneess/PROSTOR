@@ -1,4 +1,4 @@
-.wind-edit-overlay {
+.admin-wind-edit-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -9,10 +9,10 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  animation: fadeIn 0.3s ease;
+  animation: admin-wind-edit-fadeIn 0.3s ease;
 }
 
-.wind-edit-modal {
+.admin-wind-edit-modal {
   background: white;
   border-radius: 12px;
   width: 90%;
@@ -20,10 +20,10 @@
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  animation: slideUp 0.3s ease;
+  animation: admin-wind-edit-slideUp 0.3s ease;
 }
 
-.wind-edit-header {
+.admin-wind-edit-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -33,14 +33,14 @@
   border-radius: 12px 12px 0 0;
 }
 
-.wind-edit-header h2 {
+.admin-wind-edit-header h2 {
   margin: 0;
   font-size: 20px;
   font-weight: 600;
   color: #2c3e50;
 }
 
-.wind-edit-close {
+.admin-wind-edit-close {
   background: none;
   border: none;
   font-size: 24px;
@@ -56,39 +56,39 @@
   transition: all 0.2s;
 }
 
-.wind-edit-close:hover {
+.admin-wind-edit-close:hover {
   background-color: #e9ecef;
   color: #495057;
 }
 
-.wind-edit-content {
+.admin-wind-edit-content {
   padding: 24px;
 }
 
-.user-info-section h3,
-.actions-section h3 {
+.admin-wind-edit-user-info-section h3,
+.admin-wind-edit-actions-section h3 {
   font-size: 16px;
   font-weight: 600;
   margin: 0 0 16px 0;
   color: #495057;
 }
 
-.user-info-section {
+.admin-wind-edit-user-info-section {
   margin-bottom: 32px;
 }
 
-.form-row {
+.admin-wind-edit-form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
   margin-bottom: 16px;
 }
 
-.form-group {
+.admin-wind-edit-form-group {
   margin-bottom: 20px;
 }
 
-.form-group label {
+.admin-wind-edit-form-group label {
   display: block;
   margin-bottom: 8px;
   font-size: 14px;
@@ -96,7 +96,7 @@
   color: #495057;
 }
 
-.form-group input {
+.admin-wind-edit-form-group input {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid #dee2e6;
@@ -107,27 +107,27 @@
   transition: all 0.2s;
 }
 
-.form-group input:focus {
+.admin-wind-edit-form-group input:focus {
   outline: none;
   border-color: #adb5bd;
   box-shadow: 0 0 0 3px rgba(108, 117, 125, 0.1);
 }
 
-.form-group input::placeholder {
+.admin-wind-edit-form-group input::placeholder {
   color: #ced4da;
 }
 
-.actions-section {
+.admin-wind-edit-actions-section {
   border-top: 1px solid #e9ecef;
   padding-top: 24px;
 }
 
-.action-buttons {
+.admin-wind-edit-action-buttons {
   display: flex;
   gap: 16px;
 }
 
-.action-button {
+.admin-wind-edit-action-button {
   flex: 1;
   padding: 10px 16px;
   border: 1px solid #dee2e6;
@@ -144,38 +144,38 @@
   color: #495057;
 }
 
-.action-button.block-button:hover {
+.admin-wind-edit-block-button:hover {
   background-color: #999ca0;
   border-color: #999ca0;
   color: #495057;
 }
 
-.action-button.block-button.active {
+.admin-wind-edit-block-button.admin-wind-edit-active {
   background-color: #e6e6e6;
   border-color: #495057;
   color: #495057;
 }
 
-.action-button.delete-button:hover {
+.admin-wind-edit-delete-button:hover {
   background-color: #e6e6e6;
   border-color: #e9ecef;
   color: #495057;
 }
 
-.action-button.delete-button.active {
+.admin-wind-edit-delete-button.admin-wind-edit-active {
   background-color: #e6e6e6;
   border-color: #495057;
   color: #495057;
 }
 
-.wind-edit-footer {
+.admin-wind-edit-footer {
   padding: 20px 24px;
   border-top: 1px solid #e9ecef;
   background: #f8f9fa;
   border-radius: 0 0 12px 12px;
 }
 
-.save-button {
+.admin-wind-edit-save-button {
   width: 100%;
   padding: 12px 20px;
   background: #6c757d;
@@ -188,18 +188,18 @@
   transition: all 0.2s;
 }
 
-.save-button:hover {
+.admin-wind-edit-save-button:hover {
   background: #5a6268;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
 }
 
-.save-button:active {
+.admin-wind-edit-save-button:active {
   transform: translateY(0);
   background: #495057;
 }
 
-@keyframes fadeIn {
+@keyframes admin-wind-edit-fadeIn {
   from {
     opacity: 0;
   }
@@ -208,7 +208,7 @@
   }
 }
 
-@keyframes slideUp {
+@keyframes admin-wind-edit-slideUp {
   from {
     transform: translateY(20px);
     opacity: 0;
@@ -220,49 +220,20 @@
 }
 
 /* Стили для скролла */
-.wind-edit-modal::-webkit-scrollbar {
+.admin-wind-edit-modal::-webkit-scrollbar {
   width: 8px;
 }
 
-.wind-edit-modal::-webkit-scrollbar-track {
+.admin-wind-edit-modal::-webkit-scrollbar-track {
   background: #999ca0;
   border-radius: 4px;
 }
 
-.wind-edit-modal::-webkit-scrollbar-thumb {
+.admin-wind-edit-modal::-webkit-scrollbar-thumb {
   background: #999ca0;
   border-radius: 4px;
 }
 
-.wind-edit-modal::-webkit-scrollbar-thumb:hover {
+.admin-wind-edit-modal::-webkit-scrollbar-thumb:hover {
   background: #999ca0;
-}
-
-/* Адаптивность */
-@media (max-width: 640px) {
-  .wind-edit-modal {
-    width: 95%;
-    margin: 16px;
-  }
-  
-  .form-row {
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
-  
-  .action-buttons {
-    flex-direction: column;
-  }
-  
-  .wind-edit-header {
-    padding: 16px 20px;
-  }
-  
-  .wind-edit-content {
-    padding: 20px;
-  }
-  
-  .wind-edit-footer {
-    padding: 16px 20px;
-  }
 }

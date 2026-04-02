@@ -170,35 +170,35 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
       {/* Убираем передачу пропса - просто рендерим HeaderAdmin без параметров */}
       <HeaderAdmin />
 
-      <div className="UsersAdmin">
-        <div className="users-container">
-          <div className="users-header">
+      <div className="admin-users-container">
+        <div className="admin-users-main-container">
+          <div className="admin-users-header">
             <h1>Пользователи</h1>
-            <button className="back-button" onClick={handleBack}>
+            <button className="admin-users-back-button" onClick={handleBack}>
               Назад
             </button>
           </div>
 
-          <div className="tabs">
+          <div className="admin-users-tabs">
             <button 
-              className={`tab ${activeTab === 'all' ? 'active' : ''}`}
+              className={`admin-users-tab ${activeTab === 'all' ? 'admin-users-active' : ''}`}
               onClick={() => handleTabChange('all')}
             >
               Все пользователи
             </button>
             <button 
-              className={`tab ${activeTab === 'active' ? 'active' : ''}`}
+              className={`admin-users-tab ${activeTab === 'active' ? 'admin-users-active' : ''}`}
               onClick={() => handleTabChange('active')}
             >
               Активные
             </button>
           </div>
           
-          <div className="table-wrapper">
-            <table className="users-table">
+          <div className="admin-users-table-wrapper">
+            <table className="admin-users-table">
               <thead>
                 <tr>
-                  <th className="checkbox-cell"></th>
+                  <th className="admin-users-checkbox-cell"></th>
                   <th>ID</th>
                   <th>Имя</th>
                   <th>Email</th>
@@ -209,7 +209,7 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
               <tbody>
                 {filteredUsers.map(user => (
                   <tr key={user.id}>
-                    <td className="checkbox-cell" onClick={(e) => e.stopPropagation()}>
+                    <td className="admin-users-checkbox-cell" onClick={(e) => e.stopPropagation()}>
                       <input
                         type="checkbox"
                         checked={selectedUsers.includes(user.id)}
@@ -235,28 +235,28 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
           </div>
 
           {/* Кнопки действий как на скриншоте */}
-          <div className="action-buttons">
-            <button className="edit-button" onClick={handleEdit}>
+          <div className="admin-users-action-buttons">
+            <button className="admin-users-edit-button" onClick={handleEdit}>
               Редактировать пользователя
             </button>
-            <button className="invite-button" onClick={openModal}>
+            <button className="admin-users-invite-button" onClick={openModal}>
               Пригласить сотрудника
             </button>
           </div>
 
           {/* Модальное окно для приглашения с крестиком */}
           {showModal && (
-            <div className="modal-overlay" onClick={closeModal}>
-              <div className="invite-modal" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-header-with-close">
-                  <h2 className="modal-title">Данные нового сотрудника</h2>
-                  <button className="modal-close-button" onClick={closeModal}>
+            <div className="admin-users-modal-overlay" onClick={closeModal}>
+              <div className="admin-users-invite-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="admin-users-modal-header-with-close">
+                  <h2 className="admin-users-modal-title">Данные нового сотрудника</h2>
+                  <button className="admin-users-modal-close-button" onClick={closeModal}>
                     ×
                   </button>
                 </div>
                 
-                <div className="modal-form">
-                  <div className="form-group">
+                <div className="admin-users-modal-form">
+                  <div className="admin-users-form-group">
                     <label>Имя:</label>
                     <input
                       type="text"
@@ -266,7 +266,7 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
                     />
                   </div>
                   
-                  <div className="form-group">
+                  <div className="admin-users-form-group">
                     <label>Фамилия:</label>
                     <input
                       type="text"
@@ -276,7 +276,7 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
                     />
                   </div>
                   
-                  <div className="form-group">
+                  <div className="admin-users-form-group">
                     <label>Email:</label>
                     <input
                       type="email"
@@ -286,12 +286,12 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
                     />
                   </div>
                   
-                  <div className="form-group">
+                  <div className="admin-users-form-group">
                     <label>Должность:</label>
                     <select
                       value={newUser.role}
                       onChange={(e) => setNewUser({...newUser, role: e.target.value})}
-                      className="role-select"
+                      className="admin-users-role-select"
                     >
                       <option value="Менеджер">Менеджер</option>
                       <option value="Покупатель">Покупатель</option>
@@ -300,8 +300,8 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
                   </div>
                 </div>
                 
-                <div className="modal-actions">
-                  <button className="submit-button" onClick={handleInvite}>
+                <div className="admin-users-modal-actions">
+                  <button className="admin-users-submit-button" onClick={handleInvite}>
                     Отправить приглашение
                   </button>
                 </div>
@@ -318,7 +318,7 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
 
           {/* Toast уведомление */}
           {showToast && (
-            <div className="toast-notification">
+            <div className="admin-users-toast-notification">
               {toastMessage}
             </div>
           )}

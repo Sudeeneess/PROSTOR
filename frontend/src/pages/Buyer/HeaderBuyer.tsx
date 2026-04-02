@@ -50,6 +50,11 @@ const Header: React.FC = () => {
     }
   };
 
+  // Обработчик клика на аватар
+  const handleAvatarClick = () => {
+    navigate('/profile'); 
+  };
+
   //массив подкатегорий
   const catalogData = [
     {
@@ -167,7 +172,11 @@ const Header: React.FC = () => {
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          <div className='buyer-ava-icon'>
+          <div 
+            className='buyer-ava-icon'
+            onClick={handleAvatarClick}  // Добавлен обработчик клика
+            style={{ cursor: 'pointer' }} // Курсор в виде указателя
+          >
             <IoPersonCircleOutline size={50} color='#000000' />
           </div>
           <div className='buyer-basket-icon'>

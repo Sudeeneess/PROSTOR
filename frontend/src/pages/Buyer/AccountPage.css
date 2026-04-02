@@ -1,0 +1,461 @@
+/* AccountPage.css */
+
+.buyer-account-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+}
+
+.buyer-account-main {
+  padding: 40px 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.buyer-account-container {
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Блок с информацией о пользователе */
+.buyer-account-header {
+  padding: 32px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.buyer-account-user-info {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.buyer-account-avatar {
+  flex-shrink: 0;
+}
+
+.buyer-account-avatar svg {
+  width: 80px;
+  height: 80px;
+}
+
+.buyer-account-name-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.buyer-account-name {
+  font-size: 28px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.buyer-account-edit-btn {
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 20px;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.buyer-account-edit-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+/* Редактирование имени */
+.buyer-account-name-edit {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.buyer-account-name-input {
+  font-size: 24px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border: 2px solid #9ca3af;
+  border-radius: 12px;
+  outline: none;
+  font-family: inherit;
+  width: 250px;
+  color: #1f2937;
+}
+
+.buyer-account-name-input:focus {
+  border-color: #6b7280;
+}
+
+.buyer-account-edit-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.buyer-account-save-btn,
+.buyer-account-cancel-btn {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.buyer-account-save-btn {
+  background: #4b5563;
+  color: white;
+  border: none;
+}
+
+.buyer-account-save-btn:hover {
+  background: #374151;
+}
+
+.buyer-account-cancel-btn {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  color: #6b7280;
+}
+
+.buyer-account-cancel-btn:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+/* Опции профиля */
+.buyer-account-options {
+  padding: 16px;
+}
+
+.buyer-account-option-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px;
+  margin-bottom: 12px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #fafbfc;
+  border: 1px solid #eef2f6;
+}
+
+.buyer-account-option-card:hover {
+  background: #ffffff;
+  border-color: #9ca3af;
+  transform: translateX(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.buyer-account-option-icon {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  border-radius: 16px;
+}
+
+.buyer-account-option-icon svg path,
+.buyer-account-option-icon svg circle,
+.buyer-account-option-icon svg rect {
+  stroke: #6b7280;
+}
+
+.buyer-account-option-icon svg circle[fill="#4F46E5"] {
+  fill: #6b7280;
+}
+
+.buyer-account-option-icon svg path[fill="#4F46E5"] {
+  fill: #6b7280;
+}
+
+.buyer-account-option-content {
+  flex: 1;
+}
+
+.buyer-account-option-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 4px 0;
+}
+
+.buyer-account-option-description {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.buyer-account-option-arrow {
+  font-size: 24px;
+  color: #9ca3af;
+  transition: transform 0.3s ease;
+}
+
+.buyer-account-option-card:hover .buyer-account-option-arrow {
+  transform: translateX(4px);
+  color: #6b7280;
+}
+
+/* Модальные окна */
+.buyer-account-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: buyer-account-fadeIn 0.2s ease;
+}
+
+@keyframes buyer-account-fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.buyer-account-modal-content {
+  background: white;
+  border-radius: 24px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow: hidden;
+  animation: buyer-account-slideUp 0.3s ease;
+}
+
+@keyframes buyer-account-slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.buyer-account-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.buyer-account-modal-header h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.buyer-account-modal-close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #9ca3af;
+  transition: color 0.2s;
+  line-height: 1;
+}
+
+.buyer-account-modal-close:hover {
+  color: #374151;
+}
+
+.buyer-account-modal-body {
+  padding: 24px;
+  max-height: calc(80vh - 80px);
+  overflow-y: auto;
+}
+
+/* Стили для заказов */
+.buyer-account-orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.buyer-account-order-item {
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  transition: all 0.2s;
+}
+
+.buyer-account-order-item:hover {
+  border-color: #9ca3af;
+  background: #fafbfc;
+}
+
+.buyer-account-order-number {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.buyer-account-order-date {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-bottom: 6px;
+}
+
+.buyer-account-order-status {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.buyer-account-status-delivered {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.buyer-account-status-shipped {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.buyer-account-status-processing {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.buyer-account-order-summary {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.buyer-account-order-total {
+  font-weight: 500;
+  color: #1f2937;
+}
+
+/* Стили для способов оплаты */
+.buyer-account-payment-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.buyer-account-payment-method {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.buyer-account-payment-method.buyer-account-selected {
+  border-color: #6b7280;
+  background: #f9fafb;
+}
+
+.buyer-account-payment-method:hover {
+  border-color: #9ca3af;
+}
+
+.buyer-account-payment-method-icon {
+  font-size: 28px;
+}
+
+.buyer-account-payment-method-info {
+  flex: 1;
+}
+
+.buyer-account-payment-method-name {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.buyer-account-payment-method-details {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.buyer-account-payment-method-check {
+  color: #6b7280;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.buyer-account-add-payment-btn {
+  margin-top: 16px;
+  padding: 12px;
+  background: #f3f4f6;
+  border: 1px dashed #d1d5db;
+  border-radius: 12px;
+  color: #6b7280;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.buyer-account-add-payment-btn:hover {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+  color: #374151;
+}
+
+/* Адаптивность */
+@media (max-width: 640px) {
+  .buyer-account-main {
+    padding: 20px;
+  }
+  
+  .buyer-account-user-info {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .buyer-account-name-section {
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .buyer-account-name-edit {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .buyer-account-option-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .buyer-account-option-card:hover {
+    transform: translateY(-4px);
+  }
+  
+  .buyer-account-modal-content {
+    width: 95%;
+    margin: 16px;
+  }
+}

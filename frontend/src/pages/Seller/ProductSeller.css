@@ -1,27 +1,27 @@
-.seller-container {
+.seller-prod-container {
   background: #f5f5f5;
   min-height: 100vh;
 }
 
-.content {
+.seller-prod-content {
   padding: 30px;
 }
 
 /* верх */
-.top-bar {
+.seller-prod-top-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 25px;
 }
 
-.top-bar h2 {
+.seller-prod-top-bar h2 {
   margin: 0;
   color: #333;
   font-size: 24px;
 }
 
-.back-btn {
+.seller-prod-back-btn {
   padding: 10px 18px;
   border-radius: 20px;
   border: 1px solid #ccc;
@@ -31,11 +31,11 @@
   font-size: 14px;
 }
 
-.back-btn:hover {
+.seller-prod-back-btn:hover {
   background: #f0f0f0;
 }
 
-.add-btn {
+.seller-prod-add-btn {
   padding: 10px 18px;
   border-radius: 20px;
   border: 1px solid #ccc;
@@ -45,12 +45,12 @@
   font-size: 14px;
 }
 
-.add-btn:hover {
+.seller-prod-add-btn:hover {
   background: #f0f0f0;
 }
 
 /* таблица */
-.table {
+.seller-prod-table {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -60,7 +60,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.table-header {
+.seller-prod-table-header {
   display: grid;
   grid-template-columns: 2fr 2fr 1fr 1fr 0.5fr;
   color: #070202;
@@ -71,7 +71,7 @@
   padding: 0 10px;
 }
 
-.table-row {
+.seller-prod-table-row {
   display: grid;
   grid-template-columns: 2fr 2fr 1fr 1fr 0.5fr;
   gap: 10px;
@@ -79,11 +79,11 @@
   border-bottom: 1px solid #e0e0e0;
 }
 
-.table-row:last-child {
+.seller-prod-table-row:last-child {
   border-bottom: none;
 }
 
-.readonly-input {
+.seller-prod-readonly-input {
   width: 100%;
   padding: 10px;
   border-radius: 8px;
@@ -95,12 +95,12 @@
   box-sizing: border-box;
 }
 
-.readonly-input:focus {
+.seller-prod-readonly-input:focus {
   outline: none;
   border-color: #e0e0e0;
 }
 
-.checkbox-input {
+.seller-prod-checkbox-input {
   width: 18px;
   height: 18px;
   margin: auto;
@@ -109,14 +109,14 @@
 }
 
 /* кнопки снизу */
-.actions {
+.seller-prod-actions {
   margin-top: 30px;
   display: flex;
   justify-content: flex-end;
   gap: 15px;
 }
 
-.delete-btn {
+.seller-prod-delete-btn {
   padding: 12px 20px;
   border-radius: 20px;
   border: none;
@@ -126,7 +126,7 @@
   font-size: 14px;
 }
 
-.edit-btn {
+.seller-prod-edit-btn {
   padding: 12px 20px;
   border-radius: 20px;
   border: none;
@@ -136,7 +136,7 @@
   font-size: 14px;
 }
 
-.empty-state {
+.seller-prod-empty-state {
   text-align: center;
   padding: 60px 20px;
   background: white;
@@ -144,13 +144,13 @@
   margin-top: 20px;
 }
 
-.empty-state p {
+.seller-prod-empty-state p {
   font-size: 18px;
   color: #666;
   margin-bottom: 20px;
 }
 
-.add-first-btn {
+.seller-prod-add-first-btn {
   padding: 12px 24px;
   border-radius: 20px;
   border: none;
@@ -161,7 +161,7 @@
 }
 
 /* Модальное окно */
-.modal-overlay {
+.seller-prod-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -174,7 +174,7 @@
   z-index: 1000;
 }
 
-.modal-content {
+.seller-prod-modal-content {
   background: white;
   border-radius: 20px;
   padding: 30px;
@@ -182,10 +182,10 @@
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
-  animation: slideIn 0.3s ease;
+  animation: seller-prod-slideIn 0.3s ease;
 }
 
-@keyframes slideIn {
+@keyframes seller-prod-slideIn {
   from {
     transform: translateY(-50px);
     opacity: 0;
@@ -196,33 +196,33 @@
   }
 }
 
-.modal-content h2 {
+.seller-prod-modal-content h2 {
   margin-bottom: 20px;
   color: #333;
   text-align: center;
   font-size: 24px;
 }
 
-.edit-form {
+.seller-prod-edit-form {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.form-group {
+.seller-prod-form-group {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.form-group label {
+.seller-prod-form-group label {
   font-weight: 600;
   color: #555;
   font-size: 14px;
 }
 
-.edit-input,
-.edit-textarea {
+.seller-prod-edit-input,
+.seller-prod-edit-textarea {
   padding: 12px;
   border: 2px solid #e0e0e0;
   border-radius: 10px;
@@ -233,19 +233,19 @@
   box-sizing: border-box;
 }
 
-.edit-textarea {
+.seller-prod-edit-textarea {
   resize: vertical;
   min-height: 80px;
 }
 
-.modal-buttons {
+.seller-prod-modal-buttons {
   display: flex;
   gap: 15px;
   margin-top: 25px;
 }
 
-.save-btn,
-.cancel-btn {
+.seller-prod-save-btn,
+.seller-prod-cancel-btn {
   flex: 1;
   padding: 12px;
   border: none;
@@ -256,18 +256,17 @@
   transition: all 0.3s;
 }
 
-.save-btn {
+.seller-prod-save-btn {
   background: #6e6e6e;
   color: white;
 }
 
-.cancel-btn {
+.seller-prod-cancel-btn {
   background: #e0e0e0;
   color: #333;
 }
 
-.cancel-btn:hover {
+.seller-prod-cancel-btn:hover {
   background: #d0d0d0;
   transform: translateY(-2px);
 }
-

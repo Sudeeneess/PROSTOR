@@ -22,37 +22,37 @@ const OrdersSeller: React.FC = () => {
   };
 
   return (
-    <div className="orders-page">
+    <div className="seller-orders-page">
       <HeaderSeller />
 
-      <div className="orders-container">
-        <div className="orders-header">
+      <div className="seller-orders-container">
+        <div className="seller-orders-header">
           <h1>Заказы</h1>
 
-          <button className="back-button" onClick={handleBack}>
+          <button className="seller-orders-back-button" onClick={handleBack}>
             ← Назад
           </button>
         </div>
 
-        <div className="orders-grid">
-          <div className="order-card">
+        <div className="seller-orders-grid">
+          <div className="seller-orders-card">
             <span>Новые</span>
-            <span className="order-count">{orders.new}</span>
+            <span className="seller-orders-count">{orders.new}</span>
           </div>
 
-          <div className="order-card">
+          <div className="seller-orders-card">
             <span>В сборке</span>
-            <span className="order-count">{orders.assembling}</span>
+            <span className="seller-orders-count">{orders.assembling}</span>
           </div>
 
-          <div className="order-card">
+          <div className="seller-orders-card">
             <span>Проданные</span>
-            <span className="order-count">{orders.sold}</span>
+            <span className="seller-orders-count">{orders.sold}</span>
           </div>
 
-          <div className="order-card">
+          <div className="seller-orders-card">
             <span>В пути</span>
-            <span className="order-count">{orders.onTheWay}</span>
+            <span className="seller-orders-count">{orders.onTheWay}</span>
           </div>
         </div>
       </div>

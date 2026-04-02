@@ -7,7 +7,7 @@ const MainPageBuyer: React.FC = () => {
   return (
     <div className="buyer-page">
       <Header />
-      <main className="main-content">
+      <main className="buyer-main-content">
         <ProductGrid />
       </main>
     </div>

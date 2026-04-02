@@ -65,13 +65,13 @@ const ProductAdmin: React.FC = () => {
     <div>
       <HeaderAdmin />
 
-      <div className="product-container">
-        <div className="product-header">
+      <div className="admin-prod-container">
+        <div className="admin-prod-header">
           <h2>Товары</h2>
 
           {/* ✅ ИСПРАВЛЕНО */}
           <span 
-            className="back-link"
+            className="admin-prod-back-link"
             onClick={() => navigate('/admin')} // 👈 переход
             style={{ cursor: 'pointer' }}
           >
@@ -79,28 +79,28 @@ const ProductAdmin: React.FC = () => {
           </span>
         </div>
 
-        <div className="tabs">
+        <div className="admin-prod-tabs">
           <button
-            className={filter === 'all' ? 'active' : ''}
+            className={filter === 'all' ? 'admin-prod-active' : ''}
             onClick={() => setFilter('all')}
           >
             Все товары
           </button>
           <button
-            className={filter === 'visible' ? 'active' : ''}
+            className={filter === 'visible' ? 'admin-prod-active' : ''}
             onClick={() => setFilter('visible')}
           >
             Активные
           </button>
           <button
-            className={filter === 'hidden' ? 'active' : ''}
+            className={filter === 'hidden' ? 'admin-prod-active' : ''}
             onClick={() => setFilter('hidden')}
           >
             Скрытые
           </button>
         </div>
 
-        <table className="product-table">
+        <table className="admin-prod-table">
           <thead>
             <tr>
               <th></th>
@@ -134,7 +134,7 @@ const ProductAdmin: React.FC = () => {
         </table>
 
         {selected.length > 0 && (
-          <div className="actions">
+          <div className="admin-prod-actions">
             <button onClick={handleHideSelected}>
               Скрыть выбранные 
             </button>
