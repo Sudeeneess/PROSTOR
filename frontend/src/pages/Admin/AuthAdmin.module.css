@@ -7,36 +7,56 @@ body {
 
 /* Главный контейнер */
 .admin-auth-app {
-  width: 100%;
   min-height: 100vh;
-  background-color: #f4f6f9;
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f5f5;
 }
 
 /* Основная секция */
 .admin-auth-content-section {
+  flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 80px);
-  padding: 40px 20px;
+  padding: 2rem;
 }
 
 /* Форма авторизации */
 .admin-auth-form {
-  max-width: 500px;
+  background: white;
+  padding-bottom: 1.2rem;
+  padding-top: 1.2rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  border-radius: 30px;
   width: 100%;
-  padding: 40px;
-  background-color: white;
-  border-radius: 14px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  max-width: 400px;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  animation: admin-auth-slideIn 0.3s ease;
+  transform: translateY(-100px);
+}
+
+@keyframes admin-auth-slideIn {
+  from {
+    transform: translateY(-180px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(-100px);
+    opacity: 1;
+  }
 }
 
 .admin-auth-form-header {
-  font-size: 26px;
+  text-align: start;
+  margin-bottom: 2rem;
+  color: #0a0a0a;
+  font-size: 1.5rem;
   font-weight: 600;
-  text-align: center;
-  margin-bottom: 30px;
-  color: #1a2634;
+  display: flex;
+  align-items: center;
 }
 
 /* Контейнер формы */
@@ -48,7 +68,8 @@ body {
 
 /* Поля формы */
 .admin-auth-form-field {
-  margin-bottom: 10px;
+  margin-bottom: 1.5rem;
+  width: 100%;
 }
 
 .admin-auth-form-field label {
@@ -61,73 +82,195 @@ body {
 
 .admin-auth-input-field {
   width: 100%;
-  padding: 12px 16px;
-  border: 2px solid #e1e8f0;
-  border-radius: 12px;
-  font-size: 16px;
-  background: #fafbfc;
-  transition: all 0.2s;
+  max-width: 100%;
+  padding: 12px;
+  padding-left: 15px;
+  border: 1px solid #C0C0C0;
+  border-radius: 20px;
+  font-size: 14px;
   outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 
 .admin-auth-input-field:focus {
-  border-color: #1a2634;
-  background: white;
+  border-color: #8d8d8d;
+  box-shadow: 0 0 0 2px rgba(192, 192, 192, 0.2);
 }
 
 /* Кнопка */
 .admin-auth-save-button {
   width: 100%;
-  padding: 14px;
-  background-color: #1a2634;
-  color: white;
+  padding: 13px;
+  background-color: #e0e0e0;
+  color: #000000;
   border: none;
-  border-radius: 40px;
-  font-size: 18px;
+  border-radius: 20px;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s;
-  text-transform: uppercase;
+  transition: background-color 0.2s;
+  text-transform: none;
 }
 
 .admin-auth-save-button:hover:not(:disabled) {
-  background-color: #0f1720;
+  background-color: #acacac;
 }
 
 .admin-auth-save-button:disabled {
-  opacity: 0.7;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
 /* Сообщения */
 .admin-auth-error-message {
-  background: #ffe6e6;
-  color: #cc0000;
-  padding: 12px;
-  margin: 15px 0;
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 12px 16px;
   border-radius: 20px;
+  margin-bottom: 20px;
   text-align: center;
+  font-size: 14px;
+  border: 1px solid #ffcdd2;
+  animation: admin-auth-shake 0.5s ease-in-out;
+  width: 100%;
+  box-sizing: border-box;
+  box-shadow: 0 2px 8px rgba(198, 40, 40, 0.1);
+}
+
+@keyframes admin-auth-shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
 }
 
 .admin-auth-success-message {
-  background: #e6ffe6;
-  color: #000;
-  padding: 12px;
-  margin: 15px 0;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  padding: 12px 16px;
   border-radius: 20px;
+  margin-bottom: 20px;
   text-align: center;
+  font-size: 14px;
+  border: 1px solid #c8e6c9;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* Ссылка */
+/* Ссылка регистрации */
 .admin-auth-registration-link {
   text-align: center;
-  margin-top: 20px;
-  font-size: 14px;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.admin-auth-registration-link p {
   color: #666;
+  font-size: 0.9rem;
 }
 
 .admin-auth-registration-link a {
-  color: #1a2634;
-  font-weight: bold;
+  background: none;
+  border: none;
+  color: #1f54c7;
+  cursor: pointer;
+  font-size: 0.9rem;
   text-decoration: underline;
+  padding: 0;
+  margin-left: 0.3rem;
+}
+
+.admin-auth-registration-link a:hover {
+  color: #003772;
+}
+
+/* Стили для инпута с ошибкой */
+.admin-auth-input-field.admin-auth-error {
+  border-color: #c62828;
+  background-color: #ffebee;
+}
+
+.admin-auth-input-field.admin-auth-error:focus {
+  border-color: #c62828;
+  box-shadow: 0 0 0 2px rgba(198, 40, 40, 0.2);
+}
+
+/* Стили для disabled состояния кнопки */
+.admin-auth-save-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #e0e0e0;
+}
+
+.admin-auth-save-button:disabled:hover {
+  background-color: #e0e0e0;
+}
+
+/* Стили для disabled состояния ссылок */
+.admin-auth-registration-link a:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  color: #999;
+  text-decoration: none;
+}
+
+/* Стили для disabled состояния инпутов */
+.admin-auth-input-field:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Стили для индикатора загрузки на кнопке */
+.admin-auth-save-button.admin-auth-loading {
+  position: relative;
+  color: transparent;
+}
+
+.admin-auth-save-button.admin-auth-loading::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  left: 50%;
+  margin-left: -10px;
+  margin-top: -10px;
+  border: 2px solid #000000;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: admin-auth-spinner 0.8s linear infinite;
+}
+
+@keyframes admin-auth-spinner {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 480px) {
+  .admin-auth-content-section {
+    padding: 1rem;
+  }
+  
+  .admin-auth-form {
+    padding: 1.5rem;
+    transform: translateY(-50px);
+  }
+  
+  .admin-auth-form-header {
+    font-size: 1.3rem;
+  }
+  
+  @keyframes admin-auth-slideIn {
+    from {
+      transform: translateY(-100px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(-50px);
+      opacity: 1;
+    }
+  }
 }
