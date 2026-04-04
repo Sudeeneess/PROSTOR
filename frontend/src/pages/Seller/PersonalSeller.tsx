@@ -17,7 +17,6 @@ const PersonalSeller: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Загружаем данные продавца
     const storedData = localStorage.getItem("sellerProfile");
     if (storedData) {
       const parsedData = JSON.parse(storedData);
@@ -25,7 +24,6 @@ const PersonalSeller: React.FC = () => {
       setFormData(parsedData);
     }
     
-    // Проверяем роль пользователя
     const userRole = sessionStorage.getItem('userRole');
     console.log("Current user role:", userRole);
   }, []);
@@ -92,16 +90,26 @@ const PersonalSeller: React.FC = () => {
           </button>
         </div>
 
-        <button className={styles['seller-personal-add-product-btn']} onClick={handleAddProduct}>
-          Добавить товары
-          <span className={styles['seller-personal-add-icon']}></span>
-        </button>
+        {/* Единый класс для всех кнопок действий */}
+        <div className={styles['seller-personal-actions']}>
+          <button 
+            className={styles['seller-personal-action-btn']} 
+            onClick={handleAddProduct}
+          >
+            Добавить товары
+          </button>
 
-        <div className={styles['seller-personal-menu-links']}>
-          <button onClick={handleMyProducts} className={styles['seller-personal-menu-link']}>
+          <button 
+            className={styles['seller-personal-action-btn']} 
+            onClick={handleMyProducts}
+          >
             Мои товары
           </button>
-          <button onClick={handleMyOrders} className={styles['seller-personal-menu-link']}>
+
+          <button 
+            className={styles['seller-personal-action-btn']} 
+            onClick={handleMyOrders}
+          >
             Мои заказы
           </button>
         </div>
