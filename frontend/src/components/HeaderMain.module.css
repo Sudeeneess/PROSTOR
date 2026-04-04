@@ -261,142 +261,89 @@
   line-height: 0;
 }
 
-/* Выпадающее меню ролей — как в Header.css */
+/* Выпадающее меню ролей - без стрелок */
 .hm-role-dropdown {
   position: absolute;
   top: calc(100% + 14px);
   right: 0;
-  min-width: 290px;            /* Немного увеличено, чтобы текст не стягивался */
-  background: rgba(255, 255, 255, 0.95); /* чуть менее непрозрачный, для чистоты читаемости */
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-radius: 20px;           /* плавное скругление углов */
-  box-shadow:
-    0 14px 34px rgba(0, 0, 0, 0.10),   /* более мягкая, воздушная тень */
-    0 2px 6px rgba(0, 0, 0, 0.04);
+  min-width: 260px;
+  max-width: 320px;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 24px;
+  box-shadow: 
+    0 20px 35px -12px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(0, 0, 0, 0.03);
   z-index: 1000;
   overflow: hidden;
-  animation: hm-roleDropdownFadeIn 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-  border: 1px solid rgba(0, 0, 0, 0.05); /* тонкая рамка для четкости */
+  animation: hm-roleDropdownFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Заголовок внутри dropdown - светлый, минималистичный */
+/* Заголовок dropdown */
 .hm-role-dropdown-heading {
-  padding: 14px 18px 12px;
-  color: #6b6b6b;
-  font-size: 12px;
+  padding: 18px 20px 12px;
+  color: #8b8b8b;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   cursor: default;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  background: linear-gradient(#ffffff 0%, #f7f7f7 100%); /* легкая градиентация снизу */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
+  white-space: nowrap;
 }
 
-/* Элемент списка ролей */
+/* Элемент списка ролей - без псевдоэлемента со стрелкой */
 .hm-role-item {
-  padding: 12px 20px;
+  padding: 13px 20px;
   cursor: pointer;
-  color: #1a1a1a;
+  color: #1c1c1e;
   font-size: 15px;
   font-weight: 500;
-  transition: transform 0.25s cubic-bezier(.2,.9,.3,1), background 0.25s, color 0.25s;
+  transition: all 0.25s ease;
   position: relative;
   background: transparent;
-  display: block;
+  
+  /* Перенос текста */
+  word-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
+  line-height: 1.4;
 }
 
-/* Разделители между элементами — более светлые и просторные */
+/* Разделители между элементами */
 .hm-role-item:not(:last-child) {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
 }
 
-/* При наведении — мягкое выделение с лёгким смещением */
+/* При наведении - плавное смещение и изменение фона */
 .hm-role-item:hover {
-  background: rgba(0, 0, 0, 0.04);
-  color: #111;
-  padding-left: 26px;
-  border-radius: 6px;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.04) 100%);
+  color: #000;
+  padding-left: 24px;  /* Легкое смещение вправо при наведении */
+  padding-right: 16px;
   transform: translateX(2px);
-  text-shadow: 0 0 0 transparent; /* сброс теней */
 }
 
-/* При активном нажатии — лёгкая обратная реакция */
+/* При активном нажатии */
 .hm-role-item:active {
   transform: scale(0.98);
   transition-duration: 0.08s;
   background: rgba(0, 0, 0, 0.06);
 }
 
-/* Декоративная лента слева для акцента выбранного элемента */
-.hm-role-item::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 12%;
-  height: 76%;
-  width: 3px;
-  background: #d0d0d0;
-  border-radius: 0 4px 4px 0;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-/* Активный элемент подчёркнут аналогичным образом, но с более ярким цветом */
-.hm-role-item:hover::before {
-  opacity: 0.8;
-  background: #8a8a8a;
-}
-
-/* При выборе (active) можно пометить отдельной стилизацией */
-.hm-role-item.active {
-  background: rgba(226, 226, 226, 0.75);
-  color: #000;
-  padding-left: 26px;
-  border-left: 3px solid #3a3a3a;
-}
-
-/* Цвет и стиль для активного элемента — плавное изменение цвета текста и левой линии */
-.hm-role-item.active::before {
-  opacity: 1;
-  background: #3a3a3a;
-}
-
+/* Анимация появления */
 @keyframes hm-roleDropdownFadeIn {
   0% {
     opacity: 0;
-    transform: translateY(-12px) scale(0.96);
+    transform: translateY(-10px) scale(0.98);
     backdrop-filter: blur(0px);
-  }
-  40% {
-    opacity: 0.5;
   }
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
     backdrop-filter: blur(12px);
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
   }
 }
 
