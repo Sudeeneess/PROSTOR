@@ -1,25 +1,27 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Header from './Header';
-import ProductGrid from './ProductGrid';
-import AuthPageBuyer from '../pages/Buyer/AuthPageBuyer'; 
-import MainPageBuyer from '../pages/Buyer/MainPageBuyer';
-import ProfilePage from '../pages/Buyer/AccountBuyer';
-import AuthPageManager from '../pages/Manager/AuthPageManager';
-import Warehouse from '../pages/Manager/WarehousePage';
-import Authorizationseller from '../pages/Seller/AuthSeller';
-import SellerEntrance from '../pages/Seller/RegistrSeller'; 
-import PersonalSeller from '../pages/Seller/PersonalSeller';
-import AddingProducts from '../pages/Seller/AddProducts';
-import ProductSeller from '../pages/Seller/ProductSeller';
-import OrdersSeller from '../pages/Seller/OrdersSeller';
+import styles from './App.module.css';
+import HeaderMain from './components/HeaderMain';
+import ProductGrid from './components/ProductGrid';
+import AuthPageBuyer from './pages/Buyer/AuthPageBuyer'; 
+import MainPageBuyer from './pages/Buyer/MainPageBuyer';
+import ProfilePage from './pages/Buyer/AccountBuyer';
+import OrdersPageBuyer from './pages/Buyer/OrdersPageBuyer';
+import AuthPageManager from './pages/Manager/AuthPageManager';
+import Warehouse from './pages/Manager/WarehousePage';
+import Authorizationseller from './pages/Seller/AuthSeller';
+import SellerEntrance from './pages/Seller/RegistrSeller'; 
+import PersonalSeller from './pages/Seller/PersonalSeller';
+import AddingProducts from './pages/Seller/AddProducts';
+import ProductSeller from './pages/Seller/ProductSeller';
+import OrdersSeller from './pages/Seller/OrdersSeller';
 
 // Admin imports
-import AuthorizationAdmin from '../pages/Admin/AuthAdmin';
-import Admin from '../pages/Admin/AdminPage';
-import UsersAdmin from '../pages/Admin/UsersAdmin';
-import ProductAdmin from '../pages/Admin/ProductAdmin';
-import RegistrAdmin from '../pages/Admin/RegistrAdmin';
+import AuthorizationAdmin from './pages/Admin/AuthAdmin';
+import Admin from './pages/Admin/AdminPage';
+import UsersAdmin from './pages/Admin/UsersAdmin';
+import ProductAdmin from './pages/Admin/ProductAdmin';
+import RegistrAdmin from './pages/Admin/RegistrAdmin';
 
 // ==================== КОМПОНЕНТЫ ДЛЯ ПОКУПАТЕЛЯ ====================
 
@@ -158,8 +160,8 @@ const AppContent: React.FC = () => {
           
           return (
             <>
-              <Header />
-              <main className="main-content">
+              <HeaderMain variant="landing" />
+              <main className={styles['main-content']}>
                 <ProductGrid />
               </main>
             </>
@@ -185,6 +187,12 @@ const AppContent: React.FC = () => {
       <Route path="/profile" element={
         <PrivateProfileRoute>
           <ProfilePage />
+        </PrivateProfileRoute>
+      } />
+
+      <Route path="/orders" element={
+        <PrivateProfileRoute>
+          <OrdersPageBuyer />
         </PrivateProfileRoute>
       } />
       
@@ -333,7 +341,7 @@ const AppContent: React.FC = () => {
 function App() {
   return (
     <Router>
-      <div className="app">
+      <div className={styles['app']}>
         <AppContent />
       </div>
     </Router>

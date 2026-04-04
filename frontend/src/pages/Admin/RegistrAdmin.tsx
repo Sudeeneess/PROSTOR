@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import HeaderAdmin from "./HeaderAdmin";
-import "./RegistrAdmin.css";
+import styles from './RegistrAdmin.module.css';
 
 const RegistrAdmin: React.FC = () => {
   const navigate = useNavigate();
@@ -65,21 +65,21 @@ const RegistrAdmin: React.FC = () => {
   };
 
   return (
-    <div className="admin-reg-app">
+    <div className={styles['admin-reg-app']}>
       <HeaderAdmin />
 
-      <main className="admin-reg-content-section">
-        <form className="admin-reg-auth-form" onSubmit={handleSubmit}>
-          <div className="admin-reg-auth-form-header">Регистрация администратора</div>
+      <main className={styles['admin-reg-content-section']}>
+        <form className={styles['admin-reg-auth-form']} onSubmit={handleSubmit}>
+          <div className={styles['admin-reg-auth-form-header']}>Регистрация администратора</div>
 
-          <div className="admin-reg-form-container">
+          <div className={styles['admin-reg-form-container']}>
             <input
               type="text"
               name="login"
               placeholder="Логин"
               value={formData.login}
               onChange={handleChange}
-              className="admin-reg-input-field"
+              className={styles['admin-reg-input-field']}
               required
             />
 
@@ -89,19 +89,19 @@ const RegistrAdmin: React.FC = () => {
               placeholder="Пароль"
               value={formData.password}
               onChange={handleChange}
-              className="admin-reg-input-field"
+              className={styles['admin-reg-input-field']}
               required
             />
 
-            <button className="admin-reg-save-button" disabled={loading}>
+            <button className={styles['admin-reg-save-button']} disabled={loading}>
               {loading ? "Регистрация..." : "Зарегистрироваться"}
             </button>
           </div>
 
-          {errorMessage && <p className="admin-reg-error-message">{errorMessage}</p>}
-          {successMessage && <p className="admin-reg-success-message">{successMessage}</p>}
+          {errorMessage && <p className={styles['admin-reg-error-message']}>{errorMessage}</p>}
+          {successMessage && <p className={styles['admin-reg-success-message']}>{successMessage}</p>}
 
-          <div className="admin-reg-login-footer">
+          <div className={styles['admin-reg-login-footer']}>
             Уже есть аккаунт? <Link to="/admin/auth">Войти</Link>
           </div>
         </form>

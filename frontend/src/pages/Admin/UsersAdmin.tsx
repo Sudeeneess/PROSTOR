@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './UsersAdmin.css';
+import styles from './UsersAdmin.module.css';
 import HeaderAdmin from './HeaderAdmin';
 import WindEditAdmin from './WindEditAdmin';
 
@@ -170,35 +170,37 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
       {/* Убираем передачу пропса - просто рендерим HeaderAdmin без параметров */}
       <HeaderAdmin />
 
-      <div className="admin-users-container">
-        <div className="admin-users-main-container">
-          <div className="admin-users-header">
+      <div className={styles['admin-users-container']}>
+        <div className={styles['admin-users-main-container']}>
+          <div className={styles['admin-users-header']}>
             <h1>Пользователи</h1>
-            <button className="admin-users-back-button" onClick={handleBack}>
+            <button className={styles['admin-users-back-button']} onClick={handleBack}>
               Назад
             </button>
           </div>
 
-          <div className="admin-users-tabs">
-            <button 
-              className={`admin-users-tab ${activeTab === 'all' ? 'admin-users-active' : ''}`}
+          <div className={styles['admin-users-tabs']}>
+            <button
+              type="button"
+              className={`${styles['admin-users-tab']} ${activeTab === 'all' ? styles['admin-users-active'] : ''}`}
               onClick={() => handleTabChange('all')}
             >
               Все пользователи
             </button>
-            <button 
-              className={`admin-users-tab ${activeTab === 'active' ? 'admin-users-active' : ''}`}
+            <button
+              type="button"
+              className={`${styles['admin-users-tab']} ${activeTab === 'active' ? styles['admin-users-active'] : ''}`}
               onClick={() => handleTabChange('active')}
             >
               Активные
             </button>
           </div>
           
-          <div className="admin-users-table-wrapper">
-            <table className="admin-users-table">
+          <div className={styles['admin-users-table-wrapper']}>
+            <table className={styles['admin-users-table']}>
               <thead>
                 <tr>
-                  <th className="admin-users-checkbox-cell"></th>
+                  <th className={styles['admin-users-checkbox-cell']}></th>
                   <th>ID</th>
                   <th>Имя</th>
                   <th>Email</th>
@@ -209,7 +211,7 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
               <tbody>
                 {filteredUsers.map(user => (
                   <tr key={user.id}>
-                    <td className="admin-users-checkbox-cell" onClick={(e) => e.stopPropagation()}>
+                    <td className={styles['admin-users-checkbox-cell']} onClick={(e) => e.stopPropagation()}>
                       <input
                         type="checkbox"
                         checked={selectedUsers.includes(user.id)}
@@ -235,28 +237,28 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
           </div>
 
           {/* Кнопки действий как на скриншоте */}
-          <div className="admin-users-action-buttons">
-            <button className="admin-users-edit-button" onClick={handleEdit}>
+          <div className={styles['admin-users-action-buttons']}>
+            <button className={styles['admin-users-edit-button']} onClick={handleEdit}>
               Редактировать пользователя
             </button>
-            <button className="admin-users-invite-button" onClick={openModal}>
+            <button className={styles['admin-users-invite-button']} onClick={openModal}>
               Пригласить сотрудника
             </button>
           </div>
 
           {/* Модальное окно для приглашения с крестиком */}
           {showModal && (
-            <div className="admin-users-modal-overlay" onClick={closeModal}>
-              <div className="admin-users-invite-modal" onClick={(e) => e.stopPropagation()}>
-                <div className="admin-users-modal-header-with-close">
-                  <h2 className="admin-users-modal-title">Данные нового сотрудника</h2>
-                  <button className="admin-users-modal-close-button" onClick={closeModal}>
+            <div className={styles['admin-users-modal-overlay']} onClick={closeModal}>
+              <div className={styles['admin-users-invite-modal']} onClick={(e) => e.stopPropagation()}>
+                <div className={styles['admin-users-modal-header-with-close']}>
+                  <h2 className={styles['admin-users-modal-title']}>Данные нового сотрудника</h2>
+                  <button className={styles['admin-users-modal-close-button']} onClick={closeModal}>
                     ×
                   </button>
                 </div>
                 
-                <div className="admin-users-modal-form">
-                  <div className="admin-users-form-group">
+                <div className={styles['admin-users-modal-form']}>
+                  <div className={styles['admin-users-form-group']}>
                     <label>Имя:</label>
                     <input
                       type="text"
@@ -266,7 +268,7 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
                     />
                   </div>
                   
-                  <div className="admin-users-form-group">
+                  <div className={styles['admin-users-form-group']}>
                     <label>Фамилия:</label>
                     <input
                       type="text"
@@ -276,7 +278,7 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
                     />
                   </div>
                   
-                  <div className="admin-users-form-group">
+                  <div className={styles['admin-users-form-group']}>
                     <label>Email:</label>
                     <input
                       type="email"
@@ -286,12 +288,12 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
                     />
                   </div>
                   
-                  <div className="admin-users-form-group">
+                  <div className={styles['admin-users-form-group']}>
                     <label>Должность:</label>
                     <select
                       value={newUser.role}
                       onChange={(e) => setNewUser({...newUser, role: e.target.value})}
-                      className="admin-users-role-select"
+                      className={styles['admin-users-role-select']}
                     >
                       <option value="Менеджер">Менеджер</option>
                       <option value="Покупатель">Покупатель</option>
@@ -300,8 +302,8 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
                   </div>
                 </div>
                 
-                <div className="admin-users-modal-actions">
-                  <button className="admin-users-submit-button" onClick={handleInvite}>
+                <div className={styles['admin-users-modal-actions']}>
+                  <button className={styles['admin-users-submit-button']} onClick={handleInvite}>
                     Отправить приглашение
                   </button>
                 </div>
@@ -318,7 +320,7 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
 
           {/* Toast уведомление */}
           {showToast && (
-            <div className="admin-users-toast-notification">
+            <div className={styles['admin-users-toast-notification']}>
               {toastMessage}
             </div>
           )}

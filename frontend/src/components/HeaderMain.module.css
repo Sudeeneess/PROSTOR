@@ -1,0 +1,437 @@
+.hm-header {
+  background: #C0C0C0;
+  padding: 0.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  gap: 20px;
+}
+
+.hm-header-center {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  max-width: 1000px;
+}
+
+.hm-header-right {
+  width: 50px;
+  flex-shrink: 0;
+}
+
+.hm-logo {
+  font-size: 36px;
+  font-weight: 775;
+  color: #000000;
+  text-transform: uppercase;
+  text-decoration: none;
+  flex-shrink: 0;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.hm-logo:hover {
+  opacity: 0.75;
+}
+
+.hm-search-bar {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.hm-search-bar input {
+  width: 100%;
+  padding: 12px;
+  border: 0.5px solid #C0C0C0;
+  border-radius: 35px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.hm-search-bar input:focus {
+  border-color: #8d8d8d;
+}
+
+.hm-menu-icon {
+  cursor: pointer;
+  margin-top: 3px;
+  position: relative;
+}
+
+.hm-menu-icon::after {
+  content: '';
+  position: absolute;
+  top: calc(100% - 5px);
+  left: 0;
+  right: 0;
+  height: 50px;
+  pointer-events: auto;
+  z-index: 999;
+}
+
+.hm-catalog-wrapper {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 15px;
+  display: flex;
+  gap: 0;
+  z-index: 1000;
+}
+
+.hm-catalog-dropdown {
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  padding-top: 5px;
+  padding-bottom: 5px;
+  min-width: 260px;
+  max-height: 450px;
+  overflow-y: auto;
+  animation: fadeIn 0.2s ease-in-out;
+  position: relative;
+  z-index: 1000;
+}
+
+.hm-catalog-item {
+  padding: 12px 20px;
+  color: #161616;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hm-catalog-item:not(:last-child) {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.hm-catalog-item-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.hm-catalog-item-chevron {
+  flex-shrink: 0;
+  margin-left: 8px;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: #888;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.hm-catalog-item:hover {
+  background-color: #ececec;
+  color: #000;
+  border-left-color: #555;
+  padding-left: 24px;
+  border-radius: 0 20px 20px 0;
+}
+
+.hm-catalog-item:hover .hm-catalog-item-chevron {
+  color: #333;
+  transform: translateX(4px);
+}
+
+.hm-catalog-item.active {
+  background-color: #e8e8e8;
+  color: #000;
+  border-left-color: #333;
+  padding-left: 24px;
+}
+
+.hm-catalog-item.active .hm-catalog-item-chevron {
+  color: #333;
+}
+
+.hm-subcategory-dropdown {
+  width: 600px;
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  animation: slideInRight 0.2s ease-in-out;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  max-height: 450px;
+  position: relative;
+  z-index: 1000;
+  margin-left: 5px;
+}
+
+.hm-subcategory-header {
+  padding: 16px 20px;
+  border-bottom: 2px solid #f0f0f0;
+  background-color: #fafafa;
+  border-radius: 20px 20px 0 0;
+  flex-shrink: 0;
+}
+
+.hm-subcategory-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+.hm-subcategory-list {
+  padding: 20px;
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px 20px;
+  justify-items: center;
+}
+
+.hm-subcategory-item {
+  padding: 6px 0;
+  color: #333;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  background-color: transparent;
+  text-align: center;
+  position: relative;
+  display: inline-block;
+  width: auto;
+}
+
+.hm-subcategory-item:hover {
+  color: #000;
+  transform: translateY(-2px);
+  font-weight: 600;
+}
+
+.hm-subcategory-item:active {
+  transform: translateY(0);
+  transition: transform 0.05s;
+}
+
+.hm-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+}
+
+/* Только аватар открывает меню ролей; корзина вне этой зоны */
+.hm-avatar-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  line-height: 0;
+}
+
+.hm-avatar-wrap::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 18px;
+  pointer-events: auto;
+}
+
+.hm-ava-icon {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.hm-basket-icon {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  line-height: 0;
+}
+
+/* Выпадающее меню ролей — как в Header.css */
+.hm-role-dropdown {
+  position: absolute;
+  top: calc(100% + 14px);
+  right: 0;
+  min-width: 290px;            /* Немного увеличено, чтобы текст не стягивался */
+  background: rgba(255, 255, 255, 0.95); /* чуть менее непрозрачный, для чистоты читаемости */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 20px;           /* плавное скругление углов */
+  box-shadow:
+    0 14px 34px rgba(0, 0, 0, 0.10),   /* более мягкая, воздушная тень */
+    0 2px 6px rgba(0, 0, 0, 0.04);
+  z-index: 1000;
+  overflow: hidden;
+  animation: hm-roleDropdownFadeIn 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  border: 1px solid rgba(0, 0, 0, 0.05); /* тонкая рамка для четкости */
+}
+
+/* Заголовок внутри dropdown - светлый, минималистичный */
+.hm-role-dropdown-heading {
+  padding: 14px 18px 12px;
+  color: #6b6b6b;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: default;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: linear-gradient(#ffffff 0%, #f7f7f7 100%); /* легкая градиентация снизу */
+}
+
+/* Элемент списка ролей */
+.hm-role-item {
+  padding: 12px 20px;
+  cursor: pointer;
+  color: #1a1a1a;
+  font-size: 15px;
+  font-weight: 500;
+  transition: transform 0.25s cubic-bezier(.2,.9,.3,1), background 0.25s, color 0.25s;
+  position: relative;
+  background: transparent;
+  display: block;
+}
+
+/* Разделители между элементами — более светлые и просторные */
+.hm-role-item:not(:last-child) {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* При наведении — мягкое выделение с лёгким смещением */
+.hm-role-item:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: #111;
+  padding-left: 26px;
+  border-radius: 6px;
+  transform: translateX(2px);
+  text-shadow: 0 0 0 transparent; /* сброс теней */
+}
+
+/* При активном нажатии — лёгкая обратная реакция */
+.hm-role-item:active {
+  transform: scale(0.98);
+  transition-duration: 0.08s;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+/* Декоративная лента слева для акцента выбранного элемента */
+.hm-role-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 12%;
+  height: 76%;
+  width: 3px;
+  background: #d0d0d0;
+  border-radius: 0 4px 4px 0;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* Активный элемент подчёркнут аналогичным образом, но с более ярким цветом */
+.hm-role-item:hover::before {
+  opacity: 0.8;
+  background: #8a8a8a;
+}
+
+/* При выборе (active) можно пометить отдельной стилизацией */
+.hm-role-item.active {
+  background: rgba(226, 226, 226, 0.75);
+  color: #000;
+  padding-left: 26px;
+  border-left: 3px solid #3a3a3a;
+}
+
+/* Цвет и стиль для активного элемента — плавное изменение цвета текста и левой линии */
+.hm-role-item.active::before {
+  opacity: 1;
+  background: #3a3a3a;
+}
+
+@keyframes hm-roleDropdownFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.96);
+    backdrop-filter: blur(0px);
+  }
+  40% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    backdrop-filter: blur(12px);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.hm-catalog-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.hm-catalog-dropdown::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.hm-catalog-dropdown::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+.hm-catalog-dropdown::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.hm-subcategory-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.hm-subcategory-dropdown::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.hm-subcategory-dropdown::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+.hm-subcategory-dropdown::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

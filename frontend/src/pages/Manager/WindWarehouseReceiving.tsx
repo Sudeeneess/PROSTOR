@@ -1,5 +1,5 @@
 import React from 'react';
-import './WindWarehouseReceiving.css';
+import styles from './WindWarehouseReceiving.module.css';
 
 interface ProductItem {
   id: string;
@@ -40,20 +40,20 @@ const WindWarehouseReceiving: React.FC<WindWarehouseReceivingProps> = ({
   };
 
   return (
-    <div className="wind-warehouse-receiving-overlay" onClick={handleOverlayClick}>
-      <div className="wind-warehouse-receiving-modal">
-        <div className="wind-warehouse-receiving-header">
-          <h2 className="wind-warehouse-receiving-title">
+    <div className={styles['wind-warehouse-receiving-overlay']} onClick={handleOverlayClick}>
+      <div className={styles['wind-warehouse-receiving-modal']}>
+        <div className={styles['wind-warehouse-receiving-header']}>
+          <h2 className={styles['wind-warehouse-receiving-title']}>
             Поставка {orderId} от {sellerName}
           </h2>
-          <button className="wind-warehouse-receiving-close" onClick={onClose}>
+          <button className={styles['wind-warehouse-receiving-close']} onClick={onClose}>
             ×
           </button>
         </div>
 
-        <div className="wind-warehouse-receiving-content">
-          <div className="wind-warehouse-receiving-table-container">
-            <table className="wind-warehouse-receiving-table">
+        <div className={styles['wind-warehouse-receiving-content']}>
+          <div className={styles['wind-warehouse-receiving-table-container']}>
+            <table className={styles['wind-warehouse-receiving-table']}>
               <thead>
                 <tr>
                   <th>Товар</th>
@@ -65,7 +65,7 @@ const WindWarehouseReceiving: React.FC<WindWarehouseReceivingProps> = ({
               <tbody>
                 {products.map((product, index) => (
                   <tr key={index}>
-                    <td className="wind-warehouse-receiving-product-name">{product.name}</td>
+                    <td className={styles['wind-warehouse-receiving-product-name']}>{product.name}</td>
                     <td>{product.expected}</td>
                     <td>{product.accepted}</td>
                     <td>{product.cell}</td>
@@ -76,15 +76,15 @@ const WindWarehouseReceiving: React.FC<WindWarehouseReceivingProps> = ({
           </div>
         </div>
 
-        <div className="wind-warehouse-receiving-footer">
+        <div className={styles['wind-warehouse-receiving-footer']}>
           <button 
-            className="wind-warehouse-receiving-button wind-warehouse-receiving-complete-button"
+            className={`${styles['wind-warehouse-receiving-button']} ${styles['wind-warehouse-receiving-complete-button']}`}
             onClick={handleCompleteReception}
           >
             Завершить приемку
           </button>
           <button 
-            className="wind-warehouse-receiving-button wind-warehouse-receiving-draft-button"
+            className={`${styles['wind-warehouse-receiving-button']} ${styles['wind-warehouse-receiving-draft-button']}`}
             onClick={onClose}
           >
             Сохранить черновик

@@ -1,0 +1,71 @@
+/* Единый стиль с Header / HeaderBuyer */
+.seller-header-section {
+  background: #c0c0c0;
+  padding: 0.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.seller-header-logo-text {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.seller-header-logo-prostor {
+  font-size: 36px;
+  font-weight: 775;
+  color: #000000;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.seller-header-logo-seller {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333333;
+  text-transform: none;
+}
+
+.seller-header-navigation-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.seller-header-navigation-link {
+  color: #111;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.seller-header-navigation-link:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+.seller-header-navigation-button {
+  background: none;
+  border: none;
+  color: #111;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-family: inherit;
+  transition: background-color 0.2s ease;
+}
+
+.seller-header-navigation-button:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+}

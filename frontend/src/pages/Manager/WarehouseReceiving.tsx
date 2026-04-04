@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import HeaderManager from './HeaderManager';
 import WindWarehouseReceiving from './WindWarehouseReceiving';
-import './WarehouseReceiving.css';
+import styles from './WarehouseReceiving.module.css';
 
 interface ProductItem {
   id: string;
@@ -150,20 +150,20 @@ const WarehouseReceiving: React.FC<WarehouseReceivingProps> = ({ onBack }) => {
   const windowData = getWindowData();
 
   return (
-    <div className="warehouse-receiving-content">
-      <div className="warehouse-receiving-container">
-        <div className="warehouse-receiving-header">
-          <h1 className="warehouse-receiving-title">Приемка товара</h1>
-          <button className="warehouse-receiving-back-button" onClick={handleBack}>
+    <div className={styles['warehouse-receiving-content']}>
+      <div className={styles['warehouse-receiving-container']}>
+        <div className={styles['warehouse-receiving-header']}>
+          <h1 className={styles['warehouse-receiving-title']}>Приемка товара</h1>
+          <button className={styles['warehouse-receiving-back-button']} onClick={handleBack}>
             Назад
           </button>
         </div>
 
-        <div className="warehouse-receiving-table-container">
-          <table className="warehouse-receiving-table">
+        <div className={styles['warehouse-receiving-table-container']}>
+          <table className={styles['warehouse-receiving-table']}>
             <thead>
               <tr>
-                <th className="warehouse-receiving-checkbox-column"></th>
+                <th className={styles['warehouse-receiving-checkbox-column']}></th>
                 <th>ID</th>
                 <th>Продавец</th>
                 <th>Товары</th>
@@ -174,25 +174,29 @@ const WarehouseReceiving: React.FC<WarehouseReceivingProps> = ({ onBack }) => {
             <tbody>
               {products.map((product) => (
                 <tr key={product.id}>
-                  <td className="warehouse-receiving-checkbox-column">
+                  <td className={styles['warehouse-receiving-checkbox-column']}>
                     <input
                       type="checkbox"
-                      className="warehouse-receiving-checkbox"
+                      className={styles['warehouse-receiving-checkbox']}
                       checked={product.selected}
                       onChange={() => handleSelectProduct(product.id)}
                       disabled={product.status === 'Принято'}
                     />
                   </td>
-                  <td className="warehouse-receiving-product-id">{product.id}</td>
+                  <td className={styles['warehouse-receiving-product-id']}>{product.id}</td>
                   <td>{product.seller}</td>
                   <td>{product.products}</td>
                   <td>{product.date}</td>
                   <td>
-                    <span className={`warehouse-receiving-status-badge ${
-                      product.status === 'Ожидает' ? 'warehouse-receiving-status-pending' : 
-                      product.status === 'Частично' ? 'warehouse-receiving-status-partial' : 
-                      'warehouse-receiving-status-accepted'
-                    }`}>
+                    <span
+                      className={`${styles['warehouse-receiving-status-badge']} ${
+                        product.status === 'Ожидает'
+                          ? styles['warehouse-receiving-status-pending']
+                          : product.status === 'Частично'
+                            ? styles['warehouse-receiving-status-partial']
+                            : styles['warehouse-receiving-status-accepted']
+                      }`}
+                    >
                       {product.status}
                     </span>
                   </td>
@@ -203,21 +207,21 @@ const WarehouseReceiving: React.FC<WarehouseReceivingProps> = ({ onBack }) => {
         </div>
 
         {hasSelectedItems && (
-          <div className="warehouse-receiving-action-buttons-container">
+          <div className={styles['warehouse-receiving-action-buttons-container']}>
             <button 
-              className="warehouse-receiving-action-button warehouse-receiving-accept-button"
+              className={`${styles['warehouse-receiving-action-button']} ${styles['warehouse-receiving-accept-button']}`}
               onClick={handleAcceptSelected}
             >
               Принять выбранные ({products.filter(p => p.selected).length})
             </button>
             <button 
-              className="warehouse-receiving-action-button warehouse-receiving-download-button"
+              className={`${styles['warehouse-receiving-action-button']} ${styles['warehouse-receiving-download-button']}`}
               onClick={handleDownloadInvoices}
             >
               Скачать накладные
             </button>
             <button 
-              className="warehouse-receiving-action-button warehouse-receiving-export-button"
+              className={`${styles['warehouse-receiving-action-button']} ${styles['warehouse-receiving-export-button']}`}
               onClick={handleExportToExcel}
             >
               Экспорт в Excel
