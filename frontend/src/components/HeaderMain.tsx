@@ -9,6 +9,7 @@ export type HeaderMainVariant = 'landing' | 'buyer';
 
 interface HeaderMainProps {
   variant?: HeaderMainVariant;
+  // onCartClick больше не нужен, убираем его
 }
 
 const catalogData = [
@@ -105,6 +106,23 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
   const handleAvatarClick = () => {
     if (variant === 'buyer') {
       navigate('/profile');
+    }
+  };
+
+  // Новая функция для обработки клика по корзине
+  const handleCartClick = () => {
+    const token = localStorage.getItem('token');
+    const userRole = sessionStorage.getItem('userRole');
+    
+    console.log('Клик по корзине:', { token, userRole, variant }); // для отладки
+    
+    // Если пользователь авторизован как покупатель
+    if (token && userRole === 'customer') {
+      navigate('/basket');
+    } 
+    // Если не авторизован
+    else {
+      navigate('/auth');
     }
   };
 
@@ -228,7 +246,14 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
             )}
           </div>
 
-          <div className={styles['hm-basket-icon']} aria-label="Корзина">
+          <div 
+            className={styles['hm-basket-icon']} 
+            aria-label="Корзина"
+            onClick={handleCartClick}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && handleCartClick()}
+          >
             <FaBasketShopping size={40} color="#000000" />
           </div>
         </div>

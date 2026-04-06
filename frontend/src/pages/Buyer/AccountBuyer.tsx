@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FiLogOut, FiPackage, FiCreditCard, FiChevronRight } from 'react-icons/fi';
+import { FaUserCircle } from 'react-icons/fa';
 import HeaderMain from '../../components/HeaderMain';
 import styles from './AccountPage.module.css';
 
@@ -50,6 +52,14 @@ const AccountPage: React.FC = () => {
     navigate('/orders');
   };
 
+  const handleLogout = () => {
+    // Очищаем данные авторизации
+    localStorage.removeItem('token');
+    sessionStorage.removeItem('userRole');
+    // Перенаправляем на главную страницу (лендинг)
+    navigate('/');
+  };
+
   return (
     <div className={styles['buyer-account-page']}>
       <HeaderMain variant="buyer" />
@@ -60,11 +70,7 @@ const AccountPage: React.FC = () => {
           <div className={styles['buyer-account-header']}>
             <div className={styles['buyer-account-user-info']}>
               <div className={styles['buyer-account-avatar']}>
-                <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="30" cy="30" r="30" fill="#E8F0FE"/>
-                  <path d="M30 30C33.3137 30 36 27.3137 36 24C36 20.6863 33.3137 18 30 18C26.6863 18 24 20.6863 24 24C24 27.3137 26.6863 30 30 30Z" fill="#4F46E5"/>
-                  <path d="M15 45C15 39.4772 19.4772 35 25 35H35C40.5228 35 45 39.4772 45 45V46H15V45Z" fill="#4F46E5"/>
-                </svg>
+                <FaUserCircle size={70} color="#4F46E5" />
               </div>
               
               <div className={styles['buyer-account-name-section']}>
@@ -101,46 +107,47 @@ const AccountPage: React.FC = () => {
 
           {/* Блок с опциями */}
           <div className={styles['buyer-account-options']}>
-            {/* Карточка "Заказы" - без модального окна, просто заглушка */}
+            {/* Карточка "Заказы" */}
             <div 
               className={styles['buyer-account-option-card']}
               onClick={handleOrdersClick}
             >
               <div className={styles['buyer-account-option-icon']}>
-                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M8 10L32 10" stroke="#4F46E5" strokeWidth="2" strokeLinecap="round"/>
-                  <path d="M8 20L32 20" stroke="#4F46E5" strokeWidth="2" strokeLinecap="round"/>
-                  <path d="M8 30L32 30" stroke="#4F46E5" strokeWidth="2" strokeLinecap="round"/>
-                  <circle cx="12" cy="10" r="2" fill="#4F46E5"/>
-                  <circle cx="12" cy="20" r="2" fill="#4F46E5"/>
-                  <circle cx="12" cy="30" r="2" fill="#4F46E5"/>
-                </svg>
+                <FiPackage size={32} color="#6B7280" />
               </div>
               <div className={styles['buyer-account-option-content']}>
                 <h2 className={styles['buyer-account-option-title']}>Заказы</h2>
                 <p className={styles['buyer-account-option-description']}>Просмотр и отслеживание заказов</p>
               </div>
-              <div className={styles['buyer-account-option-arrow']}>→</div>
+              <div className={styles['buyer-account-option-arrow']}>
+                <FiChevronRight size={24} color="#9CA3AF" />
+              </div>
             </div>
 
-            {/* Карточка "Способ оплаты" - открывает модальное окно */}
+            {/* Карточка "Способ оплаты" */}
             <div 
               className={styles['buyer-account-option-card']}
               onClick={() => setIsPaymentModalOpen(true)}
             >
               <div className={styles['buyer-account-option-icon']}>
-                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect x="5" y="12" width="30" height="18" rx="2" stroke="#4F46E5" strokeWidth="2"/>
-                  <path d="M12 22L28 22" stroke="#4F46E5" strokeWidth="2" strokeLinecap="round"/>
-                  <circle cx="30" cy="22" r="2" fill="#4F46E5"/>
-                </svg>
+                <FiCreditCard size={32} color="#6B7280" />
               </div>
               <div className={styles['buyer-account-option-content']}>
                 <h2 className={styles['buyer-account-option-title']}>Способ оплаты</h2>
                 <p className={styles['buyer-account-option-description']}>Управление платежными методами</p>
               </div>
-              <div className={styles['buyer-account-option-arrow']}>→</div>
+              <div className={styles['buyer-account-option-arrow']}>
+                <FiChevronRight size={24} color="#9CA3AF" />
+              </div>
             </div>
+
+            {/* Кнопка "Выйти" */}
+            <button 
+              className={styles['buyer-account-logout-btn']}
+              onClick={handleLogout}
+            >
+              <FiLogOut size={20} /> Выйти из аккаунта
+            </button>
           </div>
         </div>
       </main>

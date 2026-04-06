@@ -32,11 +32,6 @@
   flex-shrink: 0;
 }
 
-.buyer-account-avatar svg {
-  width: 80px;
-  height: 80px;
-}
-
 .buyer-account-name-section {
   flex: 1;
   display: flex;
@@ -129,6 +124,37 @@
   color: #374151;
 }
 
+/* Кнопка "Выйти" */
+.buyer-account-logout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 16px 24px;
+  margin-top: 24px;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  border: none;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+.buyer-account-logout-btn:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+}
+
+.buyer-account-logout-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
 /* Опции профиля */
 .buyer-account-options {
   padding: 16px;
@@ -163,20 +189,6 @@
   justify-content: center;
   background: #f3f4f6;
   border-radius: 16px;
-}
-
-.buyer-account-option-icon svg path,
-.buyer-account-option-icon svg circle,
-.buyer-account-option-icon svg rect {
-  stroke: #6b7280;
-}
-
-.buyer-account-option-icon svg circle[fill="#4F46E5"] {
-  fill: #6b7280;
-}
-
-.buyer-account-option-icon svg path[fill="#4F46E5"] {
-  fill: #6b7280;
 }
 
 .buyer-account-option-content {
