@@ -238,7 +238,7 @@ const AuthPageBuyer: React.FC = () => {
       <div className={styles['buyer-auth-container']}>
         <div className={styles['buyer-auth-card']}>
           <h2 className={styles['buyer-auth-title']}>
-            {isLogin ? 'Авторизация' : 'Регистрация'}
+            {isLogin ? 'Авторизация клиента' : 'Регистрация клиента'}
             <div className={styles['buyer-auth-title-icon']}>
               <BsPersonFill size={28} color='#000000' />
             </div>
