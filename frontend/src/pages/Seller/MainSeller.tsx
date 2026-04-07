@@ -6,6 +6,12 @@ import styles from './MainSeller.module.css';
 const MainSeller: React.FC = () => {
   const navigate = useNavigate();
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    sessionStorage.removeItem('userRole');
+    navigate("/");
+  };
+
   return (
     <div className={styles['seller-page']}>
       <HeaderSeller />
@@ -21,24 +27,31 @@ const MainSeller: React.FC = () => {
           </p>
 
           <button
-            className={styles['start-btn']}
+            className={styles['seller-start-btn']}
             onClick={() => navigate("/seller/register")}
           >
             Начать продавать
           </button>
 
-          <div className={styles['benefits']}>
+          <div className={styles['seller-benefits']}>
             <div> • Простая аналитика</div>
             <div> • Выгодные условия</div>
             <div> • Безопасные сделки</div>
           </div>
+
+          <button
+            className={styles['seller-logout-btn']}
+            onClick={handleLogout}
+          >
+            Выйти из аккаунта
+          </button>
         </div>
 
         {/* ПРАВО */}
-        <div className={styles['right-block']}>
+        <div className={styles['seller-right-block']}>
           <h2>Как это работает</h2>
 
-          <div className={styles['steps']}>
+          <div className={styles['seller-steps']}>
             <div>
               <b>1. Регистрация</b>
               <p>Создайте аккаунт продавца</p>
@@ -60,22 +73,20 @@ const MainSeller: React.FC = () => {
             </div>
           </div>
 
-          {/* ОТЗЫВ */}
-          <div className={styles['review']}>
+          <div className={styles['seller-review']}>
             “Подключился за день, первые заказы через 2 дня”
             <span>— ООО “Вектор”, продаёт с 2023</span>
           </div>
 
-          {/* FAQ */}
-          <div className={styles['faq']}>
+          <div className={styles['seller-faq']}>
             <h3>FAQ (частые вопросы)</h3>
 
-            <div className={styles['faq-item']}>
+            <div className={styles['seller-faq-item']}>
               <b>Сколько стоит подключение?</b>
               <p>Бесплатно</p>
             </div>
 
-            <div className={styles['faq-item']}>
+            <div className={styles['seller-faq-item']}>
               <b>Когда начнутся продажи?</b>
               <p>Обычно в течение 1-3 дней</p>
             </div>

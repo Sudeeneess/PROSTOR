@@ -1,3 +1,22 @@
+/* ===== КНОПКА ВЫХОДА ===== */
+.seller-logout-btn {
+  background: #836a6a;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  margin-top: 30px;
+  transition: all 0.2s ease;
+}
+
+.seller-logout-btn:hover {
+  background: #836a6a;
+  transform: scale(1.02);
+}
+
 .seller-page {
   position: relative;
   min-height: 100vh;
@@ -47,7 +66,7 @@
   margin-bottom: 25px;
 }
 
-.start-btn {
+.seller-start-btn {
   background: #e5e5e5;
   border: none;
   padding: 18px 38px;
@@ -59,19 +78,19 @@
   transition: all 0.2s ease;
 }
 
-.start-btn:hover {
+.seller-start-btn:hover {
   background: #d5d5d5;
   transform: scale(1.02);
 }
 
-.benefits {
+.seller-benefits {
   display: flex;
   flex-direction: column;
   gap: 14px;
   font-size: 16px;
 }
 
-.right-block {
+.seller-right-block {
   width: 38%;
   background: rgba(255, 255, 255, 0.9);
   border-radius: 25px;
@@ -79,26 +98,26 @@
   border: 1px solid #2c2c2c;
 }
 
-.right-block h2 {
+.seller-right-block h2 {
   font-size: 18px;
   margin-bottom: 20px;
 }
 
-.steps div {
+.seller-steps div {
   margin-bottom: 14px;
 }
 
-.steps b {
+.seller-steps b {
   font-size: 15px;
 }
 
-.steps p {
+.seller-steps p {
   font-size: 13px;
   color: #555;
   margin-top: 3px;
 }
 
-.review {
+.seller-review {
   margin-top: 20px;
   background: #dcdcdc;
   padding: 12px 18px;
@@ -107,34 +126,34 @@
   width: fit-content;
 }
 
-.review span {
+.seller-review span {
   display: block;
   margin-top: 5px;
   font-size: 11px;
   color: #555;
 }
 
-.faq {
+.seller-faq {
   margin-top: 20px;
 }
 
-.faq h3 {
+.seller-faq h3 {
   font-size: 15px;
   margin-bottom: 10px;
 }
 
-.faq-item {
+.seller-faq-item {
   background: #e3e3e3;
   border-radius: 25px;
   padding: 12px 15px;
   margin-bottom: 10px;
 }
 
-.faq-item b {
+.seller-faq-item b {
   font-size: 13px;
 }
 
-.faq-item p {
+.seller-faq-item p {
   font-size: 12px;
   color: #555;
   margin-top: 4px;
