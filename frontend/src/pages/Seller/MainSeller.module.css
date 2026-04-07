@@ -1,6 +1,6 @@
 /* ===== КНОПКА ВЫХОДА ===== */
 .seller-logout-btn {
-  background: #836a6a;
+  background: #585858;
   border: none;
   padding: 12px 28px;
   border-radius: 30px;
@@ -13,7 +13,7 @@
 }
 
 .seller-logout-btn:hover {
-  background: #836a6a;
+  background: #585858;
   transform: scale(1.02);
 }
 
