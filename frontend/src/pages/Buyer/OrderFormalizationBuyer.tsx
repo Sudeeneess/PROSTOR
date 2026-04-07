@@ -62,46 +62,14 @@ const getRawPhoneDigits = (phone: string): string => {
   return digits;
 };
 
-// Функция для резервирования товаров на складе
+// Упрощенная функция для резервирования товаров (без проверки наличия)
 const reserveProducts = async (items: CartItem[]): Promise<boolean> => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     setTimeout(() => {
-      try {
-        // Получаем текущие товары со склада
-        const warehouseStock = JSON.parse(localStorage.getItem('warehouseStock') || '{}');
-        
-        // Проверяем наличие и резервируем
-        for (const item of items) {
-          const currentStock = warehouseStock[item.id] || 0;
-          
-          if (currentStock < item.quantity) {
-            reject(new Error(`Недостаточно товара "${item.name}". Доступно: ${currentStock}`));
-            return;
-          }
-          
-          // Резервируем товар (уменьшаем доступный остаток)
-          warehouseStock[item.id] = currentStock - item.quantity;
-        }
-        
-        // Сохраняем обновленные остатки
-        localStorage.setItem('warehouseStock', JSON.stringify(warehouseStock));
-        
-        // Логируем операцию для склада
-        const reservationLog = {
-          timestamp: new Date().toISOString(),
-          items: items.map(i => ({ id: i.id, name: i.name, quantity: i.quantity })),
-          type: 'RESERVED'
-        };
-        
-        const logs = JSON.parse(localStorage.getItem('reservationLogs') || '[]');
-        logs.push(reservationLog);
-        localStorage.setItem('reservationLogs', JSON.stringify(logs));
-        
-        resolve(true);
-      } catch (error) {
-        reject(error);
-      }
-    }, 500); // Имитация задержки сети
+      // Просто имитируем успешное резервирование
+      console.log('✅ Товары зарезервированы (симуляция):', items.map(i => ({ name: i.name, quantity: i.quantity })));
+      resolve(true);
+    }, 500);
   });
 };
 
@@ -228,17 +196,17 @@ const OrderFormalizationBuyer: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      // ШАГ 1: Резервируем товары на складе (имитируем успешную оплату)
+      // Резервируем товары (симуляция, без проверки)
       await reserveProducts(cartItems);
       
-      // ШАГ 2: Создаем заказ со статусом "reserved"
+      // Создаем заказ
       const orderId = `ORDER_${Date.now()}_${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
       
       const fullName = lastName.trim() ? `${firstName} ${lastName}` : firstName;
       
       const newOrder: Order = {
         id: orderId,
-        status: 'reserved', // Товары зарезервированы, ждут подтверждения склада
+        status: 'reserved',
         items: cartItems.map(item => ({
           productId: item.id,
           productName: item.name,
@@ -254,7 +222,7 @@ const OrderFormalizationBuyer: React.FC = () => {
         totalPrice: totalPrice,
         totalItems: totalItems,
         createdAt: new Date().toISOString(),
-        paymentStatus: 'simulated', // Имитация оплаты
+        paymentStatus: 'simulated',
         deliveryAddress: PICKUP_ADDRESS
       };
       
@@ -272,12 +240,10 @@ const OrderFormalizationBuyer: React.FC = () => {
         localStorage.setItem('userPhone', phoneDigits);
       }
       
-      console.log('✅ Заказ создан, товары зарезервированы:', newOrder);
+      console.log('✅ Заказ создан:', newOrder);
       
-      // Показываем успешное сообщение
-      alert(`✅ Заказ №${orderId.slice(-8)} успешно оформлен!\n\nТовары зарезервированы на складе.\nСтатус заказа: ожидает подтверждения.\n\nВы можете отслеживать статус заказа в личном кабинете.`);
+      alert(`✅ Заказ №${orderId.slice(-8)} успешно оформлен!`);
       
-      // Перенаправляем на страницу заказов покупателя
       navigate('/buyer/orders');
       
     } catch (error: any) {
@@ -408,7 +374,7 @@ const OrderFormalizationBuyer: React.FC = () => {
                 fontSize: '14px',
                 color: '#0066cc'
               }}>
-                💳 <strong>Тестовый режим</strong> — оплата не требуется, товары будут зарезервированы на складе
+                💳 <strong>Тестовый режим</strong> — оплата не требуется
               </div>
 
               {savedCards.length > 0 && (
@@ -542,3 +508,5 @@ const OrderFormalizationBuyer: React.FC = () => {
 };
 
 export default OrderFormalizationBuyer;
+
+// Когда будете готовы подключить реальные эндпоинты, просто замените содержимое функции reserveProducts на API-вызовы.
