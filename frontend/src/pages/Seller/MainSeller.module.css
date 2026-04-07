@@ -12,17 +12,6 @@
   z-index: -2;
 }
 
-.seller-page::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 120px;
-  background: linear-gradient(90deg, #c86dd7, #3023ae);
-  z-index: -1;
-}
-
 .seller-wrapper {
   display: flex;
   justify-content: space-between;
