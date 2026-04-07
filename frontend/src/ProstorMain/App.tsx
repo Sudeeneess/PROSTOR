@@ -14,15 +14,12 @@ import AddingProducts from '../pages/Seller/AddProducts';
 import ProductSeller from '../pages/Seller/ProductSeller';
 import OrdersSeller from '../pages/Seller/OrdersSeller';
 
-<<<<<<< HEAD
-// Admin
-=======
 // Admin imports
 import AuthorizationAdmin from '../pages/Admin/AuthAdmin';
->>>>>>> 008ed24e5df03b7a2a1ca4ec4552bd7196443126
 import Admin from '../pages/Admin/AdminPage';
 import UsersAdmin from '../pages/Admin/UsersAdmin';
 import ProductAdmin from '../pages/Admin/ProductAdmin';
+import RegistrAdmin from '../pages/Admin/RegistrAdmin';
 
 // ==================== КОМПОНЕНТЫ ДЛЯ ПОКУПАТЕЛЯ ====================
 
@@ -86,10 +83,6 @@ const RedirectSellerIfAuthenticated: React.FC<{ children: React.ReactNode }> = (
   return <>{children}</>;
 };
 
-<<<<<<< HEAD
-// ==================== APP ====================
-
-=======
 // ==================== КОМПОНЕНТЫ ДЛЯ МЕНЕДЖЕРА СКЛАДА ====================
 
 // Компонент для защиты маршрутов (только для авторизованных менеджеров)
@@ -141,7 +134,6 @@ const RedirectAdminIfAuthenticated: React.FC<{ children: React.ReactNode }> = ({
 };
 
 // Создадим компонент-обертку для обработки навигации
->>>>>>> 008ed24e5df03b7a2a1ca4ec4552bd7196443126
 const AppContent: React.FC = () => {
   return (
     <Routes>
@@ -160,14 +152,10 @@ const AppContent: React.FC = () => {
           if (token && userRole === 'seller') {
             return <Navigate to="/seller/dashboard" replace />;
           }
-<<<<<<< HEAD
-
-=======
           if (token && userRole === 'admin') {
             return <Navigate to="/admin" replace />;
           }
           
->>>>>>> 008ed24e5df03b7a2a1ca4ec4552bd7196443126
           return (
             <>
               <Header />
@@ -296,15 +284,6 @@ const AppContent: React.FC = () => {
           } 
         />
       </Route>
-<<<<<<< HEAD
-
-      {/* ==================== ADMIN ==================== */}
-      <Route path="/admin" element={<Admin />} />
-      <Route path="/admin/users" element={<UsersAdmin onBack={() => {}} />} />
-      <Route path="/admin/products" element={<ProductAdmin />} />
-
-      {/* Redirects */}
-=======
       
       {/* ==================== МАРШРУТЫ ДЛЯ АДМИНИСТРАТОРА ==================== */}
       
@@ -342,7 +321,6 @@ const AppContent: React.FC = () => {
       } />
       
       {/* Перенаправление для старых маршрутов */}
->>>>>>> 008ed24e5df03b7a2a1ca4ec4552bd7196443126
       <Route path="/sklad" element={<Navigate to="/warehouse/dashboard" replace />} />
       <Route path="/warehouse-manager" element={<Navigate to="/warehouse/dashboard" replace />} />
       
