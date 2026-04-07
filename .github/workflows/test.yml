@@ -1,14 +1,29 @@
-name: CI
+name: CI - Run Tests
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ develop, main ]
   pull_request:
     branches: [ develop ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: prostor_test
+          POSTGRES_USER: postuser
+          POSTGRES_PASSWORD: test123
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U postuser"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - uses: actions/checkout@v4
@@ -19,14 +34,26 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Run tests
-        run: |
-          chmod +x gradlew
-          ./gradlew clean test --tests SecurityConfigTest
+      - name: Make gradlew executable
+        run: chmod +x gradlew
 
-      - name: Publish test report
+      - name: Wait for PostgreSQL
+        run: |
+          for i in {1..30}; do
+            if pg_isready -h localhost -p 5433 -U postuser; then
+              echo "PostgreSQL is ready"
+              break
+            fi
+            echo "Waiting for PostgreSQL... $i"
+            sleep 2
+          done
+
+      - name: Run tests
+        run: ./gradlew clean test --tests SecurityConfigTest --stacktrace
+
+      - name: Upload test report
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: test-results
+          name: test-reports
           path: build/reports/tests/test/
