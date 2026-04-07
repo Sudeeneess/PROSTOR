@@ -37,6 +37,28 @@ body {
   gap: 0.5rem;
 }
 
+/* ===== КНОПКА ВЫХОДА ===== */
+.admin-logout-btn {
+  background: #585858;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  margin: 30px auto;
+  transition: all 0.2s ease;
+  display: block;
+  width: fit-content;
+}
+
+.admin-logout-btn:hover {
+  background: #585858;
+  transform: scale(1.02);
+}
+
+
 .AdminPage-metric-label {
   font-size: 1rem;
   font-weight: 700;

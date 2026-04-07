@@ -24,6 +24,7 @@ import PersonalSeller from './pages/Seller/PersonalSeller';
 import AddingProducts from './pages/Seller/AddProducts';
 import ProductSeller from './pages/Seller/ProductSeller';
 import OrdersSeller from './pages/Seller/OrdersSeller';
+import MainSeller from './pages/Seller/MainSeller';
 
 // Администратор (Admin)
 import AuthorizationAdmin from './pages/Admin/AuthAdmin';
@@ -109,7 +110,6 @@ const PrivateWarehouseRoute: React.FC<{ children: React.ReactNode }> = ({ childr
   
   return <>{children}</>;
 };
-
 // Перенаправление уже авторизованного менеджера
 const RedirectIfAuthenticated: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const token = localStorage.getItem('token');
@@ -216,7 +216,6 @@ const AppContent: React.FC = () => {
           <OrdersPageBuyer />
         </PrivateProfileRoute>
       } />
-
       {/* Корзина покупателя */}
       <Route path="/basket" element={
         <PrivateProfileRoute>
@@ -245,6 +244,16 @@ const AppContent: React.FC = () => {
               <SellerEntrance />
             </RedirectSellerIfAuthenticated>
           } 
+        />
+
+          {/* ГЛАВНАЯ СТРАНИЦА ПРОДАВЦА */}
+       <Route 
+          path="main" 
+          element={
+            <PrivateSellerRoute>
+             <MainSeller />
+            </PrivateSellerRoute>
+        } 
         />
         
         {/* Личный кабинет / Дашборд продавца */}
@@ -357,7 +366,6 @@ const AppContent: React.FC = () => {
           <UsersAdmin onBack={() => {}} />
         </PrivateAdminRoute>
       } />
-
       {/* Управление товарами */}
       <Route path="/admin/products" element={
         <PrivateAdminRoute>

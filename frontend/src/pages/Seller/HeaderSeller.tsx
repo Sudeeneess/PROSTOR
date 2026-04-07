@@ -10,7 +10,7 @@ const HeaderSeller: React.FC = () => {
   };
 
   const handlePersonalClick = () => {
-    navigate("/seller/profile"); // Изменено на /seller/profile
+    navigate("/seller/dashboard"); // ИСПРАВЛЕНО: правильный путь к личному кабинету
   };
 
   return (
@@ -20,7 +20,7 @@ const HeaderSeller: React.FC = () => {
         <span className={styles['seller-header-logo-seller']}>Seller</span>
       </div>
       <nav className={styles['seller-header-navigation-bar']}>
-        <Link to="/" className={styles['seller-header-navigation-link']}>На главную</Link>
+        <Link to="/seller/main" className={styles['seller-header-navigation-link']}>На главную</Link>
         <button onClick={handleProductsClick} className={styles['seller-header-navigation-button']}>
           Товары
         </button>
