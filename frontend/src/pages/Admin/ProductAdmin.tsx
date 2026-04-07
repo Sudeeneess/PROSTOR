@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // ✅ ДОБАВИЛИ
 import HeaderAdmin from './HeaderAdmin';
-import './ProductAdmin.css';
+import styles from './ProductAdmin.module.css';
 
 interface Product {
   id: number;
@@ -65,13 +65,13 @@ const ProductAdmin: React.FC = () => {
     <div>
       <HeaderAdmin />
 
-      <div className="admin-prod-container">
-        <div className="admin-prod-header">
+      <div className={styles['admin-prod-container']}>
+        <div className={styles['admin-prod-header']}>
           <h2>Товары</h2>
 
           {/* ✅ ИСПРАВЛЕНО */}
           <span 
-            className="admin-prod-back-link"
+            className={styles['admin-prod-back-link']}
             onClick={() => navigate('/admin')} // 👈 переход
             style={{ cursor: 'pointer' }}
           >
@@ -79,28 +79,31 @@ const ProductAdmin: React.FC = () => {
           </span>
         </div>
 
-        <div className="admin-prod-tabs">
+        <div className={styles['admin-prod-tabs']}>
           <button
-            className={filter === 'all' ? 'admin-prod-active' : ''}
+            type="button"
+            className={filter === 'all' ? styles['admin-prod-active'] : ''}
             onClick={() => setFilter('all')}
           >
             Все товары
           </button>
           <button
-            className={filter === 'visible' ? 'admin-prod-active' : ''}
+            type="button"
+            className={filter === 'visible' ? styles['admin-prod-active'] : ''}
             onClick={() => setFilter('visible')}
           >
             Активные
           </button>
           <button
-            className={filter === 'hidden' ? 'admin-prod-active' : ''}
+            type="button"
+            className={filter === 'hidden' ? styles['admin-prod-active'] : ''}
             onClick={() => setFilter('hidden')}
           >
             Скрытые
           </button>
         </div>
 
-        <table className="admin-prod-table">
+        <table className={styles['admin-prod-table']}>
           <thead>
             <tr>
               <th></th>
@@ -134,7 +137,7 @@ const ProductAdmin: React.FC = () => {
         </table>
 
         {selected.length > 0 && (
-          <div className="admin-prod-actions">
+          <div className={styles['admin-prod-actions']}>
             <button onClick={handleHideSelected}>
               Скрыть выбранные 
             </button>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import HeaderManager from './HeaderManager';
-import './WarehousePage.css';
+import styles from './WarehousePage.module.css';
 import WarehouseReceiving from './WarehouseReceiving';
 import WarehouseAssembling from './WarehouseAssembling';
 import WarehouseShipment from './WarehouseShipment';
@@ -236,12 +236,12 @@ const Dashboard: React.FC = () => {
       default:
         return (
           <>
-            <div className="content-header">
-              <h1 className="page-title">Панель управления складом</h1>
-              <div className="user-info">
-                <span className="user-name">{userName}</span>
+            <div className={styles['content-header']}>
+              <h1 className={styles['page-title']}>Панель управления складом</h1>
+              <div className={styles['user-info']}>
+                <span className={styles['user-name']}>{userName}</span>
                 <button 
-                  className="logout-button"
+                  className={styles['logout-button']}
                   onClick={handleLogout}
                 >
                   Выйти
@@ -249,45 +249,45 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
 
-            <section className="stats-cards">
-              <div className="card">
-                <div className="card-title">Заказов к сборке сегодня</div>
-                <div className="card-value">
+            <section className={styles['stats-cards']}>
+              <div className={styles['card']}>
+                <div className={styles['card-title']}>Заказов к сборке сегодня</div>
+                <div className={styles['card-value']}>
                   {activities.filter(a => a.action === 'Сборка заказа' && a.status === 'pending').length}
                 </div>
               </div>
-              <div className="card">
-                <div className="card-title">Поставок на приемке</div>
-                <div className="card-value">
+              <div className={styles['card']}>
+                <div className={styles['card-title']}>Поставок на приемке</div>
+                <div className={styles['card-value']}>
                   {activities.filter(a => a.action === 'Приемка товара' && a.status === 'pending').length}
                 </div>
               </div>
-              <div className="card">
-                <div className="card-title">Заказов готово к отгрузке</div>
-                <div className="card-value">
+              <div className={styles['card']}>
+                <div className={styles['card-title']}>Заказов готово к отгрузке</div>
+                <div className={styles['card-value']}>
                   {activities.filter(a => a.action === 'Отгрузка товара' && a.status === 'success').length}
                 </div>
               </div>
             </section>
 
-            <section className="quick-actions">
-              <h2 className="section-title">Быстрые действия</h2>
-              <div className="action-buttons">
+            <section className={styles['quick-actions']}>
+              <h2 className={styles['section-title']}>Быстрые действия</h2>
+              <div className={styles['action-buttons']}>
                 <button 
-                  className="action-btn" 
+                  className={styles['action-btn']} 
                   onClick={openReceiving}
                 >
                   <span>Приемка товара</span>
                 </button>
 
                 <button 
-                  className="action-btn with-ring" 
+                  className={`${styles['action-btn']} ${styles['with-ring']}`} 
                   onClick={openAssembling}
                 >
                   <span>Заказы на сборку</span>
                 </button>
                 <button 
-                  className="action-btn" 
+                  className={styles['action-btn']} 
                   onClick={openShipment}
                 >
                   <span>Готово к отгрузке</span>
@@ -295,33 +295,39 @@ const Dashboard: React.FC = () => {
               </div>
             </section>
             
-            <section className="recent-activity">
-              <h2 className="section-title">Последние активности</h2>
-              <div className="activity-table">
-                <div className="table-header">
-                  <div className="col time">Время</div>
-                  <div className="col action">Действие</div>
-                  <div className="col number">Номер заказа/Поставки</div>
-                  <div className="col executor">Исполнитель</div>
-                  <div className="col status">Статус</div>
+            <section className={styles['recent-activity']}>
+              <h2 className={styles['section-title']}>Последние активности</h2>
+              <div className={styles['activity-table']}>
+                <div className={styles['table-header']}>
+                  <div className={`${styles['col']} ${styles['time']}`}>Время</div>
+                  <div className={`${styles['col']} ${styles['action']}`}>Действие</div>
+                  <div className={`${styles['col']} ${styles['number']}`}>Номер заказа/Поставки</div>
+                  <div className={`${styles['col']} ${styles['executor']}`}>Исполнитель</div>
+                  <div className={`${styles['col']} ${styles['status']}`}>Статус</div>
                 </div>
                 {activities.length === 0 ? (
-                  <div className="empty-table">
-                    <div className="table-row empty">
-                      <div className="col" style={{ gridColumn: '1 / -1', textAlign: 'center' }}>
+                  <div className={styles['empty-table']}>
+                    <div className={`${styles['table-row']} ${styles['empty']}`}>
+                      <div className={styles['col']} style={{ gridColumn: '1 / -1', textAlign: 'center' }}>
                         Нет активностей
                       </div>
                     </div>
                   </div>
                 ) : (
                   activities.map((item) => (
-                    <div key={item.id} className="table-row">
-                      <div className="col time">{item.time}</div>
-                      <div className="col action">{item.action}</div>
-                      <div className="col number">{item.number}</div>
-                      <div className="col executor">{item.executor}</div>
-                      <div className="col status">
-                        <span className={`status-badge ${getStatusClass(item.status)}`}>
+                    <div key={item.id} className={styles['table-row']}>
+                      <div className={`${styles['col']} ${styles['time']}`}>{item.time}</div>
+                      <div className={`${styles['col']} ${styles['action']}`}>{item.action}</div>
+                      <div className={`${styles['col']} ${styles['number']}`}>{item.number}</div>
+                      <div className={`${styles['col']} ${styles['executor']}`}>{item.executor}</div>
+                      <div className={`${styles['col']} ${styles['status']}`}>
+                        <span
+                          className={
+                            getStatusClass(item.status)
+                              ? `${styles['status-badge']} ${styles[getStatusClass(item.status) as 'status-success' | 'status-pending' | 'status-warning' | 'status-error']}`
+                              : styles['status-badge']
+                          }
+                        >
                           {getStatusText(item.status)}
                         </span>
                       </div>
@@ -336,12 +342,12 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="dashboard-wrapper">
+    <div className={styles['dashboard-wrapper']}>
       <HeaderManager 
         onMenuItemChange={handleMenuItemChange}
         onManagementClick={handleManagementClick}
       />
-      <main className="main-content">
+      <main className={styles['main-content']}>
         {renderContent()}
       </main>
     </div>

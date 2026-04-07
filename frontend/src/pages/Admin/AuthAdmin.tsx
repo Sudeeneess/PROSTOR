@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import HeaderAdmin from "./HeaderAdmin";
-import "./AuthAdmin.css";
+import styles from './AuthAdmin.module.css';
 
 const AuthorizationAdmin: React.FC = () => {
   const navigate = useNavigate();
@@ -36,44 +36,44 @@ const AuthorizationAdmin: React.FC = () => {
   };
 
   return (
-    <div className="admin-auth-app">
+    <div className={styles['admin-auth-app']}>
       <HeaderAdmin />
 
-      <main className="admin-auth-content-section">
-        <form className="admin-auth-form" onSubmit={handleSubmit}>
-          <div className="admin-auth-form-header">Авторизация администратора</div>
+      <main className={styles['admin-auth-content-section']}>
+        <form className={styles['admin-auth-form']} onSubmit={handleSubmit}>
+          <div className={styles['admin-auth-form-header']}>Авторизация администратора</div>
 
-          <div className="admin-auth-form-container">
-            <div className="admin-auth-form-field">
+          <div className={styles['admin-auth-form-container']}>
+            <div className={styles['admin-auth-form-field']}>
               <label>Логин</label>
               <input
                 type="text"
                 name="login"
                 value={formData.login}
                 onChange={handleInputChange}
-                className="admin-auth-input-field"
+                className={styles['admin-auth-input-field']}
                 required
               />
             </div>
 
-            <div className="admin-auth-form-field">
+            <div className={styles['admin-auth-form-field']}>
               <label>Пароль</label>
               <input
                 type="password"
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className="admin-auth-input-field"
+                className={styles['admin-auth-input-field']}
                 required
               />
             </div>
 
-            <button className="admin-auth-save-button" disabled={isLoading}>
+            <button className={styles['admin-auth-save-button']} disabled={isLoading}>
               {isLoading ? "Вход..." : "Войти"}
             </button>
           </div>
 
-          <div className="admin-auth-registration-link">
+          <div className={styles['admin-auth-registration-link']}>
             Нет аккаунта? <Link to="/admin/register">Зарегистрироваться</Link>
           </div>
         </form>

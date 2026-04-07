@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import HeaderManager from './HeaderManager';
 import WindWarehouseAssembling from './WindWarehouseAssembling';
-import './WarehouseAssembling.css';
+import styles from './WarehouseAssembling.module.css';
 
 interface WarehouseAssemblingProps {
   onBack: () => void; // Добавляем пропс
@@ -33,19 +33,19 @@ const WarehouseAssembling: React.FC<WarehouseAssemblingProps> = ({ onBack }) => 
   };
 
   return (
-    <div className="warehouse-assembling-main-content">
-      <div className="warehouse-assembling-content-header">
-        <h1 className="warehouse-assembling-page-title">Заказы на сборке</h1>
+    <div className={styles['warehouse-assembling-main-content']}>
+      <div className={styles['warehouse-assembling-content-header']}>
+        <h1 className={styles['warehouse-assembling-page-title']}>Заказы на сборке</h1>
         <button 
-          className="warehouse-assembling-back-button"
+          className={styles['warehouse-assembling-back-button']}
           onClick={handleBack}
         >
           Назад
         </button>
       </div>
 
-      <div className="warehouse-assembling-orders-table-container">
-        <table className="warehouse-assembling-orders-table">
+      <div className={styles['warehouse-assembling-orders-table-container']}>
+        <table className={styles['warehouse-assembling-orders-table']}>
           <thead>
             <tr>
               <th>Заказ</th>
@@ -73,9 +73,9 @@ const WarehouseAssembling: React.FC<WarehouseAssemblingProps> = ({ onBack }) => 
         </table>
       </div>
 
-      <div className="warehouse-assembling-start-assembly-container">
+      <div className={styles['warehouse-assembling-start-assembly-container']}>
         <button 
-          className="warehouse-assembling-start-assembly-button"
+          className={styles['warehouse-assembling-start-assembly-button']}
           onClick={handleStartAssembly}
         >
           Начать сборку

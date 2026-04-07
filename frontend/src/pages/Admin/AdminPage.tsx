@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './AdminPage.css';
+import styles from './AdminPage.module.css';
 import HeaderAdmin from './HeaderAdmin';
 import UsersAdmin from './UsersAdmin';
 import ProductAdmin from './ProductAdmin';
@@ -41,30 +41,30 @@ const AdminPage: React.FC = () => {
   return (
     <>
       <HeaderAdmin />
-      <div className="AdminPage-container">
+      <div className={styles['AdminPage-container']}>
         {/* Metrics Section */}
-        <div className="AdminPage-metrics">
+        <div className={styles['AdminPage-metrics']}>
           <div 
-            className="AdminPage-metric-card AdminPage-metric-card-clickable" 
+            className={`${styles['AdminPage-metric-card']} ${styles['AdminPage-metric-card-clickable']}`} 
             onClick={handleUsersClick}
           >
-            <span className="AdminPage-metric-label">Пользователи</span>
-            <span className="AdminPage-metric-value">1254</span>
+            <span className={styles['AdminPage-metric-label']}>Пользователи</span>
+            <span className={styles['AdminPage-metric-value']}>1254</span>
           </div>
           <div 
-            className="AdminPage-metric-card AdminPage-metric-card-clickable" 
+            className={`${styles['AdminPage-metric-card']} ${styles['AdminPage-metric-card-clickable']}`} 
             onClick={handleProductsClick}
           >
-            <span className="AdminPage-metric-label">Товары</span>
-            <span className="AdminPage-metric-value">8547</span>
+            <span className={styles['AdminPage-metric-label']}>Товары</span>
+            <span className={styles['AdminPage-metric-value']}>8547</span>
           </div>
         </div>
 
         
-        <div className="AdminPage-recent-actions">
-          <h2 className="AdminPage-section-title">Последние действия</h2>
-          <div className="AdminPage-table-wrapper">
-            <table className="AdminPage-actions-table">
+        <div className={styles['AdminPage-recent-actions']}>
+          <h2 className={styles['AdminPage-section-title']}>Последние действия</h2>
+          <div className={styles['AdminPage-table-wrapper']}>
+            <table className={styles['AdminPage-actions-table']}>
               <thead>
                 <tr>
                   <th>Время</th>
@@ -79,7 +79,7 @@ const AdminPage: React.FC = () => {
                     <td>{action.time}</td>
                     <td>{action.action}</td>
                     <td>{action.user}</td>
-                    <td><span className="AdminPage-status-success">{action.status}</span></td>
+                    <td><span className={styles['AdminPage-status-success']}>{action.status}</span></td>
                   </tr>
                 ))}
               </tbody>

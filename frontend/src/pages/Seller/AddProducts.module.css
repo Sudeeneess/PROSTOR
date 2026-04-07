@@ -104,8 +104,8 @@ body {
 }
 
 /* INPUT */
-input,
-textarea {
+.adding-products-form input,
+.adding-products-form textarea {
   width: 100%;
   padding: 18px;
   margin-bottom: 25px;
@@ -115,13 +115,13 @@ textarea {
   transition: border-color 0.3s;
 }
 
-input:focus,
-textarea:focus {
+.adding-products-form input:focus,
+.adding-products-form textarea:focus {
   outline: none;
   border-color: #999;
 }
 
-textarea {
+.adding-products-form textarea {
   height: 180px;
   resize: none;
 }

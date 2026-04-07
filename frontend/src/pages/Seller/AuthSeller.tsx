@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import HeaderSeller from "./HeaderSeller";
-import "./AuthSeller.css";
+import styles from './AuthSeller.module.css';
 
 const Authorizationseller: React.FC = () => {
   const navigate = useNavigate();
@@ -75,53 +75,53 @@ const Authorizationseller: React.FC = () => {
   };
 
   return (
-    <div className="seller-auth-page">
+    <div className={styles['seller-auth-page']}>
       <HeaderSeller />
 
-      <main className="seller-auth-content-section">
-        <form className="seller-auth-form" onSubmit={handleSubmit}>
-          <div className="seller-auth-form-header">
+      <main className={styles['seller-auth-content-section']}>
+        <form className={styles['seller-auth-form']} onSubmit={handleSubmit}>
+          <div className={styles['seller-auth-form-header']}>
             Авторизация продавца
           </div>
 
           {error && (
-            <div className="seller-auth-error-message">
+            <div className={styles['seller-auth-error-message']}>
               {error}
             </div>
           )}
 
-          <div className="seller-auth-form-container">
-            <div className="seller-auth-form-field">
-              <label className="seller-auth-label-text">ИНН</label>
+          <div className={styles['seller-auth-form-container']}>
+            <div className={styles['seller-auth-form-field']}>
+              <label className={styles['seller-auth-label-text']}>ИНН</label>
               <input
                 type="text"
                 name="inn"
                 value={formData.inn}
                 onChange={handleInputChange}
-                className={`seller-auth-input-field ${error && !formData.inn ? 'seller-auth-error' : ''}`}
+                className={`${styles['seller-auth-input-field']} ${error && !formData.inn ? styles['seller-auth-error'] : ''}`}
                 placeholder="Введите 10 или 12 цифр"
                 required
                 disabled={isLoading}
               />
             </div>
 
-            <div className="seller-auth-form-field">
-              <label className="seller-auth-label-text">ФИО</label>
+            <div className={styles['seller-auth-form-field']}>
+              <label className={styles['seller-auth-label-text']}>ФИО</label>
               <input
                 type="text"
                 name="fio"
                 value={formData.fio}
                 onChange={handleInputChange}
-                className={`seller-auth-input-field ${error && !formData.fio ? 'seller-auth-error' : ''}`}
+                className={`${styles['seller-auth-input-field']} ${error && !formData.fio ? styles['seller-auth-error'] : ''}`}
                 placeholder="Иванов Иван Иванович"
                 required
                 disabled={isLoading}
               />
             </div>
 
-            <div className="seller-auth-button-section">
+            <div className={styles['seller-auth-button-section']}>
               <button 
-                className={`seller-auth-save-button ${isLoading ? 'seller-auth-loading' : ''}`}
+                className={`${styles['seller-auth-save-button']} ${isLoading ? styles['seller-auth-loading'] : ''}`}
                 disabled={isLoading}
               >
                 {isLoading ? "Загрузка..." : "Войти"}
@@ -129,7 +129,7 @@ const Authorizationseller: React.FC = () => {
             </div>
           </div>
 
-          <div className="seller-auth-registration-link">
+          <div className={styles['seller-auth-registration-link']}>
             Нет аккаунта? <Link to="/seller/register">Регистрация</Link>
           </div>
         </form>

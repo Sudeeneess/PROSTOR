@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import './HeaderAdmin.css';
+import styles from './HeaderAdmin.module.css';
 
 interface HeaderAdminProps {
   onMenuItemChange?: (menuItem: string) => void;
@@ -45,29 +45,29 @@ const HeaderAdmin: React.FC<HeaderAdminProps> = ({ onMenuItemChange }) => {
   };
 
   return (
-    <header className="admin-header-container">
-      <div className="admin-header-logo">
+    <header className={styles['admin-header-container']}>
+      <div className={styles['admin-header-logo']}>
         prostor
-        <span className="admin-header-badge">Admin</span>
+        <span className={styles['admin-header-badge']}>Admin</span>
       </div>
 
-      <div className="admin-header-menu">
+      <div className={styles['admin-header-menu']}>
         <button
-          className="admin-header-menu-item"
+          className={styles['admin-header-menu-item']}
           onClick={() => handleMenuClick('main')}
         >
           Главная
         </button>
 
         <button
-          className="admin-header-menu-item"
+          className={styles['admin-header-menu-item']}
           onClick={() => handleMenuClick('users')}
         >
           Пользователи
         </button>
 
         <button
-          className="admin-header-menu-item"
+          className={styles['admin-header-menu-item']}
           onClick={() => handleMenuClick('products')}
         >
           Товары

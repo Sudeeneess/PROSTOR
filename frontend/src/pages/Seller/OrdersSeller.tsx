@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import HeaderSeller from "./HeaderSeller"; // поправь путь если нужно
-import "./OrdersSeller.css";
+import styles from './OrdersSeller.module.css';
 
 const OrdersSeller: React.FC = () => {
   const navigate = useNavigate();
@@ -22,37 +22,37 @@ const OrdersSeller: React.FC = () => {
   };
 
   return (
-    <div className="seller-orders-page">
+    <div className={styles['seller-orders-page']}>
       <HeaderSeller />
 
-      <div className="seller-orders-container">
-        <div className="seller-orders-header">
+      <div className={styles['seller-orders-container']}>
+        <div className={styles['seller-orders-header']}>
           <h1>Заказы</h1>
 
-          <button className="seller-orders-back-button" onClick={handleBack}>
+          <button className={styles['seller-orders-back-button']} onClick={handleBack}>
             ← Назад
           </button>
         </div>
 
-        <div className="seller-orders-grid">
-          <div className="seller-orders-card">
+        <div className={styles['seller-orders-grid']}>
+          <div className={styles['seller-orders-card']}>
             <span>Новые</span>
-            <span className="seller-orders-count">{orders.new}</span>
+            <span className={styles['seller-orders-count']}>{orders.new}</span>
           </div>
 
-          <div className="seller-orders-card">
+          <div className={styles['seller-orders-card']}>
             <span>В сборке</span>
-            <span className="seller-orders-count">{orders.assembling}</span>
+            <span className={styles['seller-orders-count']}>{orders.assembling}</span>
           </div>
 
-          <div className="seller-orders-card">
+          <div className={styles['seller-orders-card']}>
             <span>Проданные</span>
-            <span className="seller-orders-count">{orders.sold}</span>
+            <span className={styles['seller-orders-count']}>{orders.sold}</span>
           </div>
 
-          <div className="seller-orders-card">
+          <div className={styles['seller-orders-card']}>
             <span>В пути</span>
-            <span className="seller-orders-count">{orders.onTheWay}</span>
+            <span className={styles['seller-orders-count']}>{orders.onTheWay}</span>
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './WindWarehouseAssembling.css';
+import styles from './WindWarehouseAssembling.module.css';
 
 interface WindWarehouseAssemblingProps {
   onClose: () => void;
@@ -53,12 +53,12 @@ const WindWarehouseAssembling: React.FC<WindWarehouseAssemblingProps> = ({
   };
 
   return (
-    <div className="wind-warehouse-assembling-overlay" onClick={handleOverlayClick}>
-      <div className="wind-warehouse-assembling-modal">
-        <div className="wind-warehouse-assembling-header">
-          <h2 className="wind-warehouse-assembling-title">Сборка заказа</h2>
+    <div className={styles['wind-warehouse-assembling-overlay']} onClick={handleOverlayClick}>
+      <div className={styles['wind-warehouse-assembling-modal']}>
+        <div className={styles['wind-warehouse-assembling-header']}>
+          <h2 className={styles['wind-warehouse-assembling-title']}>Сборка заказа</h2>
           <button 
-            className="wind-warehouse-assembling-close"
+            className={styles['wind-warehouse-assembling-close']}
             onClick={onClose}
             aria-label="Закрыть"
           >
@@ -66,9 +66,9 @@ const WindWarehouseAssembling: React.FC<WindWarehouseAssemblingProps> = ({
           </button>
         </div>
 
-        <div className="wind-warehouse-assembling-content">
-          <div className="wind-warehouse-assembling-table-container">
-            <table className="wind-warehouse-assembling-table">
+        <div className={styles['wind-warehouse-assembling-content']}>
+          <div className={styles['wind-warehouse-assembling-table-container']}>
+            <table className={styles['wind-warehouse-assembling-table']}>
               <thead>
                 <tr>
                   <th>Товар</th>
@@ -80,25 +80,25 @@ const WindWarehouseAssembling: React.FC<WindWarehouseAssemblingProps> = ({
               <tbody>
                 {items.map((item, index) => (
                   <tr key={index}>
-                    <td className="product-name">{item.name}</td>
+                    <td className={styles['product-name']}>{item.name}</td>
                     <td>{item.expected}</td>
                     <td>{item.accepted}</td>
-                    <td className="cell-code">{item.cell}</td>
+                    <td className={styles['cell-code']}>{item.cell}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
 
-          <div className="wind-warehouse-assembling-actions">
+          <div className={styles['wind-warehouse-assembling-actions']}>
             <button 
-              className="wind-warehouse-assembling-complete-btn"
+              className={styles['wind-warehouse-assembling-complete-btn']}
               onClick={handleCompleteAcceptance}
             >
               Завершить приемку
             </button>
             <button 
-              className="wind-warehouse-assembling-draft-btn"
+              className={styles['wind-warehouse-assembling-draft-btn']}
               onClick={handleSaveDraft}
             >
               Сохранить черновик

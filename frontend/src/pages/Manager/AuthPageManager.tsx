@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BsPersonFill } from "react-icons/bs";
 import HeaderManager from './HeaderManager';
-import './AuthPageManager.css'; // Тот же файл с новыми стилями
+import styles from './AuthPageManager.module.css'; // Тот же файл с новыми стилями
 
 const AuthPageManager: React.FC = () => {
   const navigate = useNavigate();
@@ -61,25 +61,25 @@ const AuthPageManager: React.FC = () => {
   };
 
   return (
-    <div className="manager-auth-page">
+    <div className={styles['manager-auth-page']}>
       <HeaderManager />
-      <div className="manager-auth-container">
-        <div className="manager-auth-card">
-          <h2 className="manager-auth-title">
+      <div className={styles['manager-auth-container']}>
+        <div className={styles['manager-auth-card']}>
+          <h2 className={styles['manager-auth-title']}>
             Менеджера склада
-            <span className="manager-auth-title-icon">
+            <span className={styles['manager-auth-title-icon']}>
               <BsPersonFill size={28} color='#000000' />
             </span>
           </h2>
           
           {error && (
-            <div className="manager-auth-error-message">
+            <div className={styles['manager-auth-error-message']}>
               {error}
             </div>
           )}
           
           <form onSubmit={handleSubmit}>
-            <div className="manager-auth-form-group">
+            <div className={styles['manager-auth-form-group']}>
               <input
                 type="text"
                 id="username"
@@ -92,7 +92,7 @@ const AuthPageManager: React.FC = () => {
               />
             </div>
 
-            <div className="manager-auth-form-group">
+            <div className={styles['manager-auth-form-group']}>
               <input
                 type="password"
                 id="password"
@@ -107,7 +107,7 @@ const AuthPageManager: React.FC = () => {
 
             <button 
               type="submit" 
-              className={`manager-auth-submit-button ${loading ? 'manager-auth-loading' : ''}`}
+              className={`${styles['manager-auth-submit-button']} ${loading ? styles['manager-auth-loading'] : ''}`}
               disabled={loading}
             >
               {loading ? 'Загрузка...' : 'Войти'}
