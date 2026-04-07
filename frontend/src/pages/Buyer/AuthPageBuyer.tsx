@@ -51,6 +51,19 @@ const AuthPageBuyer: React.FC = () => {
         if (response.success && response.data) {
           console.log('Вход успешен!');
           console.log('Данные от сервера:', response.data);
+
+          // Сохраняем имя и фамилию (если имя передано как "Имя Фамилия")
+        if (formData.name) {
+          localStorage.setItem('userName', formData.name);
+          // Если нужно разделить на имя и фамилию
+          const nameParts = formData.name.split(' ');
+          if (nameParts.length >= 2) {
+          localStorage.setItem('userFirstName', nameParts[0]);
+          localStorage.setItem('userLastName', nameParts.slice(1).join(' '));
+          } else {
+          localStorage.setItem('userFirstName', formData.name);
+            }
+          }
           
           // ========== СОХРАНЕНИЕ ДАННЫХ ==========
           
@@ -64,7 +77,7 @@ const AuthPageBuyer: React.FC = () => {
           }
           
           // 2. Сохраняем роль (приводим к нижнему регистру)
-          let userRole = 'buyer'; // роль по умолчанию
+          let userRole = 'customer'; // роль по умолчанию
           if (response.data.role) {
             userRole = response.data.role.toLowerCase();
           }
@@ -100,7 +113,7 @@ const AuthPageBuyer: React.FC = () => {
           
           // 7. Перенаправление
           console.log('Перенаправление на страницу покупателя...');
-          navigate('/buyer');
+          navigate('/customer');
           
         } else {
           console.log('Ошибка входа:', response.error);
@@ -156,7 +169,7 @@ const AuthPageBuyer: React.FC = () => {
           }
           
           // 2. Сохраняем роль
-          let userRole = 'buyer';
+          let userRole = 'customer';
           if (response.data.role) {
             userRole = response.data.role.toLowerCase();
           }
@@ -193,7 +206,7 @@ const AuthPageBuyer: React.FC = () => {
           
           // 7. Перенаправление
           console.log('Перенаправление на страницу покупателя...');
-          navigate('/buyer');
+          navigate('/customer');
           
         } else {
           console.log('Ошибка регистрации:', response.error);

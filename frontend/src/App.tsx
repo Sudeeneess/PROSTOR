@@ -9,9 +9,10 @@ import ProductGrid from './components/ProductGrid';
 // Покупатель (Buyer)
 import AuthPageBuyer from './pages/Buyer/AuthPageBuyer'; 
 import MainPageBuyer from './pages/Buyer/MainPageBuyer';
-import ProfilePage from './pages/Buyer/AccountBuyer';
+import ProfilePage from './pages/Buyer/ProfileBuyer';
 import OrdersPageBuyer from './pages/Buyer/OrdersPageBuyer';
 import BasketBuyer from './pages/Buyer/BasketBuyer';
+import OrderFormalizationBuyer from './pages/Buyer/OrderFormalizationBuyer'; 
 
 // Менеджер склада (Manager)
 import AuthPageManager from './pages/Manager/AuthPageManager';
@@ -216,10 +217,18 @@ const AppContent: React.FC = () => {
           <OrdersPageBuyer />
         </PrivateProfileRoute>
       } />
+      
       {/* Корзина покупателя */}
       <Route path="/basket" element={
         <PrivateProfileRoute>
           <BasketBuyer />
+        </PrivateProfileRoute>
+      } />
+
+      {/* Оформление заказа покупателя */}
+      <Route path="/order-formalization" element={
+        <PrivateProfileRoute>
+          <OrderFormalizationBuyer />
         </PrivateProfileRoute>
       } />
       
@@ -246,14 +255,14 @@ const AppContent: React.FC = () => {
           } 
         />
 
-          {/* ГЛАВНАЯ СТРАНИЦА ПРОДАВЦА */}
-       <Route 
+        {/* ГЛАВНАЯ СТРАНИЦА ПРОДАВЦА */}
+        <Route 
           path="main" 
           element={
             <PrivateSellerRoute>
-             <MainSeller />
+              <MainSeller />
             </PrivateSellerRoute>
-        } 
+          } 
         />
         
         {/* Личный кабинет / Дашборд продавца */}
@@ -366,6 +375,7 @@ const AppContent: React.FC = () => {
           <UsersAdmin onBack={() => {}} />
         </PrivateAdminRoute>
       } />
+      
       {/* Управление товарами */}
       <Route path="/admin/products" element={
         <PrivateAdminRoute>

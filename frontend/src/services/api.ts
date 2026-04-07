@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = 'http://localhost:8080'; 
 
 export interface LoginData {
   username: string;
@@ -12,7 +12,6 @@ export interface RegisterData {
   confirmPassword: string;
 }
 
-// Интерфейс ответа от сервера при успешном входе
 export interface LoginResponse {
   token: string;
   type: string;
@@ -22,7 +21,6 @@ export interface LoginResponse {
   redirectUrl: string;
 }
 
-// Интерфейс ответа от нашего сервиса
 export interface AuthResponse {
   success: boolean;
   data?: LoginResponse;
@@ -30,7 +28,43 @@ export interface AuthResponse {
   status?: number;
 }
 
-// Класс с методами для работы с API
+// ========== НОВЫЕ ТИПЫ ==========
+
+export interface Product {
+  id: number;
+  name: string;
+  price: number;
+  sellerId: number;
+  categoryId: number;
+  parentId?: number | null;
+}
+
+export interface ProductsResponse {
+  content: Product[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+}
+
+export interface OrderItem {
+  productId: number;
+  amount: number;
+}
+
+export interface CreateOrderRequest {
+  customerId: number;
+  statusId: number;
+  items: OrderItem[];
+}
+
+export interface Category {
+  id: number;
+  categoryName: string;
+}
+
+// ========== API СЕРВИС ==========
+
 class ApiService {
   
   private async request<T>(
@@ -49,20 +83,16 @@ class ApiService {
     };
 
     try {
-      // Отправляем запрос
       const response = await fetch(url, {
         ...options,
         headers,
       });
 
       console.log('Статус ответа:', response.status);
-      console.log('Content-Type:', response.headers.get('content-type'));
 
-      // Получаем ответ как текст
       const responseText = await response.text();
       console.log('Текст ответа:', responseText || '<пустой ответ>');
 
-      // Если ответ пустой
       if (!responseText) {
         if (!response.ok) {
           throw new Error(`Ошибка ${response.status}: Пустой ответ от сервера`);
@@ -70,7 +100,6 @@ class ApiService {
         return {} as T;
       }
 
-      // Пробуем распарсить JSON
       let data;
       try {
         data = JSON.parse(responseText);
@@ -80,7 +109,6 @@ class ApiService {
         throw new Error(`Сервер вернул невалидный JSON: ${responseText.substring(0, 100)}`);
       }
 
-      // Если сервер вернул ошибку
       if (!response.ok) {
         throw new Error(data.message || data.error || `Ошибка ${response.status}`);
       }
@@ -93,7 +121,8 @@ class ApiService {
     }
   }
 
-  // МЕТОД ДЛЯ ВХОДА
+  // ========== АУТЕНТИФИКАЦИЯ ==========
+  
   async login(credentials: LoginData): Promise<AuthResponse> {
     try {
       console.log('Попытка входа с username:', credentials.username);
@@ -108,16 +137,17 @@ class ApiService {
 
       console.log('Успешный ответ от сервера:', response);
 
-      // Проверяем наличие обязательных полей
       if (!response.token) {
         throw new Error('Сервер не вернул токен');
       }
 
-      // Сохраняем данные в localStorage
+      // Нормализуем роль к нижнему регистру
+      const normalizedRole = response.role.toLowerCase();
+
       localStorage.setItem('token', response.token);
       localStorage.setItem('user', JSON.stringify({
         username: response.username,
-        role: response.role
+        role: normalizedRole
       }));
       
       if (response.type) {
@@ -144,10 +174,8 @@ class ApiService {
     }
   }
 
-  // МЕТОД ДЛЯ РЕГИСТРАЦИИ
   async register(userData: RegisterData): Promise<AuthResponse> {
     try {
-      // Проверка на клиенте
       if (userData.password !== userData.confirmPassword) {
         throw new Error('Пароли не совпадают');
       }
@@ -169,12 +197,13 @@ class ApiService {
 
       console.log('Успешная регистрация:', response);
 
-      // Сохраняем данные в localStorage
       if (response.token) {
+        const normalizedRole = response.role.toLowerCase();
+        
         localStorage.setItem('token', response.token);
         localStorage.setItem('user', JSON.stringify({
           username: response.username,
-          role: response.role
+          role: normalizedRole
         }));
         
         if (response.type) {
@@ -202,7 +231,6 @@ class ApiService {
     }
   }
 
-  // МЕТОД ДЛЯ ВЫХОДА
   logout(): void {
     console.log('Выход из системы');
     localStorage.removeItem('token');
@@ -211,7 +239,6 @@ class ApiService {
     localStorage.removeItem('expiresIn');
   }
 
-  // ПОЛУЧИТЬ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ
   getCurrentUser(): { username: string; role: string } | null {
     const userStr = localStorage.getItem('user');
     if (userStr) {
@@ -225,23 +252,19 @@ class ApiService {
     return null;
   }
 
-  // ПОЛУЧИТЬ ТОКЕН
   getToken(): string | null {
     return localStorage.getItem('token');
   }
 
-  // ПОЛУЧИТЬ ТИП ТОКЕНА
   getTokenType(): string | null {
     return localStorage.getItem('tokenType') || 'Bearer';
   }
 
-  // ПРОВЕРИТЬ, АВТОРИЗОВАН ЛИ ПОЛЬЗОВАТЕЛЬ
   isAuthenticated(): boolean {
     const token = localStorage.getItem('token');
     return !!token;
   }
 
-  // ПОЛУЧИТЬ ЗАГОЛОВКИ ДЛЯ АВТОРИЗОВАННЫХ ЗАПРОСОВ
   getAuthHeaders(): HeadersInit {
     const token = this.getToken();
     const tokenType = this.getTokenType();
@@ -250,6 +273,118 @@ class ApiService {
       'Authorization': `${tokenType} ${token}`,
       'Content-Type': 'application/json',
     };
+  }
+
+  // ========== ТОВАРЫ ==========
+
+  async getProducts(filters?: {
+    categoryId?: number;
+    sellerId?: number;
+    minPrice?: number;
+    maxPrice?: number;
+    name?: string;
+    page?: number;
+    size?: number;
+  }): Promise<{ success: boolean; data?: ProductsResponse; error?: string }> {
+    try {
+      const queryParams = new URLSearchParams();
+      if (filters) {
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            queryParams.append(key, value.toString());
+          }
+        });
+      }
+      
+      const queryString = queryParams.toString();
+      const endpoint = `/api/products${queryString ? `?${queryString}` : ''}`;
+      
+      const response = await this.request<ProductsResponse>(endpoint);
+      
+      return {
+        success: true,
+        data: response
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Ошибка загрузки товаров'
+      };
+    }
+  }
+
+  async getProductById(id: number): Promise<{ success: boolean; data?: Product; error?: string }> {
+    try {
+      const response = await this.request<Product>(`/api/products/${id}`);
+      return {
+        success: true,
+        data: response
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Ошибка загрузки товара'
+      };
+    }
+  }
+
+  // ========== КАТЕГОРИИ ==========
+
+  async getCategories(page: number = 0): Promise<{ success: boolean; data?: Category[]; error?: string }> {
+    try {
+      const response = await this.request<any>(`/api/categories?page=${page}`);
+      
+      // API возвращает пагинированный ответ
+      const categories = response.content || response;
+      
+      return {
+        success: true,
+        data: Array.isArray(categories) ? categories : []
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Ошибка загрузки категорий'
+      };
+    }
+  }
+
+  // ========== ЗАКАЗЫ ==========
+
+  async createOrder(orderData: CreateOrderRequest): Promise<{ success: boolean; data?: any; error?: string }> {
+    try {
+      const response = await this.request('/api/orders', {
+        method: 'POST',
+        body: JSON.stringify(orderData)
+      });
+      
+      return {
+        success: true,
+        data: response
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Ошибка создания заказа'
+      };
+    }
+  }
+
+  // ========== ПРОФИЛЬ ==========
+
+  async getCustomerDashboard(): Promise<{ success: boolean; data?: any; error?: string }> {
+    try {
+      const response = await this.request('/api/customer/dashboard');
+      return {
+        success: true,
+        data: response
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Ошибка загрузки данных покупателя'
+      };
+    }
   }
 }
 
