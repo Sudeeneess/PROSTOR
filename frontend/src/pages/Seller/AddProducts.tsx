@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import HeaderSeller from "./HeaderSeller";
-import "./AddProducts.css";
+import styles from './AddProducts.module.css';
 
 interface ProductForm {
   name: string;
@@ -105,24 +105,24 @@ const AddingProducts: React.FC = () => {
   };
 
   return (
-    <div className="seller-products-page">
+    <div className={styles['seller-products-page']}>
       <HeaderSeller />
-
-      <div className="seller-products-form-card">
-        <div className="seller-products-form-header">
-          <div className="seller-products-form-title">Добавление товара</div>
-          <button className="seller-products-back-button" onClick={handleBack}>
+      <div className={styles['adding-products-form']}>
+      <div className={styles['seller-products-form-card']}>
+        <div className={styles['seller-products-form-header']}>
+          <div className={styles['seller-products-form-title']}>Добавление товара</div>
+          <button className={styles['seller-products-back-button']} onClick={handleBack}>
             ← Назад
           </button>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="seller-products-form-grid">
+          <div className={styles['seller-products-form-grid']}>
             {/* LEFT */}
             <div>
-              <label className="seller-products-upload">
+              <label className={styles['seller-products-upload']}>
                 {photoPreview ? (
-                  <img src={photoPreview} className="seller-products-preview" alt="Preview" />
+                  <img src={photoPreview} className={styles['seller-products-preview']} alt="Preview" />
                 ) : (
                   <span>+ Загрузить фото</span>
                 )}
@@ -134,7 +134,7 @@ const AddingProducts: React.FC = () => {
                 />
               </label>
 
-              <button type="submit" className="seller-products-btn seller-products-save">
+              <button type="submit" className={`${styles['seller-products-btn']} ${styles['seller-products-save']}`}>
                 Сохранить товар
               </button>
             </div>
@@ -175,6 +175,7 @@ const AddingProducts: React.FC = () => {
           </div>
         </form>
       </div>
+    </div>
     </div>
   );
 };

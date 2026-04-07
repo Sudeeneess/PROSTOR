@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import HeaderSeller from "./HeaderSeller";
-import "./RegistrSeller.css";
+import styles from './RegistrSeller.module.css';
 
 const SellerEntrance: React.FC = () => {
   const navigate = useNavigate();
@@ -76,20 +76,20 @@ const SellerEntrance: React.FC = () => {
   };
 
   return (
-    <div className="seller-reg-app">
+    <div className={styles['seller-reg-app']}>
       <HeaderSeller />
 
-      <main className="seller-reg-content-section">
-        <form className="seller-reg-auth-form" onSubmit={handleSubmit}>
-          <div className="seller-reg-auth-form-header">Регистрация продавца</div>
+      <main className={styles['seller-reg-content-section']}>
+        <form className={styles['seller-reg-auth-form']} onSubmit={handleSubmit}>
+          <div className={styles['seller-reg-auth-form-header']}>Регистрация продавца</div>
 
-          <div className="seller-reg-form-container">
+          <div className={styles['seller-reg-form-container']}>
             <select
               name="country"
               value={formData.country}
               onChange={handleChange}
               required
-              className="seller-reg-input-select"
+              className={styles['seller-reg-input-select']}
             >
               <option value="">Страна</option>
               <option value="RU">Россия</option>
@@ -101,7 +101,7 @@ const SellerEntrance: React.FC = () => {
               value={formData.orgForm}
               onChange={handleChange}
               required
-              className="seller-reg-input-select"
+              className={styles['seller-reg-input-select']}
             >
               <option value="">Выберите форму организации</option>
               <option value="IP">Индивидуальный предприниматель</option>
@@ -115,7 +115,7 @@ const SellerEntrance: React.FC = () => {
               placeholder="ИНН"
               value={formData.inn}
               onChange={handleChange}
-              className="seller-reg-input-field"
+              className={styles['seller-reg-input-field']}
               required
             />
 
@@ -125,21 +125,21 @@ const SellerEntrance: React.FC = () => {
               placeholder="ФИО"
               value={formData.fullname}
               onChange={handleChange}
-              className="seller-reg-input-field"
+              className={styles['seller-reg-input-field']}
               required
             />
 
-            <div className="seller-reg-button-section">
-              <button className="seller-reg-save-button" disabled={loading}>
+            <div className={styles['seller-reg-button-section']}>
+              <button className={styles['seller-reg-save-button']} disabled={loading}>
                 {loading ? "Регистрация..." : "Зарегистрироваться"}
               </button>
             </div>
           </div>
 
-          {errorMessage && <p className="seller-reg-error-message">{errorMessage}</p>}
-          {successMessage && <p className="seller-reg-success-message">{successMessage}</p>}
+          {errorMessage && <p className={styles['seller-reg-error-message']}>{errorMessage}</p>}
+          {successMessage && <p className={styles['seller-reg-success-message']}>{successMessage}</p>}
 
-          <div className="seller-reg-login-footer">
+          <div className={styles['seller-reg-login-footer']}>
             Уже есть аккаунт? <Link to="/seller/auth">Войти</Link>
           </div>
         </form>

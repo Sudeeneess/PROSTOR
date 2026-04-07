@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import HeaderSeller from "./HeaderSeller";
-import "./PersonalSeller.css";
+import styles from './PersonalSeller.module.css';
 
 interface SellerProfile {
   fio?: string;
@@ -17,7 +17,6 @@ const PersonalSeller: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Загружаем данные продавца
     const storedData = localStorage.getItem("sellerProfile");
     if (storedData) {
       const parsedData = JSON.parse(storedData);
@@ -25,7 +24,6 @@ const PersonalSeller: React.FC = () => {
       setFormData(parsedData);
     }
     
-    // Проверяем роль пользователя
     const userRole = sessionStorage.getItem('userRole');
     console.log("Current user role:", userRole);
   }, []);
@@ -65,58 +63,68 @@ const PersonalSeller: React.FC = () => {
     <>
       <HeaderSeller />
 
-      <main className="seller-personal-container">
-        <h1 className="seller-personal-title">Личный кабинет</h1>
+      <main className={styles['seller-personal-container']}>
+        <h1 className={styles['seller-personal-title']}>Личный кабинет</h1>
 
-        <div className="seller-personal-profile-card">
-          <div className="seller-personal-profile-info">
-            <div className="seller-personal-profile-avatar">
+        <div className={styles['seller-personal-profile-card']}>
+          <div className={styles['seller-personal-profile-info']}>
+            <div className={styles['seller-personal-profile-avatar']}>
               {seller?.fio ? seller.fio.charAt(0).toUpperCase() : "?"}
             </div>
 
-            <div className="seller-personal-profile-text">
-              <span className="seller-personal-profile-name">
+            <div className={styles['seller-personal-profile-text']}>
+              <span className={styles['seller-personal-profile-name']}>
                 {seller?.fio || "Имя не указано"}
               </span>
-              <span className="seller-personal-profile-inn">
+              <span className={styles['seller-personal-profile-inn']}>
                 ИНН: {seller?.inn || "—"}
               </span>
             </div>
           </div>
 
           <button
-            className="seller-personal-edit-profile-btn"
+            className={styles['seller-personal-edit-profile-btn']}
             onClick={() => setIsModalOpen(true)}
           >
             изменить профиль
           </button>
         </div>
 
-        <button className="seller-personal-add-product-btn" onClick={handleAddProduct}>
-          Добавить товары
-          <span className="seller-personal-add-icon"></span>
-        </button>
+        {/* Единый класс для всех кнопок действий */}
+        <div className={styles['seller-personal-actions']}>
+          <button 
+            className={styles['seller-personal-action-btn']} 
+            onClick={handleAddProduct}
+          >
+            Добавить товары
+          </button>
 
-        <div className="seller-personal-menu-links">
-          <button onClick={handleMyProducts} className="seller-personal-menu-link">
+          <button 
+            className={styles['seller-personal-action-btn']} 
+            onClick={handleMyProducts}
+          >
             Мои товары
           </button>
-          <button onClick={handleMyOrders} className="seller-personal-menu-link">
+
+          <button 
+            className={styles['seller-personal-action-btn']} 
+            onClick={handleMyOrders}
+          >
             Мои заказы
           </button>
         </div>
 
         {/* Модальное окно */}
         {isModalOpen && (
-          <div className="seller-personal-modal-overlay">
-            <div className="seller-personal-modal-content">
+          <div className={styles['seller-personal-modal-overlay']}>
+            <div className={styles['seller-personal-modal-content']}>
               <h2>Редактирование профиля</h2>
               
               <select
                 name="country"
                 value={formData.country || ""}
                 onChange={handleInputChange}
-                className="seller-personal-modal-select"
+                className={styles['seller-personal-modal-select']}
               >
                 <option value="">Выберите страну</option>
                 <option value="RU">Россия</option>
@@ -128,7 +136,7 @@ const PersonalSeller: React.FC = () => {
                 name="orgForm"
                 value={formData.orgForm || ""}
                 onChange={handleInputChange}
-                className="seller-personal-modal-select"
+                className={styles['seller-personal-modal-select']}
               >
                 <option value="">Выберите форму организации</option>
                 <option value="IP">Индивидуальный предприниматель</option>
@@ -142,7 +150,7 @@ const PersonalSeller: React.FC = () => {
                 placeholder="ИНН (12 цифр)"
                 value={formData.inn || ""}
                 onChange={handleInputChange}
-                className="seller-personal-modal-input"
+                className={styles['seller-personal-modal-input']}
                 maxLength={12}
                 pattern="\d*"
               />
@@ -153,14 +161,14 @@ const PersonalSeller: React.FC = () => {
                 placeholder="ФИО"
                 value={formData.fio || ""}
                 onChange={handleInputChange}
-                className="seller-personal-modal-input"
+                className={styles['seller-personal-modal-input']}
               />
 
-              <div className="seller-personal-modal-buttons">
-                <button onClick={handleSave} className="seller-personal-modal-save-btn">
+              <div className={styles['seller-personal-modal-buttons']}>
+                <button onClick={handleSave} className={styles['seller-personal-modal-save-btn']}>
                   Сохранить
                 </button>
-                <button onClick={() => setIsModalOpen(false)} className="seller-personal-modal-cancel-btn">
+                <button onClick={() => setIsModalOpen(false)} className={styles['seller-personal-modal-cancel-btn']}>
                   Отмена
                 </button>
               </div>

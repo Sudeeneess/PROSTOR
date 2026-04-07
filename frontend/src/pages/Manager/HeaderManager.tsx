@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import './HeaderManager.css';
+import styles from './HeaderManager.module.css';
 
 interface HeaderProps {
   onManagementClick?: () => void;
@@ -44,42 +44,46 @@ const Header: React.FC<HeaderProps> = ({ onManagementClick, onMenuItemChange }) 
     }
   };
 
-  if (location.pathname === '/auth/warehouse') {
+  if (location.pathname === '/warehouse/auth') {
     return (
-      <header className="manager-header">
-        <div className="manager-logo">prostor</div>
+      <header className={styles['manager-header']}>
+        <div className={styles['manager-logo']}>prostor</div>
       </header>
     );
   }
 
   return (
-    <header className="manager-header">
-      <div className="manager-logo">
+    <header className={styles['manager-header']}>
+      <div className={styles['manager-logo']}>
         prostor
-        <span className="manager-badge">Manager</span>
+        <span className={styles['manager-badge']}>Manager</span>
       </div>
       
-      <div className="manager-menu">
-        <button 
-          className={`manager-menu-item ${location.pathname === '/warehouse' ? 'active' : ''}`}
+      <div className={styles['manager-menu']}>
+        <button
+          type="button"
+          className={`${styles['manager-menu-item']} ${location.pathname === '/warehouse' ? styles['active'] : ''}`}
           onClick={() => handleMenuClick('management')}
         >
           Управление
         </button>
-        <button 
-          className={`manager-menu-item`}
+        <button
+          type="button"
+          className={styles['manager-menu-item']}
           onClick={() => handleMenuClick('receiving')}
         >
           Приемка
         </button>
-        <button 
-          className={`manager-menu-item`}
+        <button
+          type="button"
+          className={styles['manager-menu-item']}
           onClick={() => handleMenuClick('shipment')}
         >
           Отгрузка
         </button>
-        <button 
-          className={`manager-menu-item`}
+        <button
+          type="button"
+          className={styles['manager-menu-item']}
           onClick={() => handleMenuClick('assembling')}
         >
           Сборка

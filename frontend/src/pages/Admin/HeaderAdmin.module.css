@@ -1,0 +1,60 @@
+.admin-header-container {
+  background: #c0c0c0;
+  padding: 0.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  gap: 20px;
+}
+
+.admin-header-logo {
+  font-size: 36px;
+  font-weight: 775;
+  color: #000000;
+  text-transform: uppercase;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.admin-header-badge {
+  font-size: 26px;           
+  font-weight: 700;
+  color: #ffffff;          
+  text-transform: none;
+  letter-spacing: 0.5px;
+}
+
+.admin-header-menu {
+  display: flex;
+  align-items: center;
+  gap: 12px;              
+  flex-wrap: wrap;
+}
+
+.admin-header-menu-item {
+  background: none;
+  border: none;
+  font-size: 16px;          
+  font-weight: 400;         
+  color: #111;
+  cursor: pointer;
+  padding: 10px 20px;        
+  border-radius: 40px;      
+  transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+  font-family: inherit;
+  position: relative;
+}
+
+.admin-header-menu-item:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px); 
+}
+
+/* Активное состояние при клике */
+.admin-header-menu-item:active {
+  transform: translateY(1px);
+  transition-duration: 0.1s;
+}

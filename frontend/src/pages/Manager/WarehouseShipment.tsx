@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import HeaderManager from './HeaderManager';
 import WindWarehouseShipment from './WindWarehouseShipment';
-import './WarehouseShipment.css';
+import styles from './WarehouseShipment.module.css';
 
 interface Order {
   id: string;
@@ -96,32 +96,32 @@ const WarehouseShipment: React.FC<WarehouseShipmentProps> = ({ onBack }) => {
   const selectedCount = orders.filter((order: Order) => order.selected).length;
 
   return (
-    <div className="warehouse-shipment-main-content">
-      <div className="warehouse-shipment-header">
-        <h1 className="warehouse-shipment-page-title">Отгрузка</h1>
+    <div className={styles['warehouse-shipment-main-content']}>
+      <div className={styles['warehouse-shipment-header']}>
+        <h1 className={styles['warehouse-shipment-page-title']}>Отгрузка</h1>
         <button 
-          className="warehouse-shipment-back-button"
+          className={styles['warehouse-shipment-back-button']}
           onClick={handleBack}
         >
           Назад
         </button>
       </div>
 
-      <div className="warehouse-shipment-stats-row">
-        <div className="warehouse-shipment-ready-info">
-          <div className="warehouse-shipment-ready-label">Готово к отгрузке</div>
-          <div className="warehouse-shipment-ready-count">{totalReadyCount}</div>
+      <div className={styles['warehouse-shipment-stats-row']}>
+        <div className={styles['warehouse-shipment-ready-info']}>
+          <div className={styles['warehouse-shipment-ready-label']}>Готово к отгрузке</div>
+          <div className={styles['warehouse-shipment-ready-count']}>{totalReadyCount}</div>
         </div>
         
-        <div className="warehouse-shipment-cost-info">
-          <div className="warehouse-shipment-cost-label">Общая стоимость</div>
-          <div className="warehouse-shipment-cost-value">{totalCost.toLocaleString()} ₽</div>
+        <div className={styles['warehouse-shipment-cost-info']}>
+          <div className={styles['warehouse-shipment-cost-label']}>Общая стоимость</div>
+          <div className={styles['warehouse-shipment-cost-value']}>{totalCost.toLocaleString()} ₽</div>
         </div>
         
-        <div className="warehouse-shipment-search-wrapper">
+        <div className={styles['warehouse-shipment-search-wrapper']}>
           <input
             type="text"
-            className="warehouse-shipment-search-input"
+            className={styles['warehouse-shipment-search-input']}
             placeholder="Поиск по номеру заказа"
             value={searchTerm}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
@@ -129,32 +129,32 @@ const WarehouseShipment: React.FC<WarehouseShipmentProps> = ({ onBack }) => {
         </div>
       </div>
 
-      <div className="warehouse-shipment-table-container">
-        <table className="warehouse-shipment-table">
+      <div className={styles['warehouse-shipment-table-container']}>
+        <table className={styles['warehouse-shipment-table']}>
           <thead>
             <tr>
-              <th className="warehouse-shipment-col-select"></th>
-              <th className="warehouse-shipment-col-order">Заказ</th>
-              <th className="warehouse-shipment-col-items">Товары</th>
-              <th className="warehouse-shipment-col-collector">Сборщик</th>
-              <th className="warehouse-shipment-col-time">Время</th>
+              <th className={styles['warehouse-shipment-col-select']}></th>
+              <th className={styles['warehouse-shipment-col-order']}>Заказ</th>
+              <th className={styles['warehouse-shipment-col-items']}>Товары</th>
+              <th className={styles['warehouse-shipment-col-collector']}>Сборщик</th>
+              <th className={styles['warehouse-shipment-col-time']}>Время</th>
             </tr>
           </thead>
           <tbody>
             {filteredOrders.map((order: Order) => (
               <tr key={order.id}>
-                <td className="warehouse-shipment-col-select">
+                <td className={styles['warehouse-shipment-col-select']}>
                   <input
                     type="checkbox"
-                    className="warehouse-shipment-checkbox"
+                    className={styles['warehouse-shipment-checkbox']}
                     checked={order.selected}
                     onChange={() => handleSelectOrder(order.id)}
                   />
                 </td>
-                <td className="warehouse-shipment-col-order">{order.id}</td>
-                <td className="warehouse-shipment-col-items">{order.items}</td>
-                <td className="warehouse-shipment-col-collector">{order.collector}</td>
-                <td className="warehouse-shipment-col-time">{order.time}</td>
+                <td className={styles['warehouse-shipment-col-order']}>{order.id}</td>
+                <td className={styles['warehouse-shipment-col-items']}>{order.items}</td>
+                <td className={styles['warehouse-shipment-col-collector']}>{order.collector}</td>
+                <td className={styles['warehouse-shipment-col-time']}>{order.time}</td>
               </tr>
             ))}
           </tbody>
@@ -162,9 +162,9 @@ const WarehouseShipment: React.FC<WarehouseShipmentProps> = ({ onBack }) => {
       </div>
 
       {selectedCount > 0 && (
-        <div className="warehouse-shipment-action-buttons">
+        <div className={styles['warehouse-shipment-action-buttons']}>
           <button 
-            className="warehouse-shipment-ship-button"
+            className={styles['warehouse-shipment-ship-button']}
             onClick={handleShipOrders}
           >
             Отгрузить выбранные

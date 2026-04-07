@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BsPersonFill } from "react-icons/bs";
-import Header from './HeaderBuyer';
-import './AuthPageBuyer.css';
+import HeaderMain from '../../components/HeaderMain';
+import styles from './AuthPageBuyer.module.css';
 import { api } from '../../services/api';
 
 const AuthPageBuyer: React.FC = () => {
@@ -233,20 +233,20 @@ const AuthPageBuyer: React.FC = () => {
   };
 
   return (
-    <div className="buyer-auth-page">
-      <Header />
-      <div className="buyer-auth-container">
-        <div className="buyer-auth-card">
-          <h2 className="buyer-auth-title">
-            {isLogin ? 'Авторизация' : 'Регистрация'}
-            <div className="buyer-auth-title-icon">
+    <div className={styles['buyer-auth-page']}>
+      <HeaderMain variant="buyer" />
+      <div className={styles['buyer-auth-container']}>
+        <div className={styles['buyer-auth-card']}>
+          <h2 className={styles['buyer-auth-title']}>
+            {isLogin ? 'Авторизация клиента' : 'Регистрация клиента'}
+            <div className={styles['buyer-auth-title-icon']}>
               <BsPersonFill size={28} color='#000000' />
             </div>
           </h2>
           
           {/* Отображение ошибки */}
           {error && (
-            <div className="buyer-auth-error-message">
+            <div className={styles['buyer-auth-error-message']}>
               {error}
             </div>
           )}
@@ -255,7 +255,7 @@ const AuthPageBuyer: React.FC = () => {
             {!isLogin ? (
               // Форма регистрации
               <>
-                <div className="buyer-auth-form-group">
+                <div className={styles['buyer-auth-form-group']}>
                   <input
                     type="text"
                     id="name"
@@ -268,7 +268,7 @@ const AuthPageBuyer: React.FC = () => {
                   />
                 </div>
 
-                <div className="buyer-auth-form-group">
+                <div className={styles['buyer-auth-form-group']}>
                   <input
                     type="text"
                     id="username"
@@ -281,7 +281,7 @@ const AuthPageBuyer: React.FC = () => {
                   />
                 </div>
 
-                <div className="buyer-auth-form-group">
+                <div className={styles['buyer-auth-form-group']}>
                   <input
                     type="password"
                     id="password"
@@ -294,7 +294,7 @@ const AuthPageBuyer: React.FC = () => {
                   />
                 </div>
 
-                <div className="buyer-auth-form-group">
+                <div className={styles['buyer-auth-form-group']}>
                   <input
                     type="password"
                     id="confirmPassword"
@@ -310,7 +310,7 @@ const AuthPageBuyer: React.FC = () => {
             ) : (
               // Форма входа
               <>
-                <div className="buyer-auth-form-group">
+                <div className={styles['buyer-auth-form-group']}>
                   <input
                     type="text"
                     id="username"
@@ -323,7 +323,7 @@ const AuthPageBuyer: React.FC = () => {
                   />
                 </div>
 
-                <div className="buyer-auth-form-group">
+                <div className={styles['buyer-auth-form-group']}>
                   <input
                     type="password"
                     id="password"
@@ -340,20 +340,20 @@ const AuthPageBuyer: React.FC = () => {
 
             <button 
               type="submit" 
-              className="buyer-auth-submit-button"
+              className={styles['buyer-auth-submit-button']}
               disabled={loading}
             >
               {loading ? 'Загрузка...' : (isLogin ? 'Войти' : 'Создать аккаунт')}
             </button>
           </form>
 
-          <div className="buyer-auth-footer">
+          <div className={styles['buyer-auth-footer']}>
             {isLogin ? (
               <p>
                 У вас нет аккаунта?{' '}
                 <button 
                   onClick={switchToRegister} 
-                  className="buyer-auth-link-button"
+                  className={styles['buyer-auth-link-button']}
                   disabled={loading}
                 >
                   Создать аккаунт
@@ -364,7 +364,7 @@ const AuthPageBuyer: React.FC = () => {
                 Уже есть аккаунт?{' '}
                 <button 
                   onClick={switchToLogin} 
-                  className="buyer-auth-link-button"
+                  className={styles['buyer-auth-link-button']}
                   disabled={loading}
                 >
                   Войти

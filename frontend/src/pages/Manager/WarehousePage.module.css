@@ -123,6 +123,62 @@
   cursor: not-allowed;
 }
 
+.with-ring {
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.35);
+}
+
+.quick-actions {
+  margin-bottom: 8px;
+}
+
+/* Колонки таблицы активностей */
+.col {
+  min-width: 0;
+}
+
+.time {
+}
+
+.action {
+}
+
+.number {
+}
+
+.executor {
+}
+
+.status {
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-success {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-warning {
+  background: #fed7aa;
+  color: #9a3412;
+}
+
+.status-error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
 /* Таблица активностей */
 .recent-activity {
   margin-top: 52px;

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "./HeaderSeller.css";
+import styles from './HeaderSeller.module.css';
 
 const HeaderSeller: React.FC = () => {
   const navigate = useNavigate();
@@ -14,18 +14,18 @@ const HeaderSeller: React.FC = () => {
   };
 
   return (
-    <header className="seller-header-section">
-      <div className="seller-header-logo-text">
-        <span className="seller-header-logo-prostor">prostor</span>
-        <span className="seller-header-logo-seller">Seller</span>
+    <header className={styles['seller-header-section']}>
+      <div className={styles['seller-header-logo-text']}>
+        <span className={styles['seller-header-logo-prostor']}>prostor</span>
+        <span className={styles['seller-header-logo-seller']}>Seller</span>
       </div>
-      <nav className="seller-header-navigation-bar">
-        <Link to="/" className="seller-header-navigation-link">На главную</Link>
-        <button onClick={handleProductsClick} className="seller-header-navigation-button">
+      <nav className={styles['seller-header-navigation-bar']}>
+        <Link to="/" className={styles['seller-header-navigation-link']}>На главную</Link>
+        <button onClick={handleProductsClick} className={styles['seller-header-navigation-button']}>
           Товары
         </button>
-        <Link to="/seller/orders" className="seller-header-navigation-link">Заказы</Link>
-        <button onClick={handlePersonalClick} className="seller-header-navigation-button">
+        <Link to="/seller/orders" className={styles['seller-header-navigation-link']}>Заказы</Link>
+        <button onClick={handlePersonalClick} className={styles['seller-header-navigation-button']}>
           Личный кабинет
         </button>
       </nav>

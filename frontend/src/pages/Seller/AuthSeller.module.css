@@ -27,16 +27,18 @@ body {
   justify-content: center;
   align-items: center;
   padding: 2rem;
-  min-height: calc(100vh - 80px);
 }
 
 /* Форма авторизации */
 .seller-auth-form {
   background: white;
-  padding: 2rem;
+  padding-bottom: 1.2rem;
+  padding-top: 1.2rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
   border-radius: 30px;
   width: 100%;
-  max-width: 450px;
+  max-width: 400px;
   position: relative;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   animation: seller-auth-slideIn 0.3s ease;
@@ -89,14 +91,16 @@ body {
 
 .seller-auth-input-field {
   width: 100%;
-  padding: 12px 16px;
+  max-width: 100%;
+  padding: 12px;
+  padding-left: 15px;
   border: 1px solid #C0C0C0;
   border-radius: 20px;
   font-size: 14px;
-  background: white;
-  transition: all 0.2s;
   outline: none;
+  transition: border-color 0.2s;
   box-sizing: border-box;
+  background: white;
 }
 
 .seller-auth-input-field:focus {
@@ -144,12 +148,12 @@ body {
   background-color: #e0e0e0;
   color: #000000;
   border: none;
-  border-radius: 25px;
+  border-radius: 20px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .seller-auth-save-button:hover:not(:disabled) {
@@ -177,7 +181,7 @@ body {
   left: 50%;
   margin-left: -10px;
   margin-top: -10px;
-  border: 2px solid #ffffff;
+  border: 2px solid #000000;
   border-radius: 50%;
   border-top-color: transparent;
   animation: seller-auth-spinner 0.8s linear infinite;
@@ -191,18 +195,24 @@ body {
 /* Ссылка регистрации */
 .seller-auth-registration-link {
   text-align: center;
-  margin-top: 1.5rem;
+  margin-top: 1rem;
   padding-top: 1rem;
   border-top: 1px solid #eee;
-  font-size: 0.9rem;
+}
+
+.seller-auth-registration-link p {
   color: #666;
+  font-size: 0.9rem;
 }
 
 .seller-auth-registration-link a {
+  background: none;
+  border: none;
   color: #1f54c7;
+  cursor: pointer;
+  font-size: 0.9rem;
   text-decoration: underline;
-  transition: color 0.2s;
-  font-weight: 500;
+  padding: 0;
   margin-left: 0.3rem;
 }
 
@@ -233,15 +243,23 @@ body {
   20%, 40%, 60%, 80% { transform: translateX(5px); }
 }
 
+/* Стили для disabled состояния ссылок */
+.seller-auth-registration-link a:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  color: #999;
+  text-decoration: none;
+}
+
 /* Адаптивность для мобильных устройств */
 @media (max-width: 768px) {
   .seller-auth-content-section {
-    padding: 1.5rem;
+    padding: 1rem;
   }
   
   .seller-auth-form {
-    padding: 1.8rem;
-    transform: translateY(-80px);
+    padding: 1.5rem;
+    transform: translateY(-50px);
   }
   
   .seller-auth-form-header {
@@ -251,11 +269,11 @@ body {
   
   @keyframes seller-auth-slideIn {
     from {
-      transform: translateY(-140px);
+      transform: translateY(-100px);
       opacity: 0;
     }
     to {
-      transform: translateY(-80px);
+      transform: translateY(-50px);
       opacity: 1;
     }
   }
@@ -280,7 +298,7 @@ body {
   }
   
   .seller-auth-input-field {
-    padding: 10px 14px;
+    padding: 10px 12px;
     font-size: 13px;
   }
   

@@ -1,0 +1,82 @@
+/* Единый стиль с Header / HeaderBuyer */
+.seller-header-section {
+  background: #c0c0c0;
+  padding: 0.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.seller-header-logo-text {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.seller-header-logo-prostor {
+  font-size: 36px;
+  font-weight: 700;
+  color: #000000;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.seller-header-logo-seller {
+  font-size: 26px;           /* Увеличено */
+  font-weight: 700;
+  color: #ffffff;            /* Белый цвет */
+  text-transform: none;
+  letter-spacing: 0.5px;
+}
+
+.seller-header-navigation-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;                 /* Увеличен gap между пунктами */
+  flex-wrap: wrap;
+}
+
+.seller-header-navigation-link {
+  color: #111;
+  text-decoration: none;
+  font-size: 16px;           
+  font-weight: 400;          
+  padding: 10px 20px;        
+  border-radius: 40px;       
+  transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+  position: relative;
+}
+
+.seller-header-navigation-link:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px); 
+}
+
+.seller-header-navigation-button {
+  background: none;
+  border: none;
+  color: #111;
+  font-size: 16px;          
+  font-weight: 400;        
+  cursor: pointer;
+  padding: 10px 20px;       
+  border-radius: 40px;      
+  font-family: inherit;
+  transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+}
+
+.seller-header-navigation-button:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);  
+}
+
+/* Активное состояние для кнопок/ссылок */
+.seller-header-navigation-link:active,
+.seller-header-navigation-button:active {
+  transform: translateY(1px);
+  transition-duration: 0.1s;
+}
