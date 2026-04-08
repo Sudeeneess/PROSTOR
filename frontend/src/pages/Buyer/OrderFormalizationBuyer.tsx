@@ -509,4 +509,4 @@ const OrderFormalizationBuyer: React.FC = () => {
 
 export default OrderFormalizationBuyer;
 
-// Когда будете готовы подключить реальные эндпоинты, просто замените содержимое функции reserveProducts на API-вызовы.
+//реальные эндпоинты, просто замените содержимое функции reserveProducts на API-вызовы.
