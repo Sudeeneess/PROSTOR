@@ -2,6 +2,12 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { IoCheckmark } from 'react-icons/io5';
+import {
+  CART_UPDATE_EVENT,
+  getQuantityForProduct,
+  readCart,
+  writeCart,
+} from '../utils/cartStorage';
 import styles from './ProductCard.module.css';
 
 export type ProductCardProps = {
@@ -11,37 +17,6 @@ export type ProductCardProps = {
   rating: string;
   reviews: string;
 };
-
-type CartItem = {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
-};
-
-const CART_KEY = 'cart';
-const CART_UPDATE_EVENT = 'prostoricartupdate';
-
-function readCart(): CartItem[] {
-  try {
-    const raw = localStorage.getItem(CART_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as unknown;
-    return Array.isArray(parsed) ? (parsed as CartItem[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeCart(cart: CartItem[]) {
-  localStorage.setItem(CART_KEY, JSON.stringify(cart));
-  window.dispatchEvent(new Event(CART_UPDATE_EVENT));
-}
-
-function getQuantityForProduct(cart: CartItem[], productId: number): number {
-  const item = cart.find((i) => i.id === productId);
-  return item?.quantity ?? 0;
-}
 
 const ProductCard: React.FC<ProductCardProps> = ({
   id,
@@ -82,6 +57,17 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   const parsePriceNumber = () =>
     parseInt(price.replace(/[^\d]/g, ''), 10) || 0;
+
+  const goToProduct = () => {
+    navigate(`/product/${id}`);
+  };
+
+  const handleMainKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      goToProduct();
+    }
+  };
 
   const handleAddToCart = () => {
     const token = localStorage.getItem('token');
@@ -173,17 +159,28 @@ const ProductCard: React.FC<ProductCardProps> = ({
   return (
     <div className={styles['product-card']}>
       {toastNode}
-      <div className={styles['product-image']}>
-        <div className={styles['image-placeholder']} aria-hidden>
-          📦
+      <div
+        className={styles['product-card-main']}
+        onClick={goToProduct}
+        onKeyDown={handleMainKeyDown}
+        role="link"
+        tabIndex={0}
+        aria-label={`Открыть карточку: ${name}`}
+      >
+        <div className={styles['product-image']}>
+          <div className={styles['image-placeholder']} aria-hidden>
+            📦
+          </div>
+        </div>
+        <div className={styles['product-info']}>
+          <div className={styles['price']}>{price}</div>
+          <div className={styles['name']}>{name}</div>
+          <div className={styles['rating']}>
+            ★ {rating} {reviews} отзывов
+          </div>
         </div>
       </div>
-      <div className={styles['product-info']}>
-        <div className={styles['price']}>{price}</div>
-        <div className={styles['name']}>{name}</div>
-        <div className={styles['rating']}>
-          ★ {rating} {reviews} отзывов
-        </div>
+      <div className={styles['product-card-actions']}>
         {showCounter ? (
           <div className={styles['cart-counter']} aria-label="Количество в корзине">
             <button
@@ -208,7 +205,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <button
             type="button"
             className={styles['add-to-cart']}
-            onClick={handleAddToCart}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAddToCart();
+            }}
           >
             Добавить в корзину
           </button>

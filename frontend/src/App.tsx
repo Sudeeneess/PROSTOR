@@ -13,7 +13,8 @@ import MainPageBuyer from './pages/Buyer/MainPageBuyer';
 import ProfilePage from './pages/Buyer/ProfileBuyer';
 import OrdersPageBuyer from './pages/Buyer/OrdersPageBuyer';
 import BasketBuyer from './pages/Buyer/BasketBuyer';
-import OrderFormalizationBuyer from './pages/Buyer/OrderFormalizationBuyer'; 
+import OrderFormalizationBuyer from './pages/Buyer/OrderFormalizationBuyer';
+import ProductDetailPage from './pages/Buyer/ProductDetailPage'; 
 
 // Менеджер склада (Manager)
 import AuthPageManager from './pages/Manager/AuthPageManager';
@@ -150,6 +151,20 @@ const RedirectAdminIfAuthenticated: React.FC<{ children: React.ReactNode }> = ({
   return <>{children}</>;
 };
 
+const ProductDetailLayout: React.FC = () => {
+  const token = localStorage.getItem('token');
+  const userRole = sessionStorage.getItem('userRole');
+  const variant = token && userRole === 'customer' ? 'buyer' : 'landing';
+  return (
+    <>
+      <HeaderMain variant={variant} />
+      <main className={styles['main-content']}>
+        <ProductDetailPage />
+      </main>
+    </>
+  );
+};
+
 // ==================== ОСНОВНОЙ КОМПОНЕНТ МАРШРУТИЗАЦИИ ====================
 
 const AppContent: React.FC = () => {
@@ -192,6 +207,8 @@ const AppContent: React.FC = () => {
       {/* ==================== МАРШРУТЫ ПОКУПАТЕЛЯ ==================== */}
       
       {/* Страница входа/регистрации покупателя */}
+      <Route path="/product/:id" element={<ProductDetailLayout />} />
+
       <Route path="/auth" element={
         <RedirectBuyerIfAuthenticated>
           <AuthPageBuyer />
