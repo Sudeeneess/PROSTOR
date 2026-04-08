@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
+import { IoCheckmark } from 'react-icons/io5';
 import styles from './ProductCard.module.css';
 
 export type ProductCardProps = {
@@ -10,6 +12,37 @@ export type ProductCardProps = {
   reviews: string;
 };
 
+type CartItem = {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+};
+
+const CART_KEY = 'cart';
+const CART_UPDATE_EVENT = 'prostoricartupdate';
+
+function readCart(): CartItem[] {
+  try {
+    const raw = localStorage.getItem(CART_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as unknown;
+    return Array.isArray(parsed) ? (parsed as CartItem[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeCart(cart: CartItem[]) {
+  localStorage.setItem(CART_KEY, JSON.stringify(cart));
+  window.dispatchEvent(new Event(CART_UPDATE_EVENT));
+}
+
+function getQuantityForProduct(cart: CartItem[], productId: number): number {
+  const item = cart.find((i) => i.id === productId);
+  return item?.quantity ?? 0;
+}
+
 const ProductCard: React.FC<ProductCardProps> = ({
   id,
   price,
@@ -18,53 +51,128 @@ const ProductCard: React.FC<ProductCardProps> = ({
   reviews,
 }) => {
   const navigate = useNavigate();
-  const [isAdded, setIsAdded] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [quantity, setQuantity] = useState(0);
+  const [toastVisible, setToastVisible] = useState(false);
 
-  const handleAddToCart = () => {
-    // 1. Проверяем авторизацию
+  const isBuyer = (() => {
     const token = localStorage.getItem('token');
     const userRole = sessionStorage.getItem('userRole');
-    
+    return Boolean(token && userRole === 'customer');
+  })();
+
+  const syncQuantityFromStorage = useCallback(() => {
+    setQuantity(getQuantityForProduct(readCart(), id));
+  }, [id]);
+
+  useEffect(() => {
+    syncQuantityFromStorage();
+    window.addEventListener(CART_UPDATE_EVENT, syncQuantityFromStorage);
+    window.addEventListener('storage', syncQuantityFromStorage);
+    return () => {
+      window.removeEventListener(CART_UPDATE_EVENT, syncQuantityFromStorage);
+      window.removeEventListener('storage', syncQuantityFromStorage);
+    };
+  }, [syncQuantityFromStorage]);
+
+  useEffect(() => {
+    if (!toastVisible) return;
+    const idTimer = window.setTimeout(() => setToastVisible(false), 1500);
+    return () => window.clearTimeout(idTimer);
+  }, [toastVisible]);
+
+  const parsePriceNumber = () =>
+    parseInt(price.replace(/[^\d]/g, ''), 10) || 0;
+
+  const handleAddToCart = () => {
+    const token = localStorage.getItem('token');
+    const userRole = sessionStorage.getItem('userRole');
+
     if (!token || userRole !== 'customer') {
-      // Не авторизован — идем на страницу входа
       navigate('/auth');
       return;
     }
 
-    // 2. Авторизован — добавляем в корзину
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const existingItem = cart.find((item: any) => item.id === id);
-    
+    const cart = readCart();
+    const existingItem = cart.find((item) => item.id === id);
+
     if (existingItem) {
       existingItem.quantity += 1;
     } else {
-      // Парсим цену из строки (убираем "₽", пробелы и берем только цифры)
-      const priceNumber = parseInt(price.replace(/[^\d]/g, '')) || 0;
       cart.push({
         id,
         name,
-        price: priceNumber,
-        quantity: 1
+        price: parsePriceNumber(),
+        quantity: 1,
       });
     }
-    
-    localStorage.setItem('cart', JSON.stringify(cart));
-    console.log('Товар добавлен в корзину:', { id, name });
-    
-    // 3. Анимация кнопки
-    setIsAdded(true);
-    setIsAnimating(true);
-    
-    // Сбрасываем через 2 секунды
-    setTimeout(() => {
-      setIsAdded(false);
-      setIsAnimating(false);
-    }, 2000);
+
+    writeCart(cart);
+    setQuantity(getQuantityForProduct(cart, id));
+    setToastVisible(true);
   };
+
+  const handleDecrement = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const token = localStorage.getItem('token');
+    const userRole = sessionStorage.getItem('userRole');
+    if (!token || userRole !== 'customer') return;
+
+    const cart = readCart();
+    const idx = cart.findIndex((item) => item.id === id);
+    if (idx === -1) return;
+
+    const item = cart[idx];
+    if (item.quantity <= 1) {
+      cart.splice(idx, 1);
+    } else {
+      item.quantity -= 1;
+    }
+
+    writeCart(cart);
+    setQuantity(getQuantityForProduct(cart, id));
+  };
+
+  const handleIncrement = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const token = localStorage.getItem('token');
+    const userRole = sessionStorage.getItem('userRole');
+    if (!token || userRole !== 'customer') return;
+
+    const cart = readCart();
+    const existingItem = cart.find((item) => item.id === id);
+    if (existingItem) {
+      existingItem.quantity += 1;
+    } else {
+      cart.push({
+        id,
+        name,
+        price: parsePriceNumber(),
+        quantity: 1,
+      });
+    }
+
+    writeCart(cart);
+    setQuantity(getQuantityForProduct(cart, id));
+    setToastVisible(true);
+  };
+
+  const showCounter = isBuyer && quantity > 0;
+
+  const toastNode =
+    toastVisible &&
+    createPortal(
+      <div className={styles['toast']} role="status" aria-live="polite">
+        <span className={styles['toast-icon']} aria-hidden>
+          <IoCheckmark size={20} aria-hidden />
+        </span>
+        <span className={styles['toast-text']}>Товар добавлен в корзину</span>
+      </div>,
+      document.body
+    );
 
   return (
     <div className={styles['product-card']}>
+      {toastNode}
       <div className={styles['product-image']}>
         <div className={styles['image-placeholder']} aria-hidden>
           📦
@@ -76,14 +184,35 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <div className={styles['rating']}>
           ★ {rating} {reviews} отзывов
         </div>
-        <button
-          type="button"
-          className={`${styles['add-to-cart']} ${isAdded ? styles['added'] : ''} ${isAnimating ? styles['flying'] : ''}`}
-          onClick={handleAddToCart}
-          disabled={isAdded}
-        >
-          {isAdded ? '✓ Добавлено' : 'Добавить в корзину'}
-        </button>
+        {showCounter ? (
+          <div className={styles['cart-counter']} aria-label="Количество в корзине">
+            <button
+              type="button"
+              className={styles['counter-btn']}
+              aria-label="Уменьшить количество"
+              onClick={handleDecrement}
+            >
+              −
+            </button>
+            <span className={styles['counter-value']}>{quantity}</span>
+            <button
+              type="button"
+              className={styles['counter-btn']}
+              aria-label="Увеличить количество"
+              onClick={handleIncrement}
+            >
+              +
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            className={styles['add-to-cart']}
+            onClick={handleAddToCart}
+          >
+            Добавить в корзину
+          </button>
+        )}
       </div>
     </div>
   );
