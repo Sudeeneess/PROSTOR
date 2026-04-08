@@ -1,3 +1,5 @@
+import { getCatalogProductById } from './mockCatalogProducts';
+
 /**
  * Поля в духе БД: products + product_card + brand + size.
  * Позже заменить ответом API GET /products/:id/detail
@@ -31,12 +33,28 @@ const baseDetails = (id: number): ProductDetail => ({
   photos: photosForProduct(id, 5),
 });
 
-const cache = new Map<number, ProductDetail>();
-
 export function getMockProductDetail(id: number): ProductDetail | undefined {
   if (id < 1 || id > 99999 || !Number.isFinite(id)) return undefined;
-  if (!cache.has(id)) {
-    cache.set(id, baseDetails(id));
-  }
-  return cache.get(id);
+  const base = baseDetails(id);
+  const c = getCatalogProductById(id);
+  // Галерея: первый кадр как в каталоге (product_card.photo), остальные — заглушки ракурсов
+  const photos = c
+    ? [
+        c.imageUrl,
+        ...[1, 2, 3, 4].map(
+          (i) =>
+            `https://picsum.photos/seed/prostor-${id}-g${i}/800/1000`
+        ),
+      ]
+    : photosForProduct(id, 5);
+
+  return {
+    ...base,
+    name: c?.name ?? base.name,
+    price: c?.priceRub ?? base.price,
+    brandName: c?.brandName ?? base.brandName,
+    sizeName: c?.sizeName ?? base.sizeName,
+    type: c?.type ?? base.type,
+    photos,
+  };
 }

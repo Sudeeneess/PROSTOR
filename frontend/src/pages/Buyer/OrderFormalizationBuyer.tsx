@@ -365,18 +365,6 @@ const OrderFormalizationBuyer: React.FC = () => {
                 Способ оплаты
               </h2>
 
-              {/* Информация о тестовом режиме */}
-              <div className={styles['test-mode-info']} style={{ 
-                backgroundColor: '#f0f9ff', 
-                padding: '12px', 
-                borderRadius: '8px', 
-                marginBottom: '16px',
-                fontSize: '14px',
-                color: '#0066cc'
-              }}>
-                💳 <strong>Тестовый режим</strong> — оплата не требуется
-              </div>
-
               {savedCards.length > 0 && (
                 <div className={styles['saved-cards']}>
                   <label className={styles['section-subtitle']}>Мои карты</label>

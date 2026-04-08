@@ -1,6 +1,6 @@
 .buyer-account-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+  background: var(--shop-bg);
 }
 
 .buyer-account-main {
@@ -19,7 +19,7 @@
 /* Блок с информацией о пользователе */
 .buyer-account-header {
   padding: 32px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--shop-border);
 }
 
 .buyer-account-user-info {
@@ -44,14 +44,14 @@
 .buyer-account-name {
   font-size: 28px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--shop-heading);
   margin: 0;
 }
 
 .buyer-account-edit-btn {
   background: none;
   border: none;
-  color: #6b7280;
+  color: var(--shop-text-muted);
   font-size: 14px;
   cursor: pointer;
   padding: 8px 16px;
@@ -61,8 +61,8 @@
 }
 
 .buyer-account-edit-btn:hover {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--shop-bg);
+  color: var(--shop-text-muted);
 }
 
 /* Редактирование имени */
@@ -77,16 +77,17 @@
   font-size: 24px;
   font-weight: 600;
   padding: 8px 12px;
-  border: 2px solid #9ca3af;
+  border: 2px solid var(--shop-border);
   border-radius: 12px;
   outline: none;
   font-family: inherit;
   width: 250px;
-  color: #1f2937;
+  color: var(--shop-text);
 }
 
 .buyer-account-name-input:focus {
-  border-color: #6b7280;
+  border-color: var(--shop-primary);
+  box-shadow: 0 0 0 3px var(--shop-primary-soft);
 }
 
 .buyer-account-edit-actions {
@@ -104,24 +105,24 @@
 }
 
 .buyer-account-save-btn {
-  background: #4b5563;
+  background: var(--shop-primary);
   color: white;
   border: none;
 }
 
 .buyer-account-save-btn:hover {
-  background: #374151;
+  background: var(--shop-primary-hover);
 }
 
 .buyer-account-cancel-btn {
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  color: #6b7280;
+  background: var(--shop-bg);
+  border: 1px solid var(--shop-border);
+  color: var(--shop-text-muted);
 }
 
 .buyer-account-cancel-btn:hover {
-  background: #e5e7eb;
-  color: #374151;
+  background: var(--shop-border);
+  color: var(--shop-text-muted);
 }
 
 /* Кнопка "Выйти" */
@@ -175,7 +176,7 @@
 
 .buyer-account-option-card:hover {
   background: #ffffff;
-  border-color: #9ca3af;
+  border-color: var(--shop-text-muted);
   transform: translateX(8px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -187,7 +188,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f3f4f6;
+  background: var(--shop-bg);
   border-radius: 16px;
 }
 
@@ -198,25 +199,25 @@
 .buyer-account-option-title {
   font-size: 20px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--shop-heading);
   margin: 0 0 4px 0;
 }
 
 .buyer-account-option-description {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--shop-text-muted);
   margin: 0;
 }
 
 .buyer-account-option-arrow {
   font-size: 24px;
-  color: #9ca3af;
+  color: var(--shop-text-muted);
   transition: transform 0.3s ease;
 }
 
 .buyer-account-option-card:hover .buyer-account-option-arrow {
   transform: translateX(4px);
-  color: #6b7280;
+  color: var(--shop-text-muted);
 }
 
 /* Модальные окна */
@@ -270,13 +271,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px 24px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--shop-border);
 }
 
 .buyer-account-modal-header h2 {
   font-size: 24px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--shop-heading);
   margin: 0;
 }
 
@@ -285,13 +286,13 @@
   border: none;
   font-size: 28px;
   cursor: pointer;
-  color: #9ca3af;
+  color: var(--shop-text-muted);
   transition: color 0.2s;
   line-height: 1;
 }
 
 .buyer-account-modal-close:hover {
-  color: #374151;
+  color: var(--shop-text-muted);
 }
 
 .buyer-account-modal-body {
@@ -309,25 +310,25 @@
 
 .buyer-account-order-item {
   padding: 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--shop-border);
   border-radius: 12px;
   transition: all 0.2s;
 }
 
 .buyer-account-order-item:hover {
-  border-color: #9ca3af;
+  border-color: var(--shop-text-muted);
   background: #fafbfc;
 }
 
 .buyer-account-order-number {
   font-weight: 600;
-  color: #1f2937;
+  color: var(--shop-text);
   margin-bottom: 4px;
 }
 
 .buyer-account-order-date {
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--shop-text-muted);
   margin-bottom: 6px;
 }
 
@@ -350,18 +351,18 @@
 }
 
 .buyer-account-status-processing {
-  background: #e5e7eb;
-  color: #374151;
+  background: var(--shop-border);
+  color: var(--shop-text-muted);
 }
 
 .buyer-account-order-summary {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--shop-text-muted);
 }
 
 .buyer-account-order-total {
   font-weight: 500;
-  color: #1f2937;
+  color: var(--shop-text);
 }
 
 /* Стили для способов оплаты */
@@ -376,19 +377,19 @@
   align-items: center;
   gap: 16px;
   padding: 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--shop-border);
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .buyer-account-payment-method.buyer-account-selected {
-  border-color: #6b7280;
-  background: #f9fafb;
+  border-color: var(--shop-primary);
+  background: var(--shop-primary-soft);
 }
 
 .buyer-account-payment-method:hover {
-  border-color: #9ca3af;
+  border-color: var(--shop-text-muted);
 }
 
 .buyer-account-payment-method-icon {
@@ -401,37 +402,42 @@
 
 .buyer-account-payment-method-name {
   font-weight: 600;
-  color: #1f2937;
+  color: var(--shop-text);
   margin-bottom: 4px;
 }
 
 .buyer-account-payment-method-details {
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--shop-text-muted);
 }
 
 .buyer-account-payment-method-check {
-  color: #6b7280;
+  color: var(--shop-text-muted);
   font-weight: bold;
   font-size: 18px;
+}
+
+.buyer-account-payment-method.buyer-account-selected
+  .buyer-account-payment-method-check {
+  color: var(--shop-primary);
 }
 
 .buyer-account-add-payment-btn {
   margin-top: 16px;
   padding: 12px;
-  background: #f3f4f6;
+  background: var(--shop-bg);
   border: 1px dashed #d1d5db;
   border-radius: 12px;
-  color: #6b7280;
+  color: var(--shop-text-muted);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .buyer-account-add-payment-btn:hover {
-  background: #e5e7eb;
-  border-color: #9ca3af;
-  color: #374151;
+  background: var(--shop-border);
+  border-color: var(--shop-text-muted);
+  color: var(--shop-text-muted);
 }
 
 /* Адаптивность */
@@ -534,20 +540,16 @@
 .buyer-account-modal-header h2 {
   font-size: 24px;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--shop-heading);
   margin: 0;
-  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
 .buyer-account-modal-close {
-  background: #f3f4f6;
+  background: var(--shop-bg);
   border: none;
   font-size: 28px;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--shop-text-muted);
   transition: all 0.2s;
   line-height: 1;
   width: 36px;
@@ -559,8 +561,8 @@
 }
 
 .buyer-account-modal-close:hover {
-  background: #e5e7eb;
-  color: #374151;
+  background: var(--shop-border);
+  color: var(--shop-text-muted);
   transform: rotate(90deg);
 }
 
@@ -586,13 +588,13 @@
 .profile-edit-field label {
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: var(--shop-text-muted);
   margin-bottom: 4px;
 }
 
 .profile-edit-input {
   padding: 12px 16px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--shop-border);
   border-radius: 12px;
   font-size: 16px;
   transition: all 0.2s;
@@ -601,12 +603,12 @@
 
 .profile-edit-input:focus {
   outline: none;
-  border-color: #6b7280;
-  box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.1);
+  border-color: var(--shop-primary);
+  box-shadow: 0 0 0 3px var(--shop-primary-soft);
 }
 
 .profile-edit-input:hover {
-  border-color: #9ca3af;
+  border-color: var(--shop-text-muted);
 }
 
 .profile-edit-actions {
@@ -618,7 +620,11 @@
 .profile-edit-save-btn {
   flex: 1;
   padding: 12px 20px;
-  background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+  background: linear-gradient(
+    135deg,
+    var(--shop-primary) 0%,
+    var(--shop-primary-hover) 100%
+  );
   color: white;
   border: none;
   border-radius: 12px;
@@ -636,9 +642,9 @@
 .profile-edit-cancel-btn {
   flex: 1;
   padding: 12px 20px;
-  background: #f3f4f6;
-  color: #6b7280;
-  border: 1px solid #e5e7eb;
+  background: var(--shop-bg);
+  color: var(--shop-text-muted);
+  border: 1px solid var(--shop-border);
   border-radius: 12px;
   font-size: 16px;
   font-weight: 600;
@@ -647,8 +653,8 @@
 }
 
 .profile-edit-cancel-btn:hover {
-  background: #e5e7eb;
-  color: #374151;
+  background: var(--shop-border);
+  color: var(--shop-text-muted);
 }
 
 /* Стили для способов оплаты */
@@ -664,7 +670,7 @@
   justify-content: space-between;
   padding: 16px;
   background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--shop-border);
   border-radius: 16px;
   transition: all 0.2s;
 }
@@ -692,7 +698,7 @@
   justify-content: center;
   background: white;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--shop-border);
 }
 
 .payment-card-details {
@@ -702,7 +708,7 @@
 .payment-card-number {
   font-size: 16px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--shop-text);
   margin-bottom: 4px;
   font-family: monospace;
   letter-spacing: 0.5px;
@@ -710,13 +716,13 @@
 
 .payment-card-expiry {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--shop-text-muted);
   margin-bottom: 2px;
 }
 
 .payment-card-holder {
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--shop-text-muted);
   text-transform: uppercase;
 }
 
@@ -745,10 +751,10 @@
   justify-content: center;
   gap: 8px;
   padding: 14px;
-  background: #f3f4f6;
+  background: var(--shop-bg);
   border: 2px dashed #cbd5e1;
   border-radius: 16px;
-  color: #6b7280;
+  color: var(--shop-text-muted);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
@@ -756,9 +762,9 @@
 }
 
 .add-card-button:hover {
-  background: #e5e7eb;
-  border-color: #9ca3af;
-  color: #374151;
+  background: var(--shop-border);
+  border-color: var(--shop-text-muted);
+  color: var(--shop-text-muted);
   transform: translateY(-2px);
 }
 
@@ -767,14 +773,14 @@
   background: #f9fafb;
   padding: 20px;
   border-radius: 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--shop-border);
   margin-top: 8px;
 }
 
 .add-card-title {
   font-size: 18px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--shop-heading);
   margin: 0 0 16px 0;
 }
 
@@ -785,7 +791,7 @@
 .add-card-input {
   width: 100%;
   padding: 12px 16px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--shop-border);
   border-radius: 12px;
   font-size: 14px;
   transition: all 0.2s;
@@ -794,8 +800,8 @@
 
 .add-card-input:focus {
   outline: none;
-  border-color: #6b7280;
-  box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.1);
+  border-color: var(--shop-primary);
+  box-shadow: 0 0 0 3px var(--shop-primary-soft);
 }
 
 .add-card-row {
@@ -832,9 +838,9 @@
 .add-card-cancel-btn {
   flex: 1;
   padding: 12px 20px;
-  background: #f3f4f6;
-  color: #6b7280;
-  border: 1px solid #e5e7eb;
+  background: var(--shop-bg);
+  color: var(--shop-text-muted);
+  border: 1px solid var(--shop-border);
   border-radius: 12px;
   font-size: 14px;
   font-weight: 600;
@@ -843,15 +849,15 @@
 }
 
 .add-card-cancel-btn:hover {
-  background: #e5e7eb;
-  color: #374151;
+  background: var(--shop-border);
+  color: var(--shop-text-muted);
 }
 
 /* Стили для пустого состояния */
 .empty-cards {
   text-align: center;
   padding: 40px 20px;
-  color: #9ca3af;
+  color: var(--shop-text-muted);
 }
 
 .empty-cards svg {

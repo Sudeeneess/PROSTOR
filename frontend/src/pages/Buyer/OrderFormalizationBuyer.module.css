@@ -2,7 +2,7 @@
 
 .order-container {
   min-height: calc(100vh - 80px);
-  background-color: #f5f5f5;
+  background-color: var(--shop-bg);
   padding: 24px;
 }
 
@@ -41,7 +41,7 @@
 .section-header {
   font-size: 18px;
   font-weight: 600;
-  color: #000;
+  color: var(--shop-heading);
   margin-bottom: 20px;
   display: flex;
   align-items: center;
@@ -54,8 +54,8 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-  background-color: #000;
-  color: #fff;
+  background-color: var(--shop-primary);
+  color: var(--shop-on-primary);
   border-radius: 50%;
   font-size: 14px;
   font-weight: 600;
@@ -74,7 +74,7 @@
 .summary-title {
   font-size: 20px;
   font-weight: 600;
-  color: #000;
+  color: var(--shop-heading);
   margin-bottom: 20px;
   padding-bottom: 12px;
   border-bottom: 1px solid #eee;
@@ -172,8 +172,8 @@
 /* Кнопка заказа */
 .order-button {
   width: 100%;
-  background-color: #000;
-  color: #fff;
+  background-color: var(--shop-primary);
+  color: var(--shop-on-primary);
   border: none;
   border-radius: 40px;
   padding: 14px;
@@ -185,7 +185,7 @@
 }
 
 .order-button:hover {
-  opacity: 0.85;
+  background-color: var(--shop-primary-hover);
   transform: translateY(-1px);
 }
 
@@ -278,7 +278,7 @@
 }
 
 .card-option:has(input:checked) {
-  background-color: #e8f0fe;
+  background-color: var(--shop-primary-soft);
   border-color: #000;
 }
 
@@ -361,14 +361,14 @@
 }
 
 .back-button:hover {
-  color: #000;
+  color: var(--shop-heading);
 }
 
 .order-title {
   font-size: 24px;
   font-weight: 600;
   margin-bottom: 24px;
-  color: #000;
+  color: var(--shop-heading);
 }
 
 .loading {

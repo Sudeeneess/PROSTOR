@@ -133,7 +133,7 @@ const ProductDetailPage: React.FC = () => {
     }
     writeCart(cart);
     setQuantity(getQuantityForProduct(cart, product.id));
-    setToastVisible(true);
+    // Тост только у кнопки «Добавить в корзину», не у «+»
   };
 
   if (!product) {

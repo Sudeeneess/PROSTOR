@@ -1,7 +1,7 @@
 /* src/pages/BasketBuyer/BasketBuyer.module.css */
 .basket-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  background: var(--shop-bg);
 }
 
 .basket-main {
@@ -25,11 +25,7 @@
 .basket-title {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #000;
-  background: linear-gradient(135deg, #000 0%, #333 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--shop-heading);
   margin: 0;
   letter-spacing: -0.02em;
 }
@@ -89,7 +85,7 @@
 
 .empty-basket h2 {
   font-size: 1.75rem;
-  color: #000;
+  color: var(--shop-heading);
   margin-bottom: 0.75rem;
   font-weight: 600;
 }
@@ -102,12 +98,12 @@
 
 .continue-btn {
   padding: 0.875rem 2.5rem;
-  background: #c0c0c0;
-  color: #000;
+  background: var(--shop-primary);
+  color: var(--shop-on-primary);
   border: none;
   border-radius: 50px;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
@@ -115,9 +111,9 @@
 }
 
 .continue-btn:hover {
-  background: #a0a0a0;
+  background: var(--shop-primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 24px rgba(104, 109, 242, 0.35);
 }
 
 .basket-content {
@@ -154,7 +150,7 @@
 }
 
 .continue-shopping-btn:hover {
-  color: #000;
+  color: var(--shop-primary);
   transform: translateX(-4px);
 }
 
@@ -180,7 +176,7 @@
 .summary-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #000;
+  color: var(--shop-heading);
   margin-bottom: 1.5rem;
   padding-bottom: 0.75rem;
   border-bottom: 2px solid #f0f0f0;
@@ -200,7 +196,12 @@
 
 .summary-divider {
   height: 2px;
-  background: linear-gradient(90deg, #e0e0e0 0%, #c0c0c0 50%, #e0e0e0 100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(104, 109, 242, 0.25) 50%,
+    transparent 100%
+  );
   margin: 1rem 0;
 }
 
@@ -210,15 +211,15 @@
   padding: 0.75rem 0;
   font-size: 1.25rem;
   font-weight: 700;
-  color: #000;
+  color: var(--shop-heading);
 }
 
 .checkout-btn {
   width: 100%;
   padding: 1rem;
   margin-top: 1rem;
-  background: #c0c0c0;
-  color: #000;
+  background: var(--shop-primary);
+  color: var(--shop-on-primary);
   border: none;
   border-radius: 50px;
   font-size: 1rem;
@@ -230,9 +231,9 @@
 }
 
 .checkout-btn:hover {
-  background: #a0a0a0;
+  background: var(--shop-primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 24px rgba(104, 109, 242, 0.35);
 }
 
 .checkout-btn:active {

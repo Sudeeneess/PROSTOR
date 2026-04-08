@@ -183,7 +183,7 @@ const AccountPage: React.FC = () => {
 
   // Функция для получения иконки карты (параметр brand не используется, но оставлен для возможного расширения)
   const getCardIcon = (_brand: string) => {
-    return <IoCardOutline size={28} color="#6B7280" />;
+    return <IoCardOutline size={28} color="#111111" />;
   };
 
   return (
@@ -196,7 +196,7 @@ const AccountPage: React.FC = () => {
           <div className={styles['buyer-account-header']}>
             <div className={styles['buyer-account-user-info']}>
               <div className={styles['buyer-account-avatar']}>
-                <FaUserCircle size={70} color="#4F46E5" />
+                <FaUserCircle size={70} color="#686df2" />
               </div>
               
               <div className={styles['buyer-account-name-section']}>
@@ -223,14 +223,14 @@ const AccountPage: React.FC = () => {
               onClick={handleOrdersClick}
             >
               <div className={styles['buyer-account-option-icon']}>
-                <FiPackage size={32} color="#6B7280" />
+                <FiPackage size={32} color="#111111" />
               </div>
               <div className={styles['buyer-account-option-content']}>
                 <h2 className={styles['buyer-account-option-title']}>Заказы</h2>
                 <p className={styles['buyer-account-option-description']}>Просмотр и отслеживание заказов</p>
               </div>
               <div className={styles['buyer-account-option-arrow']}>
-                <FiChevronRight size={24} color="#9CA3AF" />
+                <FiChevronRight size={24} color="#4b5563" />
               </div>
             </div>
 
@@ -240,7 +240,7 @@ const AccountPage: React.FC = () => {
               onClick={() => setIsPaymentModalOpen(true)}
             >
               <div className={styles['buyer-account-option-icon']}>
-                <FiCreditCard size={32} color="#6B7280" />
+                <FiCreditCard size={32} color="#111111" />
               </div>
               <div className={styles['buyer-account-option-content']}>
                 <h2 className={styles['buyer-account-option-title']}>Способы оплаты</h2>
@@ -249,7 +249,7 @@ const AccountPage: React.FC = () => {
                 </p>
               </div>
               <div className={styles['buyer-account-option-arrow']}>
-                <FiChevronRight size={24} color="#9CA3AF" />
+                <FiChevronRight size={24} color="#4b5563" />
               </div>
             </div>
 

@@ -2,7 +2,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #f5f5f5;
+  background-color: var(--shop-bg);
 }
 
 .buyer-auth-container {
@@ -42,7 +42,7 @@
 .buyer-auth-title {
   text-align: start;
   margin-bottom: 2rem;
-  color: #0a0a0a;
+  color: var(--shop-heading);
   font-size: 1.5rem;
   font-weight: 600;
   display: flex;
@@ -66,24 +66,26 @@
   max-width: 100%;
   padding: 12px;
   padding-left: 15px;
-  border: 1px solid #C0C0C0;
+  border: 1px solid var(--shop-border);
   border-radius: 20px;
   font-size: 14px;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
   box-sizing: border-box;
+  color: var(--shop-text);
+  background: var(--shop-surface);
 }
 
 .buyer-auth-form-group input:focus {
-  border-color: #8d8d8d;
-  box-shadow: 0 0 0 2px rgba(192, 192, 192, 0.2);
+  border-color: var(--shop-primary);
+  box-shadow: 0 0 0 2px var(--shop-primary-soft);
 }
 
 .buyer-auth-submit-button {
   width: 100%;
   padding: 13px;
-  background-color: #e0e0e0;
-  color: #000000;
+  background-color: var(--shop-primary);
+  color: var(--shop-on-primary);
   border: none;
   border-radius: 20px;
   font-size: 1rem;
@@ -93,7 +95,7 @@
 }
 
 .buyer-auth-submit-button:hover {
-  background-color: #acacac;
+  background-color: var(--shop-primary-hover);
 }
 
 .buyer-auth-footer {
@@ -111,16 +113,17 @@
 .buyer-auth-link-button {
   background: none;
   border: none;
-  color: #1f54c7;
+  color: var(--shop-primary);
   cursor: pointer;
   font-size: 0.9rem;
+  font-weight: 600;
   text-decoration: underline;
   padding: 0;
   margin-left: 0.3rem;
 }
 
 .buyer-auth-link-button:hover {
-  color: #003772;
+  color: var(--shop-primary-hover);
 }
 
 /* Адаптивность для мобильных устройств */
@@ -175,13 +178,13 @@
 
 /* Стили для disabled состояния кнопки */
 .buyer-auth-submit-button:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
   cursor: not-allowed;
-  background-color: #e0e0e0;
+  background-color: var(--shop-primary);
 }
 
 .buyer-auth-submit-button:disabled:hover {
-  background-color: #e0e0e0;
+  background-color: var(--shop-primary);
 }
 
 /* Стили для disabled состояния ссылок */

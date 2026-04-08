@@ -16,6 +16,8 @@ export type ProductCardProps = {
   name: string;
   rating: string;
   reviews: string;
+  /** Первое фото из product_card.photo (URL); без него — плейсхолдер */
+  imageUrl?: string | null;
 };
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -24,6 +26,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   name,
   rating,
   reviews,
+  imageUrl,
 }) => {
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(0);
@@ -139,7 +142,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
     writeCart(cart);
     setQuantity(getQuantityForProduct(cart, id));
-    setToastVisible(true);
+    // Тост только при первом добавлении через «Добавить в корзину», не при «+»
   };
 
   const showCounter = isBuyer && quantity > 0;
@@ -168,9 +171,18 @@ const ProductCard: React.FC<ProductCardProps> = ({
         aria-label={`Открыть карточку: ${name}`}
       >
         <div className={styles['product-image']}>
-          <div className={styles['image-placeholder']} aria-hidden>
-            📦
-          </div>
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt=""
+              className={styles['product-thumb']}
+              loading="lazy"
+            />
+          ) : (
+            <div className={styles['image-placeholder']} aria-hidden>
+              📦
+            </div>
+          )}
         </div>
         <div className={styles['product-info']}>
           <div className={styles['price']}>{price}</div>

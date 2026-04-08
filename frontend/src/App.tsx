@@ -1,6 +1,12 @@
 // Главная страница неавторизованных пользователей для всех ролей
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  Outlet,
+} from 'react-router-dom';
 import styles from './App.module.css';
 
 // Общие компоненты
@@ -14,7 +20,9 @@ import ProfilePage from './pages/Buyer/ProfileBuyer';
 import OrdersPageBuyer from './pages/Buyer/OrdersPageBuyer';
 import BasketBuyer from './pages/Buyer/BasketBuyer';
 import OrderFormalizationBuyer from './pages/Buyer/OrderFormalizationBuyer';
-import ProductDetailPage from './pages/Buyer/ProductDetailPage'; 
+import ProductDetailPage from './pages/Buyer/ProductDetailPage';
+import CatalogCategoryPage from './pages/Buyer/CatalogCategoryPage';
+import CatalogRootPage from './pages/Buyer/CatalogRootPage'; 
 
 // Менеджер склада (Manager)
 import AuthPageManager from './pages/Manager/AuthPageManager';
@@ -165,6 +173,21 @@ const ProductDetailLayout: React.FC = () => {
   );
 };
 
+/** Общая оболочка каталога: шапка + вложенные страницы (корень / категория / подкатегория). */
+const CatalogLayout: React.FC = () => {
+  const token = localStorage.getItem('token');
+  const userRole = sessionStorage.getItem('userRole');
+  const variant = token && userRole === 'customer' ? 'buyer' : 'landing';
+  return (
+    <>
+      <HeaderMain variant={variant} />
+      <main className={styles['main-content']}>
+        <Outlet />
+      </main>
+    </>
+  );
+};
+
 // ==================== ОСНОВНОЙ КОМПОНЕНТ МАРШРУТИЗАЦИИ ====================
 
 const AppContent: React.FC = () => {
@@ -208,6 +231,12 @@ const AppContent: React.FC = () => {
       
       {/* Страница входа/регистрации покупателя */}
       <Route path="/product/:id" element={<ProductDetailLayout />} />
+
+      <Route path="/catalog" element={<CatalogLayout />}>
+        <Route index element={<CatalogRootPage />} />
+        <Route path=":categorySlug/:subSlug" element={<CatalogCategoryPage />} />
+        <Route path=":categorySlug" element={<CatalogCategoryPage />} />
+      </Route>
 
       <Route path="/auth" element={
         <RedirectBuyerIfAuthenticated>
