@@ -25,7 +25,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthDebugController {
 
-    private final UserService userService;              // Вместо UserRepository
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
