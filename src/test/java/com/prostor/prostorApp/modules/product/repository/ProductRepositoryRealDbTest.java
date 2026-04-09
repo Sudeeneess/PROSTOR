@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
@@ -388,5 +389,34 @@ class ProductRepositoryRealDbTest {
         assertEquals(2, result.getContent().size());
         assertEquals(0, result.getNumber()); // page number
         assertEquals(3, result.getTotalPages()); // ceil(6/2) = 3
+    }
+
+    @Test
+    @DisplayName("Should sort filtered products by name ascending")
+    void filterProducts_WithSortByNameAsc_ShouldOrderByName() {
+        Product zebra = new Product();
+        zebra.setName("Zebra Product");
+        zebra.setPrice(50.0);
+        zebra.setSeller(testSeller);
+        zebra.setCategory(testCategory);
+        zebra.setCreatedAt(LocalDateTime.now());
+        entityManager.persistAndFlush(zebra);
+
+        Product alpha = new Product();
+        alpha.setName("Alpha Product");
+        alpha.setPrice(60.0);
+        alpha.setSeller(testSeller);
+        alpha.setCategory(testCategory);
+        alpha.setCreatedAt(LocalDateTime.now());
+        entityManager.persistAndFlush(alpha);
+
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "name"));
+        Page<Product> result = productRepository.filterProducts(
+                null, null, null, null, null, pageable);
+
+        assertEquals(3, result.getTotalElements());
+        assertEquals("Alpha Product", result.getContent().get(0).getName());
+        assertEquals("Test Product", result.getContent().get(1).getName());
+        assertEquals("Zebra Product", result.getContent().get(2).getName());
     }
 }
