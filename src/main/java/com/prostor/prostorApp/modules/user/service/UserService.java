@@ -105,9 +105,8 @@ public class UserService {
         if (request.getRoleId() > 0 && (user.getRole() == null || user.getRole().getId() != request.getRoleId())) {
             Role role = roleRepository.findById(request.getRoleId())
                     .orElseThrow(() -> new RuntimeException("Role not found with id: " + request.getRoleId()));
-            user.setRole(role);
-
             deleteRoleSpecificRecord(user);
+            user.setRole(role);
             createRoleSpecificRecord(user);
         }
 

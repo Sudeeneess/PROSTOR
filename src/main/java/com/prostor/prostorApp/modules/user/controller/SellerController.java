@@ -4,7 +4,6 @@ import com.prostor.prostorApp.modules.product.dto.ProductRequest;
 import com.prostor.prostorApp.modules.product.dto.ProductResponse;
 import com.prostor.prostorApp.modules.product.service.ProductService;
 import com.prostor.prostorApp.modules.user.model.Seller;
-import com.prostor.prostorApp.modules.user.model.User;
 import com.prostor.prostorApp.modules.user.repository.SellerRepository;
 import com.prostor.prostorApp.modules.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -18,7 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -33,7 +32,7 @@ public class SellerController {
     private final SellerRepository sellerRepository;
 
     private Integer getSellerIdByUsername(String username) {
-        User user = userRepository.findByUserName(username)
+        com.prostor.prostorApp.modules.user.model.User user = userRepository.findByUserName(username)
                 .orElseThrow(() -> new EntityNotFoundException("User not found: " + username));
 
         Seller seller = sellerRepository.findByUserId(user.getId())
@@ -44,10 +43,10 @@ public class SellerController {
 
     @GetMapping
     public ResponseEntity<Page<ProductResponse>> getMyProducts(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal User principal,
             @PageableDefault(size = 20) Pageable pageable) {
 
-        Integer sellerId = getSellerIdByUsername(userDetails.getUsername());
+        Integer sellerId = getSellerIdByUsername(principal.getUsername());
         log.info("Seller {} getting their products", sellerId);
 
         return ResponseEntity.ok(productService.getProductsBySeller(sellerId, pageable));
@@ -55,10 +54,10 @@ public class SellerController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProductById(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal User principal,
             @PathVariable Integer id) {
 
-        Integer sellerId = getSellerIdByUsername(userDetails.getUsername());
+        Integer sellerId = getSellerIdByUsername(principal.getUsername());
         log.info("Seller {} getting product by id: {}", sellerId, id);
 
         ProductResponse product = productService.getById(id);
@@ -72,10 +71,10 @@ public class SellerController {
 
     @PostMapping
     public ResponseEntity<ProductResponse> createProduct(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal User principal,
             @Valid @RequestBody ProductRequest request) {
 
-        Integer sellerId = getSellerIdByUsername(userDetails.getUsername());
+        Integer sellerId = getSellerIdByUsername(principal.getUsername());
         log.info("Seller {} creating new product: {}", sellerId, request.getName());
 
         request.setSellerId(sellerId);
@@ -85,11 +84,11 @@ public class SellerController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponse> updateProduct(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal User principal,
             @PathVariable Integer id,
             @Valid @RequestBody ProductRequest request) {
 
-        Integer sellerId = getSellerIdByUsername(userDetails.getUsername());
+        Integer sellerId = getSellerIdByUsername(principal.getUsername());
         log.info("Seller {} updating product with id: {}", sellerId, id);
 
         ProductResponse existing = productService.getById(id);
@@ -103,10 +102,10 @@ public class SellerController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal User principal,
             @PathVariable Integer id) {
 
-        Integer sellerId = getSellerIdByUsername(userDetails.getUsername());
+        Integer sellerId = getSellerIdByUsername(principal.getUsername());
         log.info("Seller {} deleting product with id: {}", sellerId, id);
 
         ProductResponse existing = productService.getById(id);
