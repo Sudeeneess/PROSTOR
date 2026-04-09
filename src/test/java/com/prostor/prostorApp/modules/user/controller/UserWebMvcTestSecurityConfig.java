@@ -19,12 +19,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
-/**
- * With {@code @AutoConfigureMockMvc(addFilters = false)}, Spring Security filters do not copy
- * the session security context into {@link SecurityContextHolder}. This resolver supplies
- * {@code @AuthenticationPrincipal} from the session (where {@code SecurityMockMvcRequestPostProcessors}
- * stores it) or falls back to the holder.
- */
+
 @Configuration
 public class UserWebMvcTestSecurityConfig implements WebMvcConfigurer {
 

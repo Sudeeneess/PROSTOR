@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prostor.prostorApp.common.exception.ErrorResponse;
 import com.prostor.prostorApp.common.exception.GlobalExceptionHandler;
+import com.prostor.prostorApp.modules.product.controller.CategoryController;
 import com.prostor.prostorApp.modules.product.dto.CategoryRequest;
 import com.prostor.prostorApp.modules.product.dto.CategoryResponse;
 import com.prostor.prostorApp.modules.product.service.CategoryService;

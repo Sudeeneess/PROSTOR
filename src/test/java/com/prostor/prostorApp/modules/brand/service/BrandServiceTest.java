@@ -1,9 +1,10 @@
-package com.prostor.prostorApp.modules.product.service;
+package com.prostor.prostorApp.modules.brand.service;
 
 import com.prostor.prostorApp.modules.product.dto.BrandRequest;
 import com.prostor.prostorApp.modules.product.dto.BrandResponse;
 import com.prostor.prostorApp.modules.product.model.Brand;
 import com.prostor.prostorApp.modules.product.repository.BrandRepository;
+import com.prostor.prostorApp.modules.product.service.BrandService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

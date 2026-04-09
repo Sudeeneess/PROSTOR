@@ -1,10 +1,11 @@
-package com.prostor.prostorApp.modules.product.controller;
+package com.prostor.prostorApp.modules.brand.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prostor.prostorApp.common.exception.ErrorResponse;
 import com.prostor.prostorApp.common.exception.GlobalExceptionHandler;
+import com.prostor.prostorApp.modules.product.controller.BrandController;
 import com.prostor.prostorApp.modules.product.dto.BrandRequest;
 import com.prostor.prostorApp.modules.product.dto.BrandResponse;
 import com.prostor.prostorApp.modules.product.service.BrandService;

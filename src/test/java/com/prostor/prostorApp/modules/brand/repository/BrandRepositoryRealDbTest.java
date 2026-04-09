@@ -1,6 +1,7 @@
-package com.prostor.prostorApp.modules.product.repository;
+package com.prostor.prostorApp.modules.brand.repository;
 
 import com.prostor.prostorApp.modules.product.model.Brand;
+import com.prostor.prostorApp.modules.product.repository.BrandRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

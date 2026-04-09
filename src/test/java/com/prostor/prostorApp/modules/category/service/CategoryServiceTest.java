@@ -4,6 +4,7 @@ import com.prostor.prostorApp.modules.product.dto.CategoryRequest;
 import com.prostor.prostorApp.modules.product.dto.CategoryResponse;
 import com.prostor.prostorApp.modules.product.model.Category;
 import com.prostor.prostorApp.modules.product.repository.CategoryRepository;
+import com.prostor.prostorApp.modules.product.service.CategoryService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
