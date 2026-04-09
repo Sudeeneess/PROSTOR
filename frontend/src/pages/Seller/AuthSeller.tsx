@@ -75,7 +75,7 @@ const Authorizationseller: React.FC = () => {
   };
 
   return (
-    <div className={styles['seller-auth-page']}>
+    <div className={`seller-app-shell ${styles['seller-auth-page']}`}>
       <HeaderSeller />
 
       <main className={styles['seller-auth-content-section']}>

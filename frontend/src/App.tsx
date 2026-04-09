@@ -302,15 +302,8 @@ const AppContent: React.FC = () => {
           } 
         />
 
-        {/* ГЛАВНАЯ СТРАНИЦА ПРОДАВЦА */}
-        <Route 
-          path="main" 
-          element={
-            <PrivateSellerRoute>
-              <MainSeller />
-            </PrivateSellerRoute>
-          } 
-        />
+        {/* Лендинг продавца — доступен без авторизации */}
+        <Route path="main" element={<MainSeller />} />
         
         {/* Личный кабинет / Дашборд продавца */}
         <Route 

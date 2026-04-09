@@ -41,6 +41,14 @@ const PersonalSeller: React.FC = () => {
     navigate("/seller/orders");
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('tokenType');
+    sessionStorage.removeItem('userRole');
+    // Полная перезагрузка гарантирует главную для гостя (лендинг с HeaderMain)
+    window.location.assign('/');
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     
@@ -60,7 +68,7 @@ const PersonalSeller: React.FC = () => {
   };
 
   return (
-    <>
+    <div className="seller-app-shell">
       <HeaderSeller />
 
       <main className={styles['seller-personal-container']}>
@@ -111,6 +119,14 @@ const PersonalSeller: React.FC = () => {
             onClick={handleMyOrders}
           >
             Мои заказы
+          </button>
+
+          <button
+            type="button"
+            className={styles['seller-personal-logout-btn']}
+            onClick={handleLogout}
+          >
+            Выйти из аккаунта
           </button>
         </div>
 
@@ -176,7 +192,7 @@ const PersonalSeller: React.FC = () => {
           </div>
         )}
       </main>
-    </>
+    </div>
   );
 };
 

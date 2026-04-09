@@ -87,7 +87,7 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
           navigate('/auth');
           break;
         case 'seller':
-          navigate('/seller/auth');
+          navigate('/seller/main');
           break;
         case 'warehouse':
           navigate('/warehouse/auth');
@@ -103,7 +103,7 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
 
     switch (role) {
       case 'seller':
-        navigate('/seller/auth');
+        navigate('/seller/main');
         break;
       case 'warehouse':
         navigate('/warehouse/auth');

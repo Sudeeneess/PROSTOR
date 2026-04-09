@@ -76,7 +76,7 @@ const SellerEntrance: React.FC = () => {
   };
 
   return (
-    <div className={styles['seller-reg-app']}>
+    <div className={`seller-app-shell ${styles['seller-reg-app']}`}>
       <HeaderSeller />
 
       <main className={styles['seller-reg-content-section']}>
