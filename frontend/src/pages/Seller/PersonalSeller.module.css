@@ -1,6 +1,6 @@
 /* ===== ОБЩИЙ КОНТЕЙНЕР ===== */
 .seller-personal-container {
-  max-width: 800px;
+  max-width: 1040px;
   width: 100%;
   margin: 48px auto;
   padding: 56px 64px;
@@ -88,6 +88,10 @@
   font-weight: 650;
   color: #1a1a1a;
   letter-spacing: -0.2px;
+  line-height: 1.35;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  max-width: 100%;
 }
 
 .seller-personal-profile-inn {
@@ -222,8 +226,8 @@
   background: #ffffff;
   border-radius: 28px;
   padding: 40px;
-  width: 520px;
-  max-width: 90%;
+  width: min(640px, 96vw);
+  max-width: 96vw;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   animation: slideUp 0.3s ease;
   border: 1px solid rgba(0, 0, 0, 0.05);
