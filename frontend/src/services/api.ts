@@ -47,6 +47,25 @@ function pickToken(body: Record<string, unknown>): string | undefined {
 }
 
 /** Ответ логина/регистрации может быть плоским или вложенным в `data`. */
+/** Сообщение об ошибке: message / error или строки полей валидации { phone: "…", role: "…" }. */
+function extractApiErrorMessage(data: unknown): string {
+  if (data == null) return '';
+  if (typeof data === 'string') return data;
+  if (typeof data !== 'object') return '';
+  const o = data as Record<string, unknown>;
+  if (typeof o.message === 'string') return o.message;
+  if (typeof o.error === 'string') return o.error;
+  const pieces: string[] = [];
+  for (const v of Object.values(o)) {
+    if (typeof v === 'string' && v.length) pieces.push(v);
+    else if (Array.isArray(v))
+      for (const x of v) {
+        if (typeof x === 'string') pieces.push(x);
+      }
+  }
+  return pieces.join(' ') || '';
+}
+
 function unwrapAuthBody(raw: unknown): Record<string, unknown> {
   if (!raw || typeof raw !== 'object') return {};
   const o = raw as Record<string, unknown>;
@@ -100,10 +119,15 @@ export interface LoginData {
 }
 
 export interface RegisterData {
-  name: string;
   username: string;
   password: string;
   confirmPassword: string;
+  /** 11 цифр, как ожидает бэкенд (например 79001234567). */
+  phone: string;
+  /** Роль в терминах API; для покупателя — CUSTOMER. */
+  role?: string;
+  /** Локальное имя (не в JSON регистрации, только для UI). */
+  displayName?: string;
 }
 
 export interface LoginResponse {
@@ -226,7 +250,8 @@ class ApiService {
       }
 
       if (!response.ok) {
-        throw new Error(data.message || data.error || `Ошибка ${response.status}`);
+        const errText = extractApiErrorMessage(data);
+        throw new Error(errText || `Ошибка ${response.status}`);
       }
 
       return data as T;
@@ -282,14 +307,20 @@ class ApiService {
         throw new Error('Пароль должен быть не менее 6 символов');
       }
 
-      console.log('Попытка регистрации пользователя:', userData.username);
+      const phoneDigits = userData.phone.replace(/\D/g, '');
+      if (phoneDigits.length !== 11) {
+        throw new Error('Телефон: ровно 11 цифр (например 79001234567)');
+      }
+
+      const role = (userData.role ?? 'CUSTOMER').toUpperCase();
 
       const raw = await this.request<unknown>('/api/auth/register', {
         method: 'POST',
         body: JSON.stringify({
-          name: userData.name,
           username: userData.username,
           password: userData.password,
+          phone: phoneDigits,
+          role,
         }),
       });
 

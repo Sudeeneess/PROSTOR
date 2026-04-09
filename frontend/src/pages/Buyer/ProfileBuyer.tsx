@@ -5,6 +5,7 @@ import { FaUserCircle } from 'react-icons/fa';
 import { IoCardOutline } from "react-icons/io5";
 import InputMask from 'react-input-mask';
 import HeaderMain from '../../components/HeaderMain';
+import { formatRuPhoneFromDigits } from '../../utils/phoneFormat';
 import styles from './ProfileBuyer.module.css';
 
 interface UserProfile {
@@ -59,37 +60,49 @@ const AccountPage: React.FC = () => {
     loadUserData();
   }, []);
 
+  const phoneFromStorage = (savedPhone: string | null): string => {
+    if (!savedPhone) return '+7';
+    const digits = savedPhone.replace(/\D/g, '');
+    if (digits.length === 11 && digits.startsWith('7')) {
+      return formatRuPhoneFromDigits(digits);
+    }
+    if (savedPhone.trim().startsWith('+')) {
+      return savedPhone;
+    }
+    return '+7';
+  };
+
   const loadUserData = () => {
     try {
       const userName = localStorage.getItem('userName');
       const savedPhone = localStorage.getItem('userPhone');
-      
+      const phoneMasked = phoneFromStorage(savedPhone);
+
       if (userName) {
         const nameParts = userName.split(' ');
         setProfile({
           firstName: nameParts[0] || '',
           lastName: nameParts.slice(1).join(' ') || '',
-          phone: savedPhone || '+7'
+          phone: phoneMasked,
         });
         setEditProfile({
           firstName: nameParts[0] || '',
           lastName: nameParts.slice(1).join(' ') || '',
-          phone: savedPhone || '+7'
+          phone: phoneMasked,
         });
       } else {
-        // Загрузка из user объекта
         const userStr = localStorage.getItem('user');
         if (userStr) {
           const userData = JSON.parse(userStr);
           setProfile({
             firstName: userData.name || userData.username || '',
             lastName: '',
-            phone: savedPhone || '+7'
+            phone: phoneMasked,
           });
           setEditProfile({
             firstName: userData.name || userData.username || '',
             lastName: '',
-            phone: savedPhone || '+7'
+            phone: phoneMasked,
           });
         }
       }

@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import InputMask from 'react-input-mask';
 import { BsPersonFill } from 'react-icons/bs';
 import HeaderMain from '../../components/HeaderMain';
 import styles from './AuthPageBuyer.module.css';
 import { api, resolveAfterLogin } from '../../services/api';
+
+function persistRegistrationPhone(phoneMasked: string) {
+  const digits = phoneMasked.replace(/\D/g, '');
+  if (digits.length === 11) {
+    localStorage.setItem('userPhone', digits);
+  }
+}
 
 const AuthPageBuyer: React.FC = () => {
   const navigate = useNavigate();
@@ -13,6 +21,7 @@ const AuthPageBuyer: React.FC = () => {
   const [info, setInfo] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
+    phone: '',
     username: '',
     password: '',
     confirmPassword: '',
@@ -67,10 +76,11 @@ const AuthPageBuyer: React.FC = () => {
         }
 
         const response = await api.register({
-          name: formData.name,
           username: formData.username,
           password: formData.password,
           confirmPassword: formData.confirmPassword,
+          phone: formData.phone,
+          displayName: formData.name.trim() || undefined,
         });
 
         if (!response.success) {
@@ -82,6 +92,7 @@ const AuthPageBuyer: React.FC = () => {
           if (formData.name.trim()) {
             localStorage.setItem('userName', formData.name.trim());
           }
+          persistRegistrationPhone(formData.phone);
           setInfo('Регистрация прошла успешно. Войдите в систему.');
           setIsLogin(true);
           setFormData((prev) => ({
@@ -96,6 +107,7 @@ const AuthPageBuyer: React.FC = () => {
           if (formData.name.trim()) {
             localStorage.setItem('userName', formData.name.trim());
           }
+          persistRegistrationPhone(formData.phone);
           navigate(resolveAfterLogin(response.data), { replace: true });
         }
       }
@@ -110,6 +122,7 @@ const AuthPageBuyer: React.FC = () => {
     setIsLogin(false);
     setFormData({
       name: '',
+      phone: '',
       username: '',
       password: '',
       confirmPassword: '',
@@ -122,6 +135,7 @@ const AuthPageBuyer: React.FC = () => {
     setIsLogin(true);
     setFormData({
       name: '',
+      phone: '',
       username: '',
       password: '',
       confirmPassword: '',
@@ -143,7 +157,7 @@ const AuthPageBuyer: React.FC = () => {
           </h2>
 
           {info && (
-            <div className={styles['buyer-auth-error-message']} role="status">
+            <div className={styles['buyer-auth-success-message']} role="status">
               {info}
             </div>
           )}
@@ -178,6 +192,25 @@ const AuthPageBuyer: React.FC = () => {
                     required
                     disabled={loading}
                   />
+                </div>
+
+                <div className={styles['buyer-auth-form-group']}>
+                  <InputMask
+                    mask="+7 (999) 999-99-99"
+                    maskChar="_"
+                    id="phone-reg"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    placeholder="+7 (___) ___-__-__"
+                    disabled={loading}
+                    required
+                    autoComplete="tel"
+                  >
+                    {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => (
+                      <input {...inputProps} type="tel" />
+                    )}
+                  </InputMask>
                 </div>
 
                 <div className={styles['buyer-auth-form-group']}>
