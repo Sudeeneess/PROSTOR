@@ -50,6 +50,7 @@ class OrderRepositoryRealDbTest {
         User user = new User();
         user.setUserName("ord_u_" + n);
         user.setPasswordHash("hash");
+        user.setContactPhone(String.format("%011d", n % 100_000_000_000L));
         user.setRole(role);
         user.setCreatedAt(LocalDateTime.now());
         entityManager.persistAndFlush(user);

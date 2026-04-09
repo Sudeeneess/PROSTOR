@@ -45,8 +45,10 @@ class ProductCardRepositoryRealDbTest {
         entityManager.persistAndFlush(role);
 
         User user = new User();
-        user.setUserName("pc_u_" + System.nanoTime());
+        long n = System.nanoTime();
+        user.setUserName("pc_u_" + n);
         user.setPasswordHash("hash");
+        user.setContactPhone(String.format("%011d", n % 100_000_000_000L));
         user.setRole(role);
         user.setCreatedAt(LocalDateTime.now());
         entityManager.persistAndFlush(user);

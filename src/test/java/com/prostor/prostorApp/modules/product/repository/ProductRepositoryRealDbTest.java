@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.Page;
@@ -25,7 +26,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
-@ActiveProfiles("realdb")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ActiveProfiles("test")
 @DisplayName("Product Repository Tests (Real PostgreSQL)")
 class ProductRepositoryRealDbTest {
 
@@ -43,13 +45,17 @@ class ProductRepositoryRealDbTest {
 
     @BeforeEach
     void setUp() {
+        long n = System.nanoTime();
+        String suffix = String.valueOf(Math.abs(n % 100_000_000L));
+
         testRole = new Role();
-        testRole.setName("SELLER");
+        testRole.setName("SELLER_" + n);
         entityManager.persistAndFlush(testRole);
 
         testUser = new User();
-        testUser.setUserName("testuser");
+        testUser.setUserName("tu_" + suffix);
         testUser.setPasswordHash("hashedpassword");
+        testUser.setContactPhone(String.format("%011d", n % 100_000_000_000L));
         testUser.setRole(testRole);
         testUser.setCreatedAt(LocalDateTime.now());
         entityManager.persistAndFlush(testUser);
@@ -240,13 +246,17 @@ class ProductRepositoryRealDbTest {
     @Test
     @DisplayName("Should filter products by seller ID")
     void filterProducts_WhenOnlySellerIdProvided_ShouldFilterBySeller() {
+        long n = System.nanoTime();
+        String suffix = String.valueOf(Math.abs(n % 100_000_000L));
+
         Role anotherRole = new Role();
-        anotherRole.setName("ANOTHER_SELLER");
+        anotherRole.setName("ANOTHER_SELLER_" + n);
         entityManager.persistAndFlush(anotherRole);
 
         User anotherUser = new User();
-        anotherUser.setUserName("anotheruser");
+        anotherUser.setUserName("au_" + suffix);
         anotherUser.setPasswordHash("hashedpassword");
+        anotherUser.setContactPhone(String.format("%011d", n % 100_000_000_000L));
         anotherUser.setRole(anotherRole);
         anotherUser.setCreatedAt(LocalDateTime.now());
         entityManager.persistAndFlush(anotherUser);
