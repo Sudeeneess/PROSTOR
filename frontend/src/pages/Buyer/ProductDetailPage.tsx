@@ -9,6 +9,7 @@ import {
   readCart,
   writeCart,
 } from '../../utils/cartStorage';
+import { api } from '../../services/api';
 import styles from './ProductDetailPage.module.css';
 
 const TOAST_MS = 1500;
@@ -34,7 +35,7 @@ const ProductDetailPage: React.FC = () => {
 
   const isBuyer = (() => {
     const token = localStorage.getItem('token');
-    const userRole = sessionStorage.getItem('userRole');
+    const userRole = api.getStoredUserRole();
     return Boolean(token && userRole === 'customer');
   })();
 
@@ -71,7 +72,7 @@ const ProductDetailPage: React.FC = () => {
   const handleAdd = () => {
     if (!product) return;
     const token = localStorage.getItem('token');
-    const userRole = sessionStorage.getItem('userRole');
+    const userRole = api.getStoredUserRole();
     if (!token || userRole !== 'customer') {
       navigate('/auth');
       return;
@@ -97,7 +98,7 @@ const ProductDetailPage: React.FC = () => {
   const handleDec = () => {
     if (!product) return;
     const token = localStorage.getItem('token');
-    const userRole = sessionStorage.getItem('userRole');
+    const userRole = api.getStoredUserRole();
     if (!token || userRole !== 'customer') return;
 
     const cart = readCart();
@@ -116,7 +117,7 @@ const ProductDetailPage: React.FC = () => {
   const handleInc = () => {
     if (!product) return;
     const token = localStorage.getItem('token');
-    const userRole = sessionStorage.getItem('userRole');
+    const userRole = api.getStoredUserRole();
     if (!token || userRole !== 'customer') return;
 
     const cart = readCart();

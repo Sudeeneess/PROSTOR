@@ -9,6 +9,7 @@ import {
 } from '../../data/mockCatalogProducts';
 import ProductGrid from '../../components/ProductGrid';
 import styles from './CatalogRootPage.module.css';
+import { api } from '../../services/api';
 
 /** Корень каталога: список разделов (/catalog) или сетка по бренду (?brand=). */
 const CatalogRootPage: React.FC = () => {
@@ -17,8 +18,8 @@ const CatalogRootPage: React.FC = () => {
 
   const homePath = useMemo(() => {
     const token = localStorage.getItem('token');
-    const role = sessionStorage.getItem('userRole');
-    return token && role === 'customer' ? '/buyer' : '/';
+    const role = api.getStoredUserRole();
+    return token && role === 'customer' ? '/customer' : '/';
   }, []);
 
   const brandProducts = useMemo(() => {

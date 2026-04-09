@@ -11,6 +11,7 @@ import {
   getFirstHeaderSearchHit,
   type HeaderSearchHit,
 } from '../utils/catalogSearch';
+import { api } from '../services/api';
 
 export type HeaderMainVariant = 'landing' | 'buyer';
 
@@ -125,9 +126,8 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
   // Новая функция для обработки клика по корзине
   const handleCartClick = () => {
     const token = localStorage.getItem('token');
-    const userRole = sessionStorage.getItem('userRole');
-    
-    // Если пользователь авторизован как покупатель
+    const userRole = api.getStoredUserRole();
+
     if (token && userRole === 'customer') {
       navigate('/basket');
     } 
@@ -139,7 +139,7 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
 
   const logo = (
     <Link
-      to={variant === 'landing' ? '/' : '/buyer'}
+      to={variant === 'landing' ? '/' : '/customer'}
       className={styles['hm-logo']}
       title="На главную"
     >

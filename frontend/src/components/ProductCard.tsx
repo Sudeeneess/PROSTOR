@@ -8,6 +8,7 @@ import {
   readCart,
   writeCart,
 } from '../utils/cartStorage';
+import { api } from '../services/api';
 import styles from './ProductCard.module.css';
 
 export type ProductCardProps = {
@@ -34,7 +35,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   const isBuyer = (() => {
     const token = localStorage.getItem('token');
-    const userRole = sessionStorage.getItem('userRole');
+    const userRole = api.getStoredUserRole();
     return Boolean(token && userRole === 'customer');
   })();
 
@@ -74,7 +75,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   const handleAddToCart = () => {
     const token = localStorage.getItem('token');
-    const userRole = sessionStorage.getItem('userRole');
+    const userRole = api.getStoredUserRole();
 
     if (!token || userRole !== 'customer') {
       navigate('/auth');
@@ -103,7 +104,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const handleDecrement = (e: React.MouseEvent) => {
     e.stopPropagation();
     const token = localStorage.getItem('token');
-    const userRole = sessionStorage.getItem('userRole');
+    const userRole = api.getStoredUserRole();
     if (!token || userRole !== 'customer') return;
 
     const cart = readCart();
@@ -124,7 +125,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const handleIncrement = (e: React.MouseEvent) => {
     e.stopPropagation();
     const token = localStorage.getItem('token');
-    const userRole = sessionStorage.getItem('userRole');
+    const userRole = api.getStoredUserRole();
     if (!token || userRole !== 'customer') return;
 
     const cart = readCart();

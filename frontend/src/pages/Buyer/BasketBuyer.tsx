@@ -68,7 +68,7 @@ const BasketBuyer: React.FC = () => {
               <p>Похоже, вы еще не выбрали ни одного товара</p>
               <button 
                 className={styles['continue-btn']}
-                onClick={() => navigate('/buyer')}
+                onClick={() => navigate('/customer')}
               >
                 Продолжить покупки
               </button>
@@ -93,7 +93,7 @@ const BasketBuyer: React.FC = () => {
                 <div className={styles['continue-shopping']}>
                   <button 
                     className={styles['continue-shopping-btn']}
-                    onClick={() => navigate('/buyer')}
+                    onClick={() => navigate('/customer')}
                   >
                     ← Продолжить покупки
                   </button>

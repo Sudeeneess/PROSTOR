@@ -244,7 +244,7 @@ const OrderFormalizationBuyer: React.FC = () => {
       
       alert(`✅ Заказ №${orderId.slice(-8)} успешно оформлен!`);
       
-      navigate('/buyer/orders');
+      navigate('/orders');
       
     } catch (error: any) {
       console.error('❌ Ошибка при оформлении заказа:', error);

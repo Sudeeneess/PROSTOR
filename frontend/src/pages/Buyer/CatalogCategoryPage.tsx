@@ -13,6 +13,7 @@ import {
   type CatalogFilterState,
 } from '../../data/mockCatalogProducts';
 import styles from './CatalogCategoryPage.module.css';
+import { api } from '../../services/api';
 
 function goodsWord(n: number): string {
   const m = n % 10;
@@ -32,8 +33,8 @@ const CatalogCategoryPage: React.FC = () => {
 
   const homePath = useMemo(() => {
     const token = localStorage.getItem('token');
-    const role = sessionStorage.getItem('userRole');
-    return token && role === 'customer' ? '/buyer' : '/';
+    const role = api.getStoredUserRole();
+    return token && role === 'customer' ? '/customer' : '/';
   }, []);
 
   const [filter, setFilter] = useState<CatalogFilterState>(() =>

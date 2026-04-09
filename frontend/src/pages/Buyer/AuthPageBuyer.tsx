@@ -1,220 +1,105 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BsPersonFill } from "react-icons/bs";
+import { BsPersonFill } from 'react-icons/bs';
 import HeaderMain from '../../components/HeaderMain';
 import styles from './AuthPageBuyer.module.css';
-import { api } from '../../services/api';
+import { api, resolveAfterLogin } from '../../services/api';
 
 const AuthPageBuyer: React.FC = () => {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     username: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
     setError(null);
+    setInfo(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
-    console.log('Форма отправлена:', { 
-      isLogin, 
-      username: formData.username 
-    });
+    setInfo(null);
 
     try {
       if (isLogin) {
-        console.log('Попытка входа...');
-        console.log('Отправляемые данные:', {
-          username: formData.username,
-          password: '***'
-        });
-        
         const response = await api.login({
           username: formData.username,
-          password: formData.password
+          password: formData.password,
         });
-        
-        console.log('Ответ от API:', response);
-        
-        if (response.success && response.data) {
-          console.log('Вход успешен!');
-          console.log('Данные от сервера:', response.data);
 
-          // Сохраняем имя и фамилию (если имя передано как "Имя Фамилия")
-        if (formData.name) {
-          localStorage.setItem('userName', formData.name);
-          // Если нужно разделить на имя и фамилию
-          const nameParts = formData.name.split(' ');
-          if (nameParts.length >= 2) {
-          localStorage.setItem('userFirstName', nameParts[0]);
-          localStorage.setItem('userLastName', nameParts.slice(1).join(' '));
-          } else {
-          localStorage.setItem('userFirstName', formData.name);
+        if (response.success && response.data) {
+          if (formData.name.trim()) {
+            localStorage.setItem('userName', formData.name.trim());
+            const nameParts = formData.name.trim().split(/\s+/);
+            if (nameParts.length >= 2) {
+              localStorage.setItem('userFirstName', nameParts[0]);
+              localStorage.setItem('userLastName', nameParts.slice(1).join(' '));
+            } else {
+              localStorage.setItem('userFirstName', formData.name.trim());
+              localStorage.removeItem('userLastName');
             }
           }
-          
-          // ========== СОХРАНЕНИЕ ДАННЫХ ==========
-          
-          // 1. Сохраняем токен
-          if (response.data.token) {
-            localStorage.setItem('token', response.data.token);
-            console.log('✅ Токен сохранен в localStorage');
-          } else {
-            console.warn('⚠️ Токен не получен от сервера, создаем тестовый');
-            localStorage.setItem('token', 'test-token-' + Date.now());
-          }
-          
-          // 2. Сохраняем роль (приводим к нижнему регистру)
-          let userRole = 'customer'; // роль по умолчанию
-          if (response.data.role) {
-            userRole = response.data.role.toLowerCase();
-          }
-          sessionStorage.setItem('userRole', userRole);
-          console.log('✅ Роль пользователя сохранена:', userRole);
-          
-          // 3. Сохраняем username
-          if (response.data.username) {
-            localStorage.setItem('username', response.data.username);
-            console.log('✅ Username сохранен:', response.data.username);
-          }
-          
-          // 4. Сохраняем имя (если есть)
-          if (formData.name) {
-            localStorage.setItem('userName', formData.name);
-            console.log('✅ Имя пользователя сохранено:', formData.name);
-          }
-          
-          // 5. Сохраняем полную информацию о пользователе
-          const userData = {
-            username: response.data.username || formData.username,
-            role: userRole
-          };
-          localStorage.setItem('user', JSON.stringify(userData));
-          console.log('✅ Данные пользователя сохранены:', userData);
-          
-          // 6. ПРОВЕРКА СОХРАНЕНИЯ
-          console.log('========== ПРОВЕРКА СОХРАНЕНИЯ ==========');
-          console.log('localStorage token:', localStorage.getItem('token'));
-          console.log('sessionStorage role:', sessionStorage.getItem('userRole'));
-          console.log('localStorage username:', localStorage.getItem('username'));
-          console.log('==========================================');
-          
-          // 7. Перенаправление
-          console.log('Перенаправление на страницу покупателя...');
-          navigate('/customer');
-          
+          navigate(resolveAfterLogin(response.data), { replace: true });
         } else {
-          console.log('Ошибка входа:', response.error);
           setError(response.error || 'Неверное имя пользователя или пароль');
         }
       } else {
-        // Регистрация
-        console.log('Попытка регистрации...');
-        
-        // Валидация на клиенте
         if (formData.password !== formData.confirmPassword) {
-          console.log('Пароли не совпадают');
           setError('Пароли не совпадают');
           setLoading(false);
           return;
         }
-
         if (formData.password.length < 6) {
-          console.log('Пароль слишком короткий');
           setError('Пароль должен быть не менее 6 символов');
           setLoading(false);
           return;
         }
 
-        console.log('Отправляемые данные для регистрации:', {
-          name: formData.name,
-          username: formData.username,
-          password: '***'
-        });
-
         const response = await api.register({
           name: formData.name,
           username: formData.username,
           password: formData.password,
-          confirmPassword: formData.confirmPassword
+          confirmPassword: formData.confirmPassword,
         });
 
-        console.log('Ответ от API (регистрация):', response);
-
-        if (response.success && response.data) {
-          console.log('Регистрация успешна!');
-          console.log('Данные от сервера:', response.data);
-          
-          // ========== СОХРАНЕНИЕ ДАННЫХ ПОСЛЕ РЕГИСТРАЦИИ ==========
-          
-          // 1. Сохраняем токен
-          if (response.data.token) {
-            localStorage.setItem('token', response.data.token);
-            console.log('✅ Токен сохранен в localStorage');
-          } else {
-            console.warn('⚠️ Токен не получен от сервера, создаем тестовый');
-            localStorage.setItem('token', 'test-token-' + Date.now());
-          }
-          
-          // 2. Сохраняем роль
-          let userRole = 'customer';
-          if (response.data.role) {
-            userRole = response.data.role.toLowerCase();
-          }
-          sessionStorage.setItem('userRole', userRole);
-          console.log('✅ Роль пользователя сохранена:', userRole);
-          
-          // 3. Сохраняем username
-          if (response.data.username) {
-            localStorage.setItem('username', response.data.username);
-            console.log('✅ Username сохранен:', response.data.username);
-          }
-          
-          // 4. Сохраняем имя
-          if (formData.name) {
-            localStorage.setItem('userName', formData.name);
-            console.log('✅ Имя пользователя сохранено:', formData.name);
-          }
-          
-          // 5. Сохраняем полную информацию
-          const userData = {
-            username: response.data.username || formData.username,
-            name: formData.name,
-            role: userRole
-          };
-          localStorage.setItem('user', JSON.stringify(userData));
-          console.log('✅ Данные пользователя сохранены:', userData);
-          
-          // 6. ПРОВЕРКА СОХРАНЕНИЯ
-          console.log('========== ПРОВЕРКА СОХРАНЕНИЯ ==========');
-          console.log('localStorage token:', localStorage.getItem('token'));
-          console.log('sessionStorage role:', sessionStorage.getItem('userRole'));
-          console.log('localStorage username:', localStorage.getItem('username'));
-          console.log('==========================================');
-          
-          // 7. Перенаправление
-          console.log('Перенаправление на страницу покупателя...');
-          navigate('/customer');
-          
-        } else {
-          console.log('Ошибка регистрации:', response.error);
+        if (!response.success) {
           setError(response.error || 'Ошибка при регистрации');
+          return;
+        }
+
+        if (response.needsLogin) {
+          if (formData.name.trim()) {
+            localStorage.setItem('userName', formData.name.trim());
+          }
+          setInfo('Регистрация прошла успешно. Войдите в систему.');
+          setIsLogin(true);
+          setFormData((prev) => ({
+            ...prev,
+            password: '',
+            confirmPassword: '',
+          }));
+          return;
+        }
+
+        if (response.data) {
+          if (formData.name.trim()) {
+            localStorage.setItem('userName', formData.name.trim());
+          }
+          navigate(resolveAfterLogin(response.data), { replace: true });
         }
       }
     } catch (err) {
-      console.error('Критическая ошибка:', err);
       setError('Произошла непредвиденная ошибка. Проверьте подключение к серверу.');
     } finally {
       setLoading(false);
@@ -222,27 +107,27 @@ const AuthPageBuyer: React.FC = () => {
   };
 
   const switchToRegister = () => {
-    console.log('Переключение на форму регистрации');
     setIsLogin(false);
-    setFormData({ 
-      name: '', 
-      username: '', 
-      password: '', 
-      confirmPassword: '' 
+    setFormData({
+      name: '',
+      username: '',
+      password: '',
+      confirmPassword: '',
     });
     setError(null);
+    setInfo(null);
   };
 
   const switchToLogin = () => {
-    console.log('Переключение на форму входа');
     setIsLogin(true);
-    setFormData({ 
-      name: '', 
-      username: '', 
-      password: '', 
-      confirmPassword: '' 
+    setFormData({
+      name: '',
+      username: '',
+      password: '',
+      confirmPassword: '',
     });
     setError(null);
+    setInfo(null);
   };
 
   return (
@@ -253,20 +138,21 @@ const AuthPageBuyer: React.FC = () => {
           <h2 className={styles['buyer-auth-title']}>
             {isLogin ? 'Авторизация клиента' : 'Регистрация клиента'}
             <div className={styles['buyer-auth-title-icon']}>
-              <BsPersonFill size={28} color='#000000' />
+              <BsPersonFill size={28} color="#000000" />
             </div>
           </h2>
-          
-          {/* Отображение ошибки */}
-          {error && (
-            <div className={styles['buyer-auth-error-message']}>
-              {error}
+
+          {info && (
+            <div className={styles['buyer-auth-error-message']} role="status">
+              {info}
             </div>
           )}
-          
+          {error && (
+            <div className={styles['buyer-auth-error-message']}>{error}</div>
+          )}
+
           <form onSubmit={handleSubmit}>
             {!isLogin ? (
-              // Форма регистрации
               <>
                 <div className={styles['buyer-auth-form-group']}>
                   <input
@@ -321,7 +207,6 @@ const AuthPageBuyer: React.FC = () => {
                 </div>
               </>
             ) : (
-              // Форма входа
               <>
                 <div className={styles['buyer-auth-form-group']}>
                   <input
@@ -351,12 +236,12 @@ const AuthPageBuyer: React.FC = () => {
               </>
             )}
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className={styles['buyer-auth-submit-button']}
               disabled={loading}
             >
-              {loading ? 'Загрузка...' : (isLogin ? 'Войти' : 'Создать аккаунт')}
+              {loading ? 'Загрузка...' : isLogin ? 'Войти' : 'Создать аккаунт'}
             </button>
           </form>
 
@@ -364,8 +249,9 @@ const AuthPageBuyer: React.FC = () => {
             {isLogin ? (
               <p>
                 У вас нет аккаунта?{' '}
-                <button 
-                  onClick={switchToRegister} 
+                <button
+                  type="button"
+                  onClick={switchToRegister}
                   className={styles['buyer-auth-link-button']}
                   disabled={loading}
                 >
@@ -375,8 +261,9 @@ const AuthPageBuyer: React.FC = () => {
             ) : (
               <p>
                 Уже есть аккаунт?{' '}
-                <button 
-                  onClick={switchToLogin} 
+                <button
+                  type="button"
+                  onClick={switchToLogin}
                   className={styles['buyer-auth-link-button']}
                   disabled={loading}
                 >

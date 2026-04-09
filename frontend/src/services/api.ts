@@ -1,4 +1,98 @@
-const API_BASE_URL = 'http://localhost:8080'; 
+const API_BASE_URL = (
+  import.meta.env.VITE_API_BASE_URL as string | undefined
+)?.replace(/\/$/, '') || 'http://localhost:8080';
+
+/** Роль из JWT/API: ADMIN, ROLE_CUSTOMER, customer → каноническое имя для guards. */
+export function normalizeRole(role: string | undefined | null): string {
+  if (role == null || String(role).trim() === '') return 'customer';
+  let r = String(role).trim().toLowerCase().replace(/^role_/, '');
+  if (r === 'administrator') r = 'admin';
+  if (r === 'warehouse' || r === 'warehousemanager' || r === 'warehouse_manager')
+    r = 'warehouse_manager';
+  return r;
+}
+
+/** Куда вести после успешного логина (redirectUrl от API или роль). */
+export function resolveAfterLogin(data: LoginResponse): string {
+  const url = data.redirectUrl?.trim();
+  if (url) {
+    try {
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        const u = new URL(url);
+        if (u.origin === window.location.origin) {
+          return `${u.pathname}${u.search}${u.hash}`;
+        }
+      } else if (url.startsWith('/')) {
+        return url;
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+  switch (data.role) {
+    case 'admin':
+      return '/admin';
+    case 'seller':
+      return '/seller/dashboard';
+    case 'warehouse_manager':
+      return '/warehouse/dashboard';
+    default:
+      return '/customer';
+  }
+}
+
+function pickToken(body: Record<string, unknown>): string | undefined {
+  const t = body.token ?? body.accessToken ?? body.access_token;
+  return typeof t === 'string' && t.length > 0 ? t : undefined;
+}
+
+/** Ответ логина/регистрации может быть плоским или вложенным в `data`. */
+function unwrapAuthBody(raw: unknown): Record<string, unknown> {
+  if (!raw || typeof raw !== 'object') return {};
+  const o = raw as Record<string, unknown>;
+  const inner = o.data;
+  if (inner && typeof inner === 'object' && !Array.isArray(inner)) {
+    return inner as Record<string, unknown>;
+  }
+  return o;
+}
+
+function parseLoginPayload(raw: unknown): LoginResponse | null {
+  const body = unwrapAuthBody(raw);
+  const token = pickToken(body);
+  if (!token) return null;
+  const username =
+    (typeof body.username === 'string' && body.username) ||
+    (typeof body.sub === 'string' && body.sub) ||
+    '';
+  const roleRaw =
+    (typeof body.role === 'string' && body.role) ||
+    (Array.isArray(body.authorities) && typeof body.authorities[0] === 'string'
+      ? (body.authorities[0] as string)
+      : '') ||
+    'customer';
+  const type = typeof body.type === 'string' ? body.type : 'Bearer';
+  const expiresIn =
+    typeof body.expiresIn === 'number'
+      ? body.expiresIn
+      : typeof body.expires_in === 'number'
+        ? body.expires_in
+        : undefined;
+  const redirectUrl =
+    typeof body.redirectUrl === 'string'
+      ? body.redirectUrl
+      : typeof body.redirect_url === 'string'
+        ? body.redirect_url
+        : '';
+  return {
+    token,
+    type,
+    username,
+    role: normalizeRole(roleRaw),
+    expiresIn: expiresIn ?? 0,
+    redirectUrl: redirectUrl ?? '',
+  };
+}
 
 export interface LoginData {
   username: string;
@@ -16,6 +110,7 @@ export interface LoginResponse {
   token: string;
   type: string;
   username: string;
+  /** Уже нормализованная роль (customer, admin, …). */
   role: string;
   expiresIn: number;
   redirectUrl: string;
@@ -26,6 +121,8 @@ export interface AuthResponse {
   data?: LoginResponse;
   error?: string;
   status?: number;
+  /** Регистрация прошла, но сервер не выдал JWT — показать форму входа. */
+  needsLogin?: boolean;
 }
 
 // ========== НОВЫЕ ТИПЫ ==========
@@ -66,7 +163,26 @@ export interface Category {
 // ========== API СЕРВИС ==========
 
 class ApiService {
-  
+  /** Единая запись сессии: localStorage + sessionStorage для существующих guards. */
+  persistAuth(response: LoginResponse): void {
+    localStorage.setItem('token', response.token);
+    localStorage.setItem(
+      'user',
+      JSON.stringify({
+        username: response.username,
+        role: response.role,
+      })
+    );
+    sessionStorage.setItem('userRole', response.role);
+
+    if (response.type) {
+      localStorage.setItem('tokenType', response.type);
+    }
+    if (response.expiresIn) {
+      localStorage.setItem('expiresIn', response.expiresIn.toString());
+    }
+  }
+
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
@@ -125,9 +241,7 @@ class ApiService {
   
   async login(credentials: LoginData): Promise<AuthResponse> {
     try {
-      console.log('Попытка входа с username:', credentials.username);
-      
-      const response = await this.request<LoginResponse>('/api/auth/login', {
+      const raw = await this.request<unknown>('/api/auth/login', {
         method: 'POST',
         body: JSON.stringify({
           username: credentials.username,
@@ -135,32 +249,16 @@ class ApiService {
         }),
       });
 
-      console.log('Успешный ответ от сервера:', response);
-
-      if (!response.token) {
+      const parsed = parseLoginPayload(raw);
+      if (!parsed) {
         throw new Error('Сервер не вернул токен');
       }
 
-      // Нормализуем роль к нижнему регистру
-      const normalizedRole = response.role.toLowerCase();
-
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify({
-        username: response.username,
-        role: normalizedRole
-      }));
-      
-      if (response.type) {
-        localStorage.setItem('tokenType', response.type);
-      }
-      
-      if (response.expiresIn) {
-        localStorage.setItem('expiresIn', response.expiresIn.toString());
-      }
+      this.persistAuth(parsed);
 
       return {
         success: true,
-        data: response,
+        data: parsed,
       };
       
     } catch (error) {
@@ -186,7 +284,7 @@ class ApiService {
 
       console.log('Попытка регистрации пользователя:', userData.username);
 
-      const response = await this.request<LoginResponse>('/api/auth/register', {
+      const raw = await this.request<unknown>('/api/auth/register', {
         method: 'POST',
         body: JSON.stringify({
           name: userData.name,
@@ -195,29 +293,15 @@ class ApiService {
         }),
       });
 
-      console.log('Успешная регистрация:', response);
-
-      if (response.token) {
-        const normalizedRole = response.role.toLowerCase();
-        
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('user', JSON.stringify({
-          username: response.username,
-          role: normalizedRole
-        }));
-        
-        if (response.type) {
-          localStorage.setItem('tokenType', response.type);
-        }
-        
-        if (response.expiresIn) {
-          localStorage.setItem('expiresIn', response.expiresIn.toString());
-        }
+      const parsed = parseLoginPayload(raw);
+      if (parsed) {
+        this.persistAuth(parsed);
+        return { success: true, data: parsed };
       }
 
       return {
         success: true,
-        data: response,
+        needsLogin: true,
       };
       
     } catch (error) {
@@ -232,11 +316,28 @@ class ApiService {
   }
 
   logout(): void {
-    console.log('Выход из системы');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('tokenType');
     localStorage.removeItem('expiresIn');
+    sessionStorage.removeItem('userRole');
+  }
+
+  /** Роль для guards: сначала `user` в localStorage, иначе sessionStorage (обратная совместимость). */
+  getStoredUserRole(): string | null {
+    try {
+      const raw = localStorage.getItem('user');
+      if (raw) {
+        const u = JSON.parse(raw) as { role?: string };
+        if (u?.role != null && String(u.role).trim() !== '') {
+          return String(u.role).toLowerCase();
+        }
+      }
+    } catch {
+      /* ignore */
+    }
+    const s = sessionStorage.getItem('userRole');
+    return s ? s.toLowerCase() : null;
   }
 
   getCurrentUser(): { username: string; role: string } | null {
