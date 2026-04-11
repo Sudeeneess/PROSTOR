@@ -1,5 +1,12 @@
+// Главная страница неавторизованных пользователей для всех ролей
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  Outlet,
+} from 'react-router-dom';
 import styles from './App.module.css';
 
 // Общие компоненты
@@ -9,9 +16,13 @@ import ProductGrid from './components/ProductGrid';
 // Покупатель (Buyer)
 import AuthPageBuyer from './pages/Buyer/AuthPageBuyer'; 
 import MainPageBuyer from './pages/Buyer/MainPageBuyer';
-import ProfilePage from './pages/Buyer/AccountBuyer';
+import ProfilePage from './pages/Buyer/ProfileBuyer';
 import OrdersPageBuyer from './pages/Buyer/OrdersPageBuyer';
 import BasketBuyer from './pages/Buyer/BasketBuyer';
+import OrderFormalizationBuyer from './pages/Buyer/OrderFormalizationBuyer';
+import ProductDetailPage from './pages/Buyer/ProductDetailPage';
+import CatalogCategoryPage from './pages/Buyer/CatalogCategoryPage';
+import CatalogRootPage from './pages/Buyer/CatalogRootPage'; 
 
 // Менеджер склада (Manager)
 import AuthPageManager from './pages/Manager/AuthPageManager';
@@ -24,6 +35,7 @@ import PersonalSeller from './pages/Seller/PersonalSeller';
 import AddingProducts from './pages/Seller/AddProducts';
 import ProductSeller from './pages/Seller/ProductSeller';
 import OrdersSeller from './pages/Seller/OrdersSeller';
+import MainSeller from './pages/Seller/MainSeller';
 
 // Администратор (Admin)
 import AuthorizationAdmin from './pages/Admin/AuthAdmin';
@@ -31,42 +43,43 @@ import Admin from './pages/Admin/AdminPage';
 import UsersAdmin from './pages/Admin/UsersAdmin';
 import ProductAdmin from './pages/Admin/ProductAdmin';
 import RegistrAdmin from './pages/Admin/RegistrAdmin';
+import { api } from './services/api';
 
 // ==================== ЗАЩИТА МАРШРУТОВ - ПОКУПАТЕЛЬ ====================
 
 // Проверка авторизации покупателя (приватный маршрут)
 const PrivateBuyerRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const token = localStorage.getItem('token');
-  const userRole = sessionStorage.getItem('userRole');
-  
+  const userRole = api.getStoredUserRole();
+
   if (!token || userRole !== 'customer') {
     return <Navigate to="/auth" replace />;
   }
-  
+
   return <>{children}</>;
 };
 
 // Перенаправление уже авторизованного покупателя на главную
 const RedirectBuyerIfAuthenticated: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const token = localStorage.getItem('token');
-  const userRole = sessionStorage.getItem('userRole');
-  
+  const userRole = api.getStoredUserRole();
+
   if (token && userRole === 'customer') {
-    return <Navigate to="/buyer" replace />;
+    return <Navigate to="/customer" replace />;
   }
-  
+
   return <>{children}</>;
 };
 
 // Специальная защита для профиля покупателя
 const PrivateProfileRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const token = localStorage.getItem('token');
-  const userRole = sessionStorage.getItem('userRole');
-  
+  const userRole = api.getStoredUserRole();
+
   if (!token || userRole !== 'customer') {
     return <Navigate to="/auth" replace />;
   }
-  
+
   return <>{children}</>;
 };
 
@@ -109,7 +122,6 @@ const PrivateWarehouseRoute: React.FC<{ children: React.ReactNode }> = ({ childr
   
   return <>{children}</>;
 };
-
 // Перенаправление уже авторизованного менеджера
 const RedirectIfAuthenticated: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const token = localStorage.getItem('token');
@@ -148,6 +160,35 @@ const RedirectAdminIfAuthenticated: React.FC<{ children: React.ReactNode }> = ({
   return <>{children}</>;
 };
 
+const ProductDetailLayout: React.FC = () => {
+  const token = localStorage.getItem('token');
+  const userRole = api.getStoredUserRole();
+  const variant = token && userRole === 'customer' ? 'buyer' : 'landing';
+  return (
+    <>
+      <HeaderMain variant={variant} />
+      <main className={styles['main-content']}>
+        <ProductDetailPage />
+      </main>
+    </>
+  );
+};
+
+/** Общая оболочка каталога: шапка + вложенные страницы (корень / категория / подкатегория). */
+const CatalogLayout: React.FC = () => {
+  const token = localStorage.getItem('token');
+  const userRole = api.getStoredUserRole();
+  const variant = token && userRole === 'customer' ? 'buyer' : 'landing';
+  return (
+    <>
+      <HeaderMain variant={variant} />
+      <main className={styles['main-content']}>
+        <Outlet />
+      </main>
+    </>
+  );
+};
+
 // ==================== ОСНОВНОЙ КОМПОНЕНТ МАРШРУТИЗАЦИИ ====================
 
 const AppContent: React.FC = () => {
@@ -159,11 +200,11 @@ const AppContent: React.FC = () => {
       <Route path="/" element={
         (() => {
           const token = localStorage.getItem('token');
-          const userRole = sessionStorage.getItem('userRole');
-          
+          const userRole = api.getStoredUserRole();
+
           // Перенаправление по ролям
           if (token && userRole === 'customer') {
-            return <Navigate to="/buyer" replace />;
+            return <Navigate to="/customer" replace />;
           }
           if (token && userRole === 'warehouse_manager') {
             return <Navigate to="/warehouse/dashboard" replace />;
@@ -190,6 +231,14 @@ const AppContent: React.FC = () => {
       {/* ==================== МАРШРУТЫ ПОКУПАТЕЛЯ ==================== */}
       
       {/* Страница входа/регистрации покупателя */}
+      <Route path="/product/:id" element={<ProductDetailLayout />} />
+
+      <Route path="/catalog" element={<CatalogLayout />}>
+        <Route index element={<CatalogRootPage />} />
+        <Route path=":categorySlug/:subSlug" element={<CatalogCategoryPage />} />
+        <Route path=":categorySlug" element={<CatalogCategoryPage />} />
+      </Route>
+
       <Route path="/auth" element={
         <RedirectBuyerIfAuthenticated>
           <AuthPageBuyer />
@@ -197,11 +246,12 @@ const AppContent: React.FC = () => {
       } />
       
       {/* Главная страница покупателя (после входа) */}
-      <Route path="/buyer" element={
+      <Route path="/customer" element={
         <PrivateBuyerRoute>
           <MainPageBuyer />
         </PrivateBuyerRoute>
       } />
+      <Route path="/buyer" element={<Navigate to="/customer" replace />} />
       
       {/* Профиль покупателя */}
       <Route path="/profile" element={
@@ -216,11 +266,18 @@ const AppContent: React.FC = () => {
           <OrdersPageBuyer />
         </PrivateProfileRoute>
       } />
-
+      
       {/* Корзина покупателя */}
       <Route path="/basket" element={
         <PrivateProfileRoute>
           <BasketBuyer />
+        </PrivateProfileRoute>
+      } />
+
+      {/* Оформление заказа покупателя */}
+      <Route path="/order-formalization" element={
+        <PrivateProfileRoute>
+          <OrderFormalizationBuyer />
         </PrivateProfileRoute>
       } />
       
@@ -246,6 +303,9 @@ const AppContent: React.FC = () => {
             </RedirectSellerIfAuthenticated>
           } 
         />
+
+        {/* Лендинг продавца — доступен без авторизации */}
+        <Route path="main" element={<MainSeller />} />
         
         {/* Личный кабинет / Дашборд продавца */}
         <Route 
@@ -357,7 +417,7 @@ const AppContent: React.FC = () => {
           <UsersAdmin onBack={() => {}} />
         </PrivateAdminRoute>
       } />
-
+      
       {/* Управление товарами */}
       <Route path="/admin/products" element={
         <PrivateAdminRoute>

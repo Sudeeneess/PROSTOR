@@ -1,20 +1,9 @@
-/* БАЗА */
-* {
-  box-sizing: border-box;
-}
-
-body {
-  height: 100%;
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #efefef;
-}
-
 /* СТРАНИЦА */
 .seller-products-page {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: transparent;
 }
 
 /* ФОРМА */
@@ -25,8 +14,9 @@ body {
   height: auto;
   min-height: 600px;
   
-  background: #ffffff;
+  background: var(--shop-surface, #ffffff);
   border-radius: 20px;
+  border: 1px solid var(--shop-border, #e5e7eb);
   padding: 50px 40px;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -47,7 +37,7 @@ body {
 .seller-products-form-title {
   font-size: 28px;
   font-weight: 600;
-  color: #333;
+  color: var(--shop-heading, #111);
 }
 
 .seller-products-back-button {

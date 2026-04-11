@@ -1,0 +1,413 @@
+/* OrderFormalizationBuyer.module.css */
+
+.order-container {
+  min-height: calc(100vh - 80px);
+  background-color: var(--shop-bg);
+  padding: 24px;
+}
+
+/* Горизонтальный layout */
+.order-layout {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+/* Левая колонка - формы */
+.order-left {
+  flex: 2;
+  min-width: 0;
+}
+
+/* Правая колонка - сводка */
+.order-right {
+  flex: 1.2;
+  min-width: 0;
+  position: sticky;
+  top: 24px;
+}
+
+/* Секции */
+.section {
+  background-color: #fff;
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.section-header {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--shop-heading);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background-color: var(--shop-primary);
+  color: var(--shop-on-primary);
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Карточка сводки заказа */
+.summary-card {
+  background-color: #fff;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 24px;
+}
+
+.summary-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--shop-heading);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+/* Информация о доставке */
+.delivery-info {
+  background-color: #f8f8f8;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.delivery-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.delivery-icon {
+  font-size: 16px;
+  color: #888;
+}
+
+.delivery-address {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* Сводка товаров */
+.order-items-summary {
+  margin-bottom: 20px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #666;
+}
+
+.order-items-list {
+  margin: 12px 0;
+  padding: 8px 0;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+}
+
+.order-item-summary {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #555;
+}
+
+.order-item-summary:last-child {
+  margin-bottom: 0;
+}
+
+.order-item-name {
+  flex: 1;
+}
+
+.order-item-price {
+  margin-left: 16px;
+  font-weight: 500;
+}
+
+.divider {
+  height: 1px;
+  background-color: #ddd;
+  margin: 12px 0;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 18px;
+  font-weight: bold;
+  color: #000;
+}
+
+.total-price {
+  color: #000;
+  font-size: 20px;
+}
+
+/* Кнопка заказа */
+.order-button {
+  width: 100%;
+  background-color: var(--shop-primary);
+  color: var(--shop-on-primary);
+  border: none;
+  border-radius: 40px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 8px;
+}
+
+.order-button:hover {
+  background-color: var(--shop-primary-hover);
+  transform: translateY(-1px);
+}
+
+.order-button:active {
+  transform: translateY(0);
+}
+
+/* Контактные поля */
+.contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 12px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+}
+
+.contact-icon {
+  font-size: 20px;
+  color: #888;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.contact-info {
+  flex: 1;
+}
+
+.contact-label {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 4px;
+}
+
+.required {
+  color: #e74c3c;
+  margin-left: 4px;
+}
+
+.optional {
+  color: #888;
+  margin-left: 4px;
+  font-weight: normal;
+}
+
+.name-input,
+.phone-input {
+  width: 100%;
+  padding: 8px 0;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  outline: none;
+  border-bottom: 1px solid #ddd;
+}
+
+.name-input:focus,
+.phone-input:focus {
+  border-bottom-color: #000;
+}
+
+/* Способы оплаты */
+.saved-cards {
+  margin-bottom: 12px;
+}
+
+.section-subtitle {
+  font-size: 13px;
+  font-weight: 500;
+  margin: 12px 0 8px;
+  color: #888;
+  display: block;
+}
+
+.card-option {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 8px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.card-option:hover {
+  background-color: #f0f0f0;
+}
+
+.card-option:has(input:checked) {
+  background-color: var(--shop-primary-soft);
+  border-color: #000;
+}
+
+.card-radio {
+  margin-right: 12px;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.card-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.card-icon {
+  font-size: 28px;
+}
+
+.card-number {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.card-expiry {
+  font-size: 12px;
+  color: #888;
+}
+
+.new-card-text {
+  font-size: 14px;
+  color: #333;
+}
+
+.new-card-form {
+  margin-top: 12px;
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+}
+
+.card-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+}
+
+.card-row {
+  display: flex;
+  gap: 12px;
+}
+
+.card-input-small {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+/* Кнопка назад */
+.back-button {
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+  padding: 8px 0;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s ease;
+}
+
+.back-button:hover {
+  color: var(--shop-heading);
+}
+
+.order-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: var(--shop-heading);
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-size: 16px;
+}
+
+/* Адаптивность */
+@media (max-width: 900px) {
+  .order-layout {
+    flex-direction: column;
+  }
+  
+  .order-right {
+    position: static;
+    width: 100%;
+  }
+  
+  .summary-card {
+    position: static;
+  }
+}
+
+@media (max-width: 480px) {
+  .order-container {
+    padding: 16px;
+  }
+  
+  .section {
+    padding: 18px;
+  }
+  
+  .order-title {
+    font-size: 20px;
+  }
+  
+  .card-row {
+    flex-direction: column;
+  }
+}

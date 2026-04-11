@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './AdminPage.module.css';
 import HeaderAdmin from './HeaderAdmin';
 import UsersAdmin from './UsersAdmin';
 import ProductAdmin from './ProductAdmin';
 
 const AdminPage: React.FC = () => {
-  // const navigate = useNavigate(); // ✅ REMOVED - not being used
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState<'admin' | 'users' | 'products'>('admin');
   
   // Static data for the table
@@ -14,6 +15,12 @@ const AdminPage: React.FC = () => {
     { time: '14:30', action: 'Скрыт товар "Куртка"', user: 'Система', status: 'Выполнено' },
     { time: '14:30', action: 'Изменен товар "Штаны"', user: 'Система', status: 'Выполнено' },
   ];
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    sessionStorage.removeItem('userRole');
+    navigate("/");
+  };
 
   const handleUsersClick = () => {
     setCurrentPage('users');
@@ -86,6 +93,14 @@ const AdminPage: React.FC = () => {
             </table>
           </div>
         </div>
+
+        {/* Кнопка выхода */}
+        <button
+          className={styles['admin-logout-btn']}
+          onClick={handleLogout}
+        >
+          Выйти из аккаунта
+        </button>
       </div>
     </>
   );

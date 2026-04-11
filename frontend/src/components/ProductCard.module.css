@@ -1,9 +1,10 @@
 .product-card {
   background: white;
   border-radius: 30px;
-  overflow: hidden;
+  overflow: visible;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
 }
 
 .product-card:hover {
@@ -11,18 +12,46 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+.product-card-main {
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  border-radius: 30px 30px 0 0;
+}
+
+.product-card-main:focus-visible {
+  outline: 2px solid var(--shop-primary);
+  outline-offset: 2px;
+}
+
+/* Превью вплотную к скруглению карточки; картинка целиком в кадре (contain) */
 .product-image {
   height: 225px;
   background: #f0f0f0;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 30px 30px 0 0;
+  overflow: hidden;
 }
 
-.product-image img {
-  width: 150px;
-  height: 200px;
-  object-fit: cover;
+.product-thumb {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+  border: none;
+  outline: none;
+  box-shadow: none;
 }
 
 .image-placeholder {
@@ -31,21 +60,25 @@
 }
 
 .product-info {
-  padding: 0.5rem 0.75rem 0.25rem;
-  height: 150px;
+  padding: 0.5rem 0.75rem 0.35rem;
+  min-height: 5.5rem;
+}
+
+.product-card-actions {
+  padding: 0 0.75rem 0.75rem;
 }
 
 .price {
   font-size: 1.25rem;
   font-weight: bold;
-  color: #000000;
+  color: var(--shop-heading);
   margin-bottom: 0.25rem;
 }
 
 .name {
   font-size: 1rem;
   margin-bottom: 0.25rem;
-  color: #333;
+  color: var(--shop-heading);
 }
 
 .rating {
@@ -54,19 +87,120 @@
   margin-top: 7px;
 }
 
+/* Кнопка добавления в корзину */
 .add-to-cart {
   width: 100%;
   padding: 0.75rem;
-  background: #c0c0c0;
-  color: #000000;
+  background: var(--shop-primary);
+  color: var(--shop-on-primary);
   border: none;
   border-radius: 40px;
   font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
-  margin-top: 10px;
+  transition: background 0.2s, transform 0.2s;
+  margin-top: 0;
 }
 
 .add-to-cart:hover {
-  background: #888888;
+  background: var(--shop-primary-hover);
+}
+
+/* Приглушённый блок счётчика в корзине */
+.cart-counter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 0;
+  padding: 0.35rem 0.5rem;
+  background: var(--shop-primary-soft);
+  border: 1px solid rgba(104, 109, 242, 0.22);
+  border-radius: 40px;
+}
+
+.counter-btn {
+  flex: 0 0 auto;
+  min-width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--shop-primary);
+  color: var(--shop-on-primary);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.counter-btn:hover {
+  background: var(--shop-primary-hover);
+}
+
+.counter-btn:active {
+  transform: scale(0.96);
+}
+
+.counter-value {
+  flex: 1;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--shop-text);
+  user-select: none;
+}
+
+/* Уведомление в стиле маркетплейса: тёмная «таблетка», по центру сверху */
+.toast {
+  position: fixed;
+  top: 7.5rem;
+  left: 50%;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: min(92vw, 26rem);
+  padding: 0.65rem 1.15rem;
+  background: var(--shop-primary);
+  color: var(--shop-on-primary);
+  font-size: 0.875rem;
+  line-height: 1.3;
+  font-family: var(--shop-font);
+  border-radius: 20px;
+  border: none;
+  box-shadow: 0 4px 20px rgba(12, 12, 12, 0.25);
+  pointer-events: none;
+  transform: translateX(-50%);
+  animation: toastSlideIn 0.3s ease-out forwards;
+}
+
+.toast-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  color: #ffffff;
+}
+
+.toast-icon svg {
+  display: block;
+}
+
+.toast-text {
+  font-weight: 400;
+  text-align: left;
+  letter-spacing: 0.01em;
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }

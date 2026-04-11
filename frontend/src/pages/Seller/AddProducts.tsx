@@ -105,7 +105,7 @@ const AddingProducts: React.FC = () => {
   };
 
   return (
-    <div className={styles['seller-products-page']}>
+    <div className={`seller-app-shell ${styles['seller-products-page']}`}>
       <HeaderSeller />
       <div className={styles['adding-products-form']}>
       <div className={styles['seller-products-form-card']}>

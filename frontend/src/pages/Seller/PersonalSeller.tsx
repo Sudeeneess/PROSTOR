@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import HeaderSeller from "./HeaderSeller";
+import SellerFioInput from "../../components/SellerFioInput";
+import { formatFioDisplay } from "../../utils/fioInput";
 import styles from './PersonalSeller.module.css';
 
 interface SellerProfile {
@@ -19,13 +21,12 @@ const PersonalSeller: React.FC = () => {
   useEffect(() => {
     const storedData = localStorage.getItem("sellerProfile");
     if (storedData) {
-      const parsedData = JSON.parse(storedData);
-      setSeller(parsedData);
-      setFormData(parsedData);
+      const parsedData = JSON.parse(storedData) as SellerProfile;
+      const fio = formatFioDisplay(parsedData.fio || "");
+      const normalized = { ...parsedData, fio };
+      setSeller(normalized);
+      setFormData(normalized);
     }
-    
-    const userRole = sessionStorage.getItem('userRole');
-    console.log("Current user role:", userRole);
   }, []);
 
   const handleAddProduct = () => {
@@ -33,12 +34,19 @@ const PersonalSeller: React.FC = () => {
   };
 
   const handleMyProducts = () => {
-    console.log("Navigating to /seller/products");
     navigate("/seller/products");
   };
 
   const handleMyOrders = () => {
     navigate("/seller/orders");
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('tokenType');
+    sessionStorage.removeItem('userRole');
+    // Полная перезагрузка гарантирует главную для гостя (лендинг с HeaderMain)
+    window.location.assign('/');
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -54,13 +62,16 @@ const PersonalSeller: React.FC = () => {
   };
 
   const handleSave = () => {
-    setSeller(formData);
-    localStorage.setItem("sellerProfile", JSON.stringify(formData));
+    const fio = formatFioDisplay(formData.fio || "");
+    const next = { ...formData, fio };
+    setSeller(next);
+    setFormData(next);
+    localStorage.setItem("sellerProfile", JSON.stringify(next));
     setIsModalOpen(false);
   };
 
   return (
-    <>
+    <div className="seller-app-shell">
       <HeaderSeller />
 
       <main className={styles['seller-personal-container']}>
@@ -69,12 +80,14 @@ const PersonalSeller: React.FC = () => {
         <div className={styles['seller-personal-profile-card']}>
           <div className={styles['seller-personal-profile-info']}>
             <div className={styles['seller-personal-profile-avatar']}>
-              {seller?.fio ? seller.fio.charAt(0).toUpperCase() : "?"}
+              {seller?.fio
+                ? formatFioDisplay(seller.fio).charAt(0).toUpperCase()
+                : "?"}
             </div>
 
             <div className={styles['seller-personal-profile-text']}>
               <span className={styles['seller-personal-profile-name']}>
-                {seller?.fio || "Имя не указано"}
+                {formatFioDisplay(seller?.fio || "") || "Имя не указано"}
               </span>
               <span className={styles['seller-personal-profile-inn']}>
                 ИНН: {seller?.inn || "—"}
@@ -84,7 +97,15 @@ const PersonalSeller: React.FC = () => {
 
           <button
             className={styles['seller-personal-edit-profile-btn']}
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              if (seller) {
+                setFormData({
+                  ...seller,
+                  fio: formatFioDisplay(seller.fio || ""),
+                });
+              }
+              setIsModalOpen(true);
+            }}
           >
             изменить профиль
           </button>
@@ -111,6 +132,14 @@ const PersonalSeller: React.FC = () => {
             onClick={handleMyOrders}
           >
             Мои заказы
+          </button>
+
+          <button
+            type="button"
+            className={styles['seller-personal-logout-btn']}
+            onClick={handleLogout}
+          >
+            Выйти из аккаунта
           </button>
         </div>
 
@@ -155,13 +184,12 @@ const PersonalSeller: React.FC = () => {
                 pattern="\d*"
               />
 
-              <input
-                type="text"
+              <SellerFioInput
                 name="fio"
-                placeholder="ФИО"
                 value={formData.fio || ""}
-                onChange={handleInputChange}
+                onChange={(v) => setFormData({ ...formData, fio: v })}
                 className={styles['seller-personal-modal-input']}
+                placeholder="Иванов Иван Иванович"
               />
 
               <div className={styles['seller-personal-modal-buttons']}>
@@ -176,7 +204,7 @@ const PersonalSeller: React.FC = () => {
           </div>
         )}
       </main>
-    </>
+    </div>
   );
 };
 

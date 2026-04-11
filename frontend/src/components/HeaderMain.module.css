@@ -1,10 +1,10 @@
 .hm-header {
-  background: #C0C0C0;
+  background: var(--shop-header-bg);
   padding: 0.5rem 2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 14px rgba(104, 109, 242, 0.28);
   gap: 20px;
 }
 
@@ -25,9 +25,10 @@
 }
 
 .hm-logo {
+  font-family: var(--shop-font);
   font-size: 36px;
-  font-weight: 775;
-  color: #000000;
+  font-weight: 800;
+  color: #ffffff;
   text-transform: uppercase;
   text-decoration: none;
   flex-shrink: 0;
@@ -41,6 +42,12 @@
   opacity: 0.75;
 }
 
+.hm-search-wrap {
+  position: relative;
+  min-width: 0;
+  width: 100%;
+}
+
 .hm-search-bar {
   min-width: 0;
   display: flex;
@@ -50,22 +57,114 @@
 .hm-search-bar input {
   width: 100%;
   padding: 12px;
-  border: 0.5px solid #C0C0C0;
+  border: 1px solid transparent;
   border-radius: 35px;
   font-size: 16px;
   outline: none;
-  transition: border-color 0.2s;
+  transition: box-shadow 0.2s, border-color 0.2s;
   box-sizing: border-box;
+  background: var(--shop-on-primary);
+  color: var(--shop-text);
+}
+
+.hm-search-bar input::placeholder {
+  color: #6b7280;
 }
 
 .hm-search-bar input:focus {
-  border-color: #8d8d8d;
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
+}
+
+.hm-search-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  max-height: min(380px, 70vh);
+  overflow-y: auto;
+  background: var(--shop-surface);
+  color: var(--shop-text);
+  border-radius: 16px;
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.18),
+    0 0 0 1px rgba(0, 0, 0, 0.06);
+  z-index: 1200;
+  text-align: left;
+}
+
+.hm-search-group + .hm-search-group {
+  border-top: 1px solid var(--shop-border);
+}
+
+.hm-search-group-label {
+  padding: 10px 14px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--shop-text-muted);
+}
+
+.hm-search-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  padding: 10px 14px 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--shop-font);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--shop-heading);
+  text-align: left;
+  transition: background 0.15s ease;
+}
+
+.hm-search-item:hover,
+.hm-search-item:focus-visible {
+  background: var(--shop-primary-soft);
+  outline: none;
+}
+
+.hm-search-itemHint {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--shop-text-muted);
+}
+
+.hm-search-empty {
+  padding: 14px 16px;
+  font-size: 14px;
+  color: var(--shop-text-muted);
+  line-height: 1.4;
 }
 
 .hm-menu-icon {
   cursor: pointer;
   margin-top: 3px;
   position: relative;
+}
+
+/* Кнопка-иконка каталога: без рамки, клик ведёт на /catalog */
+.hm-menu-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.hm-menu-button:focus-visible {
+  outline: 2px solid var(--shop-on-primary);
+  outline-offset: 2px;
 }
 
 .hm-menu-icon::after {
@@ -136,9 +235,9 @@
 }
 
 .hm-catalog-item:hover {
-  background-color: #ececec;
-  color: #000;
-  border-left-color: #555;
+  background-color: var(--shop-primary-soft);
+  color: var(--shop-text);
+  border-left-color: var(--shop-primary);
   padding-left: 24px;
   border-radius: 0 20px 20px 0;
 }
@@ -149,14 +248,20 @@
 }
 
 .hm-catalog-item.active {
-  background-color: #e8e8e8;
-  color: #000;
-  border-left-color: #333;
+  background-color: var(--shop-primary-soft-hover);
+  color: var(--shop-text);
+  border-left-color: var(--shop-primary);
   padding-left: 24px;
 }
 
 .hm-catalog-item.active .hm-catalog-item-chevron {
   color: #333;
+}
+
+/* Первый пункт: переход на корень /catalog без выбранной категории */
+.hm-catalog-all {
+  font-weight: 700;
+  border-bottom: 2px solid #e0e0e0;
 }
 
 .hm-subcategory-dropdown {
@@ -186,7 +291,7 @@
   margin: 0;
   font-size: 20px;
   font-weight: 600;
-  color: #333;
+  color: var(--shop-heading);
 }
 
 .hm-subcategory-list {
@@ -213,7 +318,7 @@
 }
 
 .hm-subcategory-item:hover {
-  color: #000;
+  color: var(--shop-primary);
   transform: translateY(-2px);
   font-weight: 600;
 }
@@ -319,9 +424,9 @@
 
 /* При наведении - плавное смещение и изменение фона */
 .hm-role-item:hover {
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.04) 100%);
-  color: #000;
-  padding-left: 24px;  /* Легкое смещение вправо при наведении */
+  background: var(--shop-primary-soft);
+  color: var(--shop-text);
+  padding-left: 24px;
   padding-right: 16px;
   transform: translateX(2px);
 }
@@ -357,12 +462,12 @@
 }
 
 .hm-catalog-dropdown::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: rgba(104, 109, 242, 0.45);
   border-radius: 10px;
 }
 
 .hm-catalog-dropdown::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: rgba(104, 109, 242, 0.65);
 }
 
 .hm-subcategory-dropdown::-webkit-scrollbar {
@@ -375,10 +480,10 @@
 }
 
 .hm-subcategory-dropdown::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: rgba(104, 109, 242, 0.45);
   border-radius: 10px;
 }
 
 .hm-subcategory-dropdown::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: rgba(104, 109, 242, 0.65);
 }

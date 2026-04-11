@@ -1,9 +1,17 @@
 import styles from './HeaderMain.module.css';
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { LuMenu } from 'react-icons/lu';
 import { IoPersonCircleOutline } from 'react-icons/io5';
 import { FaBasketShopping } from 'react-icons/fa6';
 import { Link, useNavigate } from 'react-router-dom';
+import { CATALOG_CATEGORIES } from '../data/categories';
+import {
+  searchHeaderCatalog,
+  getHeaderSearchNavigatePath,
+  getFirstHeaderSearchHit,
+  type HeaderSearchHit,
+} from '../utils/catalogSearch';
+import { api } from '../services/api';
 
 export type HeaderMainVariant = 'landing' | 'buyer';
 
@@ -12,41 +20,42 @@ interface HeaderMainProps {
   // onCartClick больше не нужен, убираем его
 }
 
-const catalogData = [
-  {
-    name: 'Верх',
-    subcategories: ['Футболки', 'Рубашки', 'Свитера'],
-  },
-  {
-    name: 'Низ',
-    subcategories: ['Джинсы', 'Брюки', 'Шорты', 'Юбки'],
-  },
-  {
-    name: 'Верхняя одежда',
-    subcategories: ['Куртки', 'Пальто', 'Пуховики', 'Плащи'],
-  },
-  {
-    name: 'Обувь',
-    subcategories: [
-      'Кроссовки',
-      'Ботинки',
-      'Туфли',
-      'Сандалии',
-      'Сапоги',
-      'Кеды',
-    ],
-  },
-  {
-    name: 'Остальное',
-    subcategories: ['Аксессуары', 'Сумки', 'Головные уборы', 'Шарфы'],
-  },
-];
-
 const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeCategorySlug, setActiveCategorySlug] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchPanelOpen, setSearchPanelOpen] = useState(false);
+  const searchWrapRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+
+  const searchResults = useMemo(
+    () => searchHeaderCatalog(searchQuery),
+    [searchQuery]
+  );
+
+  const hasSearchQuery = searchQuery.trim().length > 0;
+  const hasSearchHits =
+    hasSearchQuery &&
+    (searchResults.categories.length > 0 ||
+      searchResults.subcategories.length > 0 ||
+      searchResults.brands.length > 0);
+
+  useEffect(() => {
+    const onDocDown = (e: MouseEvent) => {
+      if (!searchWrapRef.current?.contains(e.target as Node)) {
+        setSearchPanelOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onDocDown);
+    return () => document.removeEventListener('mousedown', onDocDown);
+  }, []);
+
+  const applySearchHit = (hit: HeaderSearchHit) => {
+    navigate(getHeaderSearchNavigatePath(hit));
+    setSearchQuery('');
+    setSearchPanelOpen(false);
+  };
 
   const handleMouseEnter = () => {
     setIsDropdownOpen(true);
@@ -62,7 +71,12 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
 
   const handleCatalogMouseLeave = () => {
     setIsCatalogOpen(false);
-    setActiveCategory(null);
+    setActiveCategorySlug(null);
+  };
+
+  const closeCatalog = () => {
+    setIsCatalogOpen(false);
+    setActiveCategorySlug(null);
   };
 
   const handleRoleClick = (role: string) => {
@@ -74,7 +88,7 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
           navigate('/auth');
           break;
         case 'seller':
-          navigate('/seller/auth');
+          navigate('/seller/main');
           break;
         case 'warehouse':
           navigate('/warehouse/auth');
@@ -90,7 +104,7 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
 
     switch (role) {
       case 'seller':
-        navigate('/seller/auth');
+        navigate('/seller/main');
         break;
       case 'warehouse':
         navigate('/warehouse/auth');
@@ -112,11 +126,8 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
   // Новая функция для обработки клика по корзине
   const handleCartClick = () => {
     const token = localStorage.getItem('token');
-    const userRole = sessionStorage.getItem('userRole');
-    
-    console.log('Клик по корзине:', { token, userRole, variant }); // для отладки
-    
-    // Если пользователь авторизован как покупатель
+    const userRole = api.getStoredUserRole();
+
     if (token && userRole === 'customer') {
       navigate('/basket');
     } 
@@ -128,7 +139,7 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
 
   const logo = (
     <Link
-      to={variant === 'landing' ? '/' : '/buyer'}
+      to={variant === 'landing' ? '/' : '/customer'}
       className={styles['hm-logo']}
       title="На главную"
     >
@@ -146,44 +157,102 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
           onMouseEnter={handleCatalogMouseEnter}
           onMouseLeave={handleCatalogMouseLeave}
         >
-          <LuMenu size={38} color="#000000" />
+          {/* Клик по иконке — сразу в корень каталога */}
+          <button
+            type="button"
+            className={styles['hm-menu-button']}
+            aria-label="Открыть каталог"
+            onClick={() => {
+              navigate('/catalog');
+              closeCatalog();
+            }}
+          >
+            <LuMenu size={38} color="#ffffff" />
+          </button>
 
           {isCatalogOpen && (
             <div className={styles['hm-catalog-wrapper']}>
               <div className={styles['hm-catalog-dropdown']}>
-                {catalogData.map((category, index) => (
+                <div
+                  className={`${styles['hm-catalog-item']} ${styles['hm-catalog-all']}`}
+                  onMouseEnter={() => setActiveCategorySlug(null)}
+                  onClick={() => {
+                    navigate('/catalog');
+                    closeCatalog();
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      navigate('/catalog');
+                      closeCatalog();
+                    }
+                  }}
+                >
+                  Все разделы
+                </div>
+                {CATALOG_CATEGORIES.map((category) => (
                   <div
-                    key={index}
-                    className={`${styles['hm-catalog-item']} ${activeCategory === category.name ? styles['active'] : ''}`}
-                    onMouseEnter={() => setActiveCategory(category.name)}
-                    onClick={() => console.log(`Выбрана категория: ${category.name}`)}
+                    key={category.slug}
+                    className={`${styles['hm-catalog-item']} ${activeCategorySlug === category.slug ? styles['active'] : ''}`}
+                    onMouseEnter={() => setActiveCategorySlug(category.slug)}
+                    onClick={() => {
+                      navigate(`/catalog/${category.slug}`);
+                      closeCatalog();
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        navigate(`/catalog/${category.slug}`);
+                        closeCatalog();
+                      }
+                    }}
                   >
                     {category.name}
                   </div>
                 ))}
               </div>
 
-              {activeCategory && (
+              {activeCategorySlug && (
                 <div
                   className={styles['hm-subcategory-dropdown']}
-                  onMouseEnter={() => setActiveCategory(activeCategory)}
-                  onMouseLeave={() => setActiveCategory(null)}
+                  onMouseEnter={() => setActiveCategorySlug(activeCategorySlug)}
+                  onMouseLeave={() => setActiveCategorySlug(null)}
                 >
                   <div className={styles['hm-subcategory-header']}>
-                    <h3>{activeCategory}</h3>
+                    <h3>
+                      {CATALOG_CATEGORIES.find((c) => c.slug === activeCategorySlug)
+                        ?.name ?? ''}
+                    </h3>
                   </div>
                   <div className={styles['hm-subcategory-list']}>
-                    {catalogData
-                      .find((cat) => cat.name === activeCategory)
-                      ?.subcategories.map((subcategory, idx) => (
+                    {CATALOG_CATEGORIES.find((c) => c.slug === activeCategorySlug)
+                      ?.subcategories.map((sub) => (
                         <div
-                          key={idx}
+                          key={sub.slug}
                           className={styles['hm-subcategory-item']}
-                          onClick={() =>
-                            console.log(`Выбрана подкатегория: ${subcategory}`)
-                          }
+                          onClick={() => {
+                            navigate(
+                              `/catalog/${activeCategorySlug}/${sub.slug}`
+                            );
+                            closeCatalog();
+                          }}
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              navigate(
+                                `/catalog/${activeCategorySlug}/${sub.slug}`
+                              );
+                              closeCatalog();
+                            }
+                          }}
                         >
-                          {subcategory}
+                          {sub.name}
                         </div>
                       ))}
                   </div>
@@ -193,8 +262,125 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
           )}
         </div>
 
-        <div className={styles['hm-search-bar']}>
-          <input type="text" placeholder="Поиск товаров..." />
+        <div
+          className={styles['hm-search-wrap']}
+          ref={searchWrapRef}
+        >
+          <div className={styles['hm-search-bar']}>
+            <input
+              type="search"
+              role="combobox"
+              aria-expanded={searchPanelOpen && hasSearchQuery}
+              aria-autocomplete="list"
+              aria-controls={
+                searchPanelOpen && hasSearchQuery
+                  ? 'hm-search-suggestions'
+                  : undefined
+              }
+              placeholder="Поиск товаров…"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setSearchPanelOpen(true);
+              }}
+              onFocus={() => setSearchPanelOpen(true)}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') {
+                  setSearchPanelOpen(false);
+                  (e.target as HTMLInputElement).blur();
+                }
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  const hit = getFirstHeaderSearchHit(searchQuery);
+                  if (hit) applySearchHit(hit);
+                }
+              }}
+            />
+          </div>
+
+          {searchPanelOpen && hasSearchQuery && (
+            <div
+              id="hm-search-suggestions"
+              className={styles['hm-search-dropdown']}
+              role="listbox"
+              aria-label="Подсказки поиска по каталогу"
+            >
+              {!hasSearchHits ? (
+                <div className={styles['hm-search-empty']}>
+                  Ничего не найдено — попробуйте другое написание
+                </div>
+              ) : (
+                <>
+                  {searchResults.categories.length > 0 && (
+                    <div className={styles['hm-search-group']}>
+                      <div className={styles['hm-search-group-label']}>
+                        Категории
+                      </div>
+                      {searchResults.categories.map((hit) => (
+                        <button
+                          key={`c-${hit.slug}`}
+                          type="button"
+                          role="option"
+                          className={styles['hm-search-item']}
+                          onMouseDown={(ev) => ev.preventDefault()}
+                          onClick={() => applySearchHit(hit)}
+                        >
+                          {hit.label}
+                          <span className={styles['hm-search-itemHint']}>
+                            Раздел каталога
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {searchResults.subcategories.length > 0 && (
+                    <div className={styles['hm-search-group']}>
+                      <div className={styles['hm-search-group-label']}>
+                        Подкатегории
+                      </div>
+                      {searchResults.subcategories.map((hit) => (
+                        <button
+                          key={`s-${hit.categorySlug}-${hit.subSlug}`}
+                          type="button"
+                          role="option"
+                          className={styles['hm-search-item']}
+                          onMouseDown={(ev) => ev.preventDefault()}
+                          onClick={() => applySearchHit(hit)}
+                        >
+                          {hit.label}
+                          <span className={styles['hm-search-itemHint']}>
+                            {hit.categoryLabel}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {searchResults.brands.length > 0 && (
+                    <div className={styles['hm-search-group']}>
+                      <div className={styles['hm-search-group-label']}>
+                        Бренды
+                      </div>
+                      {searchResults.brands.map((hit) => (
+                        <button
+                          key={`b-${hit.brandName}`}
+                          type="button"
+                          role="option"
+                          className={styles['hm-search-item']}
+                          onMouseDown={(ev) => ev.preventDefault()}
+                          onClick={() => applySearchHit(hit)}
+                        >
+                          {hit.brandName}
+                          <span className={styles['hm-search-itemHint']}>
+                            Все товары бренда
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         <div className={styles['hm-header-actions']}>
@@ -204,7 +390,7 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
             onMouseLeave={handleMouseLeave}
           >
             <div className={styles['hm-ava-icon']} onClick={handleAvatarClick}>
-              <IoPersonCircleOutline size={50} color="#000000" />
+              <IoPersonCircleOutline size={50} color="#ffffff" />
             </div>
 
             {isDropdownOpen && (
@@ -254,7 +440,7 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
             tabIndex={0}
             onKeyDown={(e) => e.key === 'Enter' && handleCartClick()}
           >
-            <FaBasketShopping size={40} color="#000000" />
+            <FaBasketShopping size={40} color="#ffffff" />
           </div>
         </div>
       </div>

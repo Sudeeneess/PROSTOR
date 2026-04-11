@@ -1,12 +1,12 @@
 /* ===== ОБЩИЙ КОНТЕЙНЕР ===== */
 .seller-personal-container {
-  max-width: 800px;
+  max-width: 1040px;
   width: 100%;
   margin: 48px auto;
   padding: 56px 64px;
-  background: #ffffff;
+  background: var(--shop-surface, #ffffff);
   border-radius: 32px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--shop-border, rgba(0, 0, 0, 0.08));
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 8px 24px rgba(0, 0, 0, 0.03);
   transition: all 0.3s ease;
   box-sizing: border-box;
@@ -17,22 +17,23 @@
   font-size: 32px;
   font-weight: 650;
   margin-bottom: 48px;
-  color: #1a1a1a;
+  color: var(--shop-heading, #1a1a1a);
   letter-spacing: -0.3px;
   line-height: 1.2;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
 }
 
 /* ===== ПЛАШКА ПРОФИЛЯ ===== */
 .seller-personal-profile-card {
   width: 100%;
-  max-width: 720px;
+  max-width: none;
   background: #f8f9fa;
   border-radius: 28px;
   padding: 32px 40px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
   margin-bottom: 56px;
   margin-left: 0;
   border: 1px solid rgba(0, 0, 0, 0.06);
@@ -52,6 +53,8 @@
   display: flex;
   align-items: center;
   gap: 24px;
+  flex: 1 1 220px;
+  min-width: 0;
 }
 
 /* Аватар */
@@ -85,6 +88,10 @@
   font-weight: 650;
   color: #1a1a1a;
   letter-spacing: -0.2px;
+  line-height: 1.35;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  max-width: 100%;
 }
 
 .seller-personal-profile-inn {
@@ -94,16 +101,18 @@
   letter-spacing: -0.1px;
 }
 
-/* Кнопка редактирования профиля */
+/* Кнопка редактирования профиля — на всю оставшуюся ширину карточки */
 .seller-personal-edit-profile-btn {
-  background: transparent;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  font-size: 14px;
-  font-weight: 500;
-  color: #6c757d;
+  flex: 1 1 200px;
+  min-width: min(100%, 200px);
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  font-size: 15px;
+  font-weight: 600;
+  color: #2a2a2a;
   cursor: pointer;
-  padding: 8px 24px;
-  border-radius: 40px;
+  padding: 14px 24px;
+  border-radius: 16px;
   transition: all 0.2s ease;
   font-family: inherit;
 }
@@ -120,9 +129,9 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-width: 400px;
-  margin-left: 0;
   width: 100%;
+  max-width: none;
+  margin-left: 0;
 }
 
 /* ЕДИНЫЙ СТИЛЬ ДЛЯ ВСЕХ КНОПОК ДЕЙСТВИЙ */
@@ -155,6 +164,39 @@
   transform: translateY(0);
 }
 
+.seller-personal-logout-btn {
+  width: 100%;
+  padding: 18px 28px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--shop-on-primary, #ffffff);
+  background: var(--shop-header-bg, #447add);
+  border: none;
+  border-radius: 60px;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: -0.2px;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(68, 122, 221, 0.35);
+  box-sizing: border-box;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+
+.seller-personal-logout-btn:hover {
+  color: var(--shop-on-primary, #ffffff);
+  filter: brightness(1.06);
+  box-shadow: 0 6px 18px rgba(68, 122, 221, 0.4);
+  transform: translateY(-2px);
+}
+
+.seller-personal-logout-btn:active {
+  transform: translateY(0);
+  filter: brightness(0.96);
+}
+
 /* ===== МОДАЛЬНОЕ ОКНО ===== */
 .seller-personal-modal-overlay {
   position: fixed;
@@ -184,8 +226,8 @@
   background: #ffffff;
   border-radius: 28px;
   padding: 40px;
-  width: 520px;
-  max-width: 90%;
+  width: min(640px, 96vw);
+  max-width: 96vw;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   animation: slideUp 0.3s ease;
   border: 1px solid rgba(0, 0, 0, 0.05);
@@ -207,9 +249,8 @@
   font-size: 26px;
   font-weight: 650;
   margin-bottom: 28px;
-  color: #1a1a1a;
+  color: var(--shop-heading, #1a1a1a);
   letter-spacing: -0.3px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
 /* Поля ввода */
@@ -274,12 +315,12 @@
 }
 
 .seller-personal-modal-save-btn {
-  background: #e5e7eb;
-  color: #1a1a1a;
+  background: var(--shop-primary, #447add);
+  color: var(--shop-on-primary, #fff);
 }
 
 .seller-personal-modal-save-btn:hover {
-  background: #d1d5db;
+  background: var(--shop-primary-hover, #3a6bc9);
   transform: translateY(-1px);
 }
 
@@ -299,4 +340,9 @@
 .seller-personal-edit-profile-btn:focus-visible {
   outline: 2px solid #9ca3af;
   outline-offset: 2px;
+}
+
+.seller-personal-logout-btn:focus-visible {
+  outline: 2px solid var(--shop-on-primary, #fff);
+  outline-offset: 3px;
 }

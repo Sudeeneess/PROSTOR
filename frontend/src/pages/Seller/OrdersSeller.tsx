@@ -22,7 +22,7 @@ const OrdersSeller: React.FC = () => {
   };
 
   return (
-    <div className={styles['seller-orders-page']}>
+    <div className={`seller-app-shell ${styles['seller-orders-page']}`}>
       <HeaderSeller />
 
       <div className={styles['seller-orders-container']}>

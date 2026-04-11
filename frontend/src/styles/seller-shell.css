@@ -1,0 +1,14 @@
+/* Страницы продавца: та же палитра и фон, что у покупателя; шрифт — Inter (--shop-font), как на главной продавца. */
+.seller-app-shell {
+  font-family: var(--shop-font);
+  color: var(--shop-text);
+  background: var(--shop-bg);
+  min-height: 100vh;
+}
+
+.seller-app-shell button,
+.seller-app-shell input,
+.seller-app-shell select,
+.seller-app-shell textarea {
+  font-family: inherit;
+}

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import HeaderSeller from "./HeaderSeller";
+import SellerFioInput from "../../components/SellerFioInput";
+import { formatFioDisplay } from "../../utils/fioInput";
 import styles from './RegistrSeller.module.css';
 
 const SellerEntrance: React.FC = () => {
@@ -44,6 +46,14 @@ const SellerEntrance: React.FC = () => {
       return;
     }
 
+    const fioNorm = formatFioDisplay(formData.fullname);
+    const parts = fioNorm.split(/\s+/).filter(Boolean);
+    if (parts.length < 2) {
+      setErrorMessage("Укажите фамилию и имя (отчество — по желанию)");
+      setLoading(false);
+      return;
+    }
+
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
@@ -51,7 +61,7 @@ const SellerEntrance: React.FC = () => {
         country: formData.country,
         orgForm: formData.orgForm,
         inn: formData.inn,
-        fio: formData.fullname,
+        fio: fioNorm,
       };
 
       // ✅ сохраняем профиль
@@ -76,7 +86,7 @@ const SellerEntrance: React.FC = () => {
   };
 
   return (
-    <div className={styles['seller-reg-app']}>
+    <div className={`seller-app-shell ${styles['seller-reg-app']}`}>
       <HeaderSeller />
 
       <main className={styles['seller-reg-content-section']}>
@@ -119,13 +129,12 @@ const SellerEntrance: React.FC = () => {
               required
             />
 
-            <input
-              type="text"
+            <SellerFioInput
               name="fullname"
-              placeholder="ФИО"
               value={formData.fullname}
-              onChange={handleChange}
+              onChange={(v) => setFormData({ ...formData, fullname: v })}
               className={styles['seller-reg-input-field']}
+              placeholder="Иванов Иван Иванович"
               required
             />
 
