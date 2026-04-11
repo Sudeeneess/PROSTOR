@@ -222,7 +222,7 @@ const Dashboard: React.FC = () => {
     localStorage.removeItem('token');
     sessionStorage.removeItem('userName');
     sessionStorage.removeItem('userRole');
-    navigate('/auth/warehouse', { replace: true });
+    navigate('/', { replace: true });
   };
 
   const renderContent = () => {
