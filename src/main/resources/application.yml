@@ -1,8 +1,8 @@
 ﻿spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/prostor_dev
-    username: developer
-    password: dev123
+    url: jdbc:postgresql://localhost:5434/prostor_db_team
+    username: db_team
+    password: team123
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -21,23 +21,12 @@
     baseline-on-migrate: true
     baseline-version: 1
 
-app:
-  jwt:
-    secret: "bPtQY64XGHrg9NGAzHWGo3IrwzH0FQtCII9RlSylZdgEJr3pfi8X7c3yVYdrYA6UvXQK6bGx5zrIpL3w5pV3wZ"
-    expiration: 86400000
-  security:
-    cors:
-      allowed-origins: "http://localhost:3001,http://localhost:3000"
-  commission:
-    rate: 0.10  #комиссия
-
 server:
   port: 8080
 
 logging:
   level:
     org.springframework.web: INFO
-    org.springframework.security: INFO
     org.flywaydb: DEBUG
     com.prostor: DEBUG
     org.hibernate.SQL: DEBUG

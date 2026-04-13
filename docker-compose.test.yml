@@ -1,15 +1,17 @@
-﻿services:
-  postgres-test:
+﻿version: '3.8'
+
+services:
+  postgres-db-team-test:
     image: postgres:15-alpine
-    container_name: prostor-postgres-test
+    container_name: prostor-db-team-test
     environment:
-      POSTGRES_DB: prostor_test
-      POSTGRES_USER: postuser
+      POSTGRES_DB: prostor_db_team_test
+      POSTGRES_USER: db_team_test
       POSTGRES_PASSWORD: test123
     ports:
-      - "5433:5432"
+      - "5435:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postuser -d prostor_test"]
+      test: ["CMD-SHELL", "pg_isready -U db_team_test -d prostor_db_team_test"]
       interval: 5s
       timeout: 3s
       retries: 5
