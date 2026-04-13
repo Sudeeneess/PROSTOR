@@ -11,13 +11,11 @@ public class LoginResponse {
     private String username;
     private String role;
     private Long expiresIn;
-    private String redirectUrl;
 
-    public LoginResponse(String token, String username, String role, Long expiresIn, String redirectUrl) {
+    public LoginResponse(String token, String username, String role, Long expiresIn) {
         this.token = token;
         this.username = username;
         this.role = role;
         this.expiresIn = expiresIn;
-        this.redirectUrl = redirectUrl;
     }
 }

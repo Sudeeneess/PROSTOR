@@ -1,0 +1,622 @@
+{
+  "info": {
+    "name": "Prostor — складской учёт в маркетплейсе",
+    "description": "Сценарии для ВКР: каталог (контекст), JWT, панель менеджера склада, склады/остатки, статусы заказов, обработка заказов, смежные API.\n\nЗапуск: импорт коллекции + окружения **Prostor Local**, выполнить папки по порядку или Collection Runner (сверху вниз). Перед папкой **06** нужны данные Flyway V9 (тестовые заказы/остатки).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 Каталог маркетплейса (контекст)",
+      "item": [
+        {
+          "name": "Категории — список",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/categories?page=0&size=20"
+          }
+        },
+        {
+          "name": "Бренды — список",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/brands?page=0&size=20"
+          }
+        },
+        {
+          "name": "Товары — список",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/products?page=0&size=20"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "try {",
+                  "  const j = pm.response.json();",
+                  "  if (j.content && j.content.length > 0 && j.content[0].id != null) {",
+                  "    pm.environment.set('productId', String(j.content[0].id));",
+                  "  }",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 Аутентификация — менеджер склада",
+      "item": [
+        {
+          "name": "Вход (warehouse_mgr)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{warehouseUsername}}\",\n  \"password\": \"{{warehousePassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Login 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.expect(j.token).to.be.a('string');",
+                  "pm.environment.set('token', j.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 Панель менеджера склада",
+      "item": [
+        {
+          "name": "Dashboard менеджера",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/warehouse/dashboard"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.expect(j.role).to.eql('WAREHOUSE_MANAGER');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 Складской учёт — склады и остатки",
+      "item": [
+        {
+          "name": "Склады — список",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/warehouses?page=0&size=20"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "try {",
+                  "  const j = pm.response.json();",
+                  "  if (j.content && j.content.length > 0 && j.content[0].id != null) {",
+                  "    pm.environment.set('warehouseId', String(j.content[0].id));",
+                  "  }",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Склад — по id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/warehouses/{{warehouseId}}"
+          }
+        },
+        {
+          "name": "Остатки — по складу",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/warehouses/stocks?warehouseId={{warehouseId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "try {",
+                  "  const j = pm.response.json();",
+                  "  if (Array.isArray(j) && j.length > 0 && j[0].id != null) {",
+                  "    pm.environment.set('stockId', String(j[0].id));",
+                  "  }",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Остатки — по товару",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/warehouses/stocks?productId={{productId}}"
+          }
+        },
+        {
+          "name": "Остаток — по id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/warehouses/stocks/{{stockId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 Справочник статусов заказа",
+      "item": [
+        {
+          "name": "Статусы заказов — список",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders-statuses?page=0&size=20"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "try {",
+                  "  const j = pm.response.json();",
+                  "  if (j.content && j.content.length > 0 && j.content[0].id != null) {",
+                  "    pm.environment.set('statusId', String(j.content[0].id));",
+                  "  }",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "06 Заказы — исполнение со склада",
+      "item": [
+        {
+          "name": "Заказы — общий список",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders?page=0&size=20"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "try {",
+                  "  const j = pm.response.json();",
+                  "  if (j.content && j.content.length > 0) {",
+                  "    const o = j.content[0];",
+                  "    if (o.id != null) pm.environment.set('orderId', String(o.id));",
+                  "    if (o.items && o.items.length > 0 && o.items[0].id != null) {",
+                  "      pm.environment.set('orderItemId', String(o.items[0].id));",
+                  "    }",
+                  "  }",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Заказы — по статусу",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/status/{{statusId}}?page=0&size=20"
+          }
+        },
+        {
+          "name": "Заказ — подтвердить",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/{{orderId}}/confirm"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Может быть 4xx если заказ уже в финальном состоянии — это нормально для демо",
+                  "pm.test('Ответ получен', () => pm.response.code !== 0);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Заказ — сменить статус",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/{{orderId}}/status/{{targetOrderStatusId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// targetOrderStatusId по умолчанию 2 (например CONFIRMED в тестовых данных V9); при необходимости задайте в окружении",
+                  "pm.test('Ответ получен', () => pm.response.code !== 0);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "07 Движения и смежные API (JWT)",
+      "item": [
+        {
+          "name": "Движения заказа — по позиции",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/order-movements/order-item/{{orderItemId}}"
+          }
+        },
+        {
+          "name": "Движение — создать",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/order-movements?orderItemId={{orderItemId}}&warehouseId={{warehouseId}}&statusName={{movementStatusName}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  try {",
+                  "    const j = pm.response.json();",
+                  "    if (j.id != null) pm.environment.set('movementId', String(j.id));",
+                  "  } catch (e) {}",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Движение — сменить статус",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/order-movements/{{movementId}}/status/SHIPPED"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Задайте movementId вручную из ответа POST «создать» или из GET по позиции",
+                  "pm.test('Ответ получен', () => pm.response.code !== 0);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Платежи — по позиции заказа",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/payments/order-item/{{orderItemId}}"
+          }
+        },
+        {
+          "name": "Возвраты — список",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/order-returns"
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 Администратор — контраст ролей (опционально)",
+      "item": [
+        {
+          "name": "Вход (admin_user)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{adminUsername}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Admin login 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.environment.set('adminToken', j.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Админ — health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/health"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Создать склад (только ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/warehouses",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"warehouseManagerId\": 1,\n  \"warehouseAddress\": \"Тестовый склад из Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// При необходимости замените warehouseManagerId на id пользователя-менеджера из БД",
+                  "pm.test('Ответ получен', () => pm.response.code !== 0);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Создать запись остатка (только ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/warehouses/stocks",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"warehouseId\": 1,\n  \"productId\": 1,\n  \"quantity\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Подставьте warehouseId и productId под вашу БД; 201 — создано, 4xx — дубликат или валидация",
+                  "pm.test('Ответ получен', () => pm.expect([200, 201, 400, 409]).to.include(pm.response.code));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

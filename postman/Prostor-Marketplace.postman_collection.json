@@ -1,0 +1,819 @@
+{
+  "info": {
+    "name": "Prostor — основная функциональность маркетплейса",
+    "description": "Сценарии ВКР: витрина (гость), регистрация, покупатель (заказ, оплата, отмена), продавец (CRUD товаров), администратор, исполнение заказов менеджером склада.\n\nИмпорт с окружением **Prostor Local**. Для заказов покупателя нужен `customerId` записи customer (после Flyway V9 у john_doe обычно id=1). Запрос «Мои заказы по customerId» может вернуть 403, если в JWT principal без поля `id` — проверьте `OrderController`.\n\nРекомендуемый порядок Runner: 01 → 02 (опц.) → 03 → 04 → 05 → 06.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 Гость — витрина и каталог",
+      "item": [
+        {
+          "name": "Категории — список",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/categories?page=0&size=20"
+          }
+        },
+        {
+          "name": "Бренды — список",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/brands?page=0&size=20"
+          }
+        },
+        {
+          "name": "Товары — список",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/products?page=0&size=20"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "try {",
+                  "  const j = pm.response.json();",
+                  "  if (j.content && j.content[0] && j.content[0].id != null)",
+                  "    pm.environment.set('productId', String(j.content[0].id));",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Товары — фильтр по категории",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/products?categoryId={{categoryId}}&page=0&size=20"
+          }
+        },
+        {
+          "name": "Товар — по id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/products/{{productId}}"
+          }
+        },
+        {
+          "name": "Карточки товара (варианты)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/products/{{productId}}/cards"
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 Регистрация (демо, уникальные логины)",
+      "item": [
+        {
+          "name": "Регистрация — покупатель",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{regCustomerName}}\",\n  \"password\": \"pass12345\",\n  \"phone\": \"79001234567\",\n  \"role\": \"CUSTOMER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('201 или 400 (логин занят)', () => pm.expect([201, 400]).to.include(pm.response.code));"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set('regCustomerName', 'pm_c_' + Date.now());"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Регистрация — продавец",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{regSellerName}}\",\n  \"password\": \"pass12345\",\n  \"phone\": \"79007654321\",\n  \"role\": \"SELLER\",\n  \"inn\": \"1234567890\",\n  \"companyName\": \"ООО Postman Test\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('201 или 400', () => pm.expect([201, 400]).to.include(pm.response.code));"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set('regSellerName', 'pm_s_' + Date.now());"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Каждый запуск генерирует новый username. Дальнейший вход — через /api/auth/login с этим логином вручную."
+    },
+    {
+      "name": "03 Покупатель",
+      "item": [
+        {
+          "name": "Вход (john_doe)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{customerUsername}}\",\n  \"password\": \"{{customerPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Login OK', () => pm.response.to.have.status(200));",
+                  "pm.environment.set('customerToken', pm.response.json().token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Панель покупателя",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/customer/dashboard"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Справочник размеров (требуется JWT)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/sizes?page=0&size=20"
+          }
+        },
+        {
+          "name": "Создать заказ",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders",
+            "description": "Переменные `customerId` и `productId` в окружении (после папки 01 для productId). Сумма `amount` подберите под цену товара при необходимости.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": {{customerId}},\n  \"items\": [\n    { \"productId\": {{productId}}, \"amount\": 1500.0 }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const j = pm.response.json();",
+                  "  if (j.id != null) pm.environment.set('orderId', String(j.id));",
+                  "  if (j.items && j.items[0] && j.items[0].id != null)",
+                  "    pm.environment.set('orderItemId', String(j.items[0].id));",
+                  "}",
+                  "pm.test('Создан или ошибка валидации', () => pm.expect([201, 400, 404]).to.include(pm.response.code));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Заказ — детали (владелец)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/{{orderId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 403 если orderId не ваш заказ",
+                  "pm.test('Ответ получен', () => pm.response.code !== 0);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Мои заказы (по customerId)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/customer/{{customerId}}",
+            "description": "Если 403: в @PreAuthorize сравнивается customerId с authentication.principal.id — у стандартного User из Spring Security поля id нет."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Ответ получен', () => pm.response.code !== 0);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Создать платёж по позиции заказа",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/payments/order-item/{{orderItemId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const j = pm.response.json();",
+                  "  if (j.id != null) pm.environment.set('paymentId', String(j.id));",
+                  "}",
+                  "pm.test('Ответ получен', () => pm.response.code !== 0);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Подтвердить платёж",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/payments/{{paymentId}}/confirm"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Ответ получен', () => pm.response.code !== 0);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Отменить заказ (владелец)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/{{orderId}}/cancel",
+            "description": "Имеет смысл после сценария с заказом; может быть 4xx если статус не позволяет."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Ответ получен', () => pm.response.code !== 0);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 Продавец",
+      "item": [
+        {
+          "name": "Вход (seller_pro)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{sellerUsername}}\",\n  \"password\": \"{{sellerPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Login OK', () => pm.response.to.have.status(200));",
+                  "pm.environment.set('sellerToken', pm.response.json().token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Мои товары — список",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sellerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/seller/products?page=0&size=20"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "try {",
+                  "  const j = pm.response.json();",
+                  "  if (j.content && j.content[0] && j.content[0].id != null)",
+                  "    pm.environment.set('sellerProductId', String(j.content[0].id));",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Мой товар — по id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sellerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/seller/products/{{sellerProductId}}"
+          }
+        },
+        {
+          "name": "Создать товар",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sellerToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/seller/products",
+            "description": "sellerId в теле перезаписывается сервером по JWT; categoryId при необходимости замените.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Товар из Postman\",\n  \"price\": 1999.99,\n  \"sellerId\": 1,\n  \"categoryId\": {{categoryId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const j = pm.response.json();",
+                  "  if (j.id != null) pm.environment.set('sellerProductId', String(j.id));",
+                  "}",
+                  "pm.test('Ответ получен', () => pm.response.code !== 0);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Обновить товар",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sellerToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/seller/products/{{sellerProductId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Товар из Postman (обновлён)\",\n  \"price\": 2099.99,\n  \"sellerId\": 1,\n  \"categoryId\": {{categoryId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Ответ получен', () => pm.response.code !== 0);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Удаление товара намеренно не включено (разрушительная операция). При необходимости: DELETE /api/seller/products/{id}"
+    },
+    {
+      "name": "05 Администратор",
+      "item": [
+        {
+          "name": "Вход (admin_user)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{adminUsername}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Login OK', () => pm.response.to.have.status(200));",
+                  "pm.environment.set('adminToken', pm.response.json().token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Дашборд — статистика",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/dashboard/stats"
+          }
+        },
+        {
+          "name": "Системная информация",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/system/info"
+          }
+        },
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/health"
+          }
+        },
+        {
+          "name": "Пользователи — список",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/users"
+          }
+        },
+        {
+          "name": "Пользователь — по username",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/users/username/{{customerUsername}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 Исполнение заказов (менеджер склада)",
+      "item": [
+        {
+          "name": "Вход (warehouse_mgr)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{warehouseUsername}}\",\n  \"password\": \"{{warehousePassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Login OK', () => pm.response.to.have.status(200));",
+                  "pm.environment.set('managerToken', pm.response.json().token);",
+                  "pm.environment.set('token', pm.response.json().token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Панель склада",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{managerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/warehouse/dashboard"
+          }
+        },
+        {
+          "name": "Статусы заказов — список",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{managerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders-statuses?page=0&size=20"
+          }
+        },
+        {
+          "name": "Заказы — список",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{managerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders?page=0&size=20"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "try {",
+                  "  const j = pm.response.json();",
+                  "  if (j.content && j.content[0] && j.content[0].id != null)",
+                  "    pm.environment.set('orderId', String(j.content[0].id));",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Заказ — подтвердить (резерв на складе)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{managerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/{{orderId}}/confirm",
+            "description": "Только для заказа в статусе PENDING и при наличии остатков на складе."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Ответ получен', () => pm.response.code !== 0);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
