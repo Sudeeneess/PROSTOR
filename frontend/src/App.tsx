@@ -11,7 +11,7 @@ import styles from './App.module.css';
 
 // Общие компоненты
 import HeaderMain from './components/HeaderMain';
-import ProductGrid from './components/ProductGrid';
+import ApiProductGrid from './components/ApiProductGrid';
 
 // Покупатель (Buyer)
 import AuthPageBuyer from './pages/Buyer/AuthPageBuyer'; 
@@ -221,7 +221,7 @@ const AppContent: React.FC = () => {
             <>
               <HeaderMain variant="landing" />
               <main className={styles['main-content']}>
-                <ProductGrid />
+                <ApiProductGrid limit={16} />
               </main>
             </>
           );
@@ -235,8 +235,7 @@ const AppContent: React.FC = () => {
 
       <Route path="/catalog" element={<CatalogLayout />}>
         <Route index element={<CatalogRootPage />} />
-        <Route path=":categorySlug/:subSlug" element={<CatalogCategoryPage />} />
-        <Route path=":categorySlug" element={<CatalogCategoryPage />} />
+        <Route path="section/:categoryId" element={<CatalogCategoryPage />} />
       </Route>
 
       <Route path="/auth" element={

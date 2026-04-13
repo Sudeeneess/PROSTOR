@@ -1,10 +1,12 @@
 import { CATALOG_CATEGORIES } from '../data/categories';
-import { getUniqueBrandNames } from '../data/mockCatalogProducts';
 
 export type HeaderSearchCategoryHit = {
   kind: 'category';
+  /** Устаревший slug для статического каталога; если задан sectionId — не используется */
   slug: string;
   label: string;
+  /** Раздел каталога с сервера: /catalog/section/:id */
+  sectionId?: number;
 };
 
 export type HeaderSearchSubcategoryHit = {
@@ -25,6 +27,13 @@ export type HeaderSearchHit =
   | HeaderSearchSubcategoryHit
   | HeaderSearchBrandHit;
 
+export type CatalogSearchOptions = {
+  /** Категории с API: id + categoryName */
+  apiCategories?: { id: number; categoryName: string }[];
+  /** Имена брендов (например из GET /api/brands) */
+  brandNames?: string[];
+};
+
 function norm(s: string): string {
   return s.trim().toLowerCase().replace(/\s+/g, ' ');
 }
@@ -42,10 +51,12 @@ function matches(text: string, query: string): boolean {
 const MAX_EACH = 8;
 
 /**
- * Подсказки для строки поиска в шапке: категории, подкатегории (по имени/slug),
- * бренды из мок-данных каталога.
+ * Подсказки для строки поиска: категории (API и/или статические), подкатегории из макета, бренды.
  */
-export function searchHeaderCatalog(query: string): {
+export function searchHeaderCatalog(
+  query: string,
+  opts?: CatalogSearchOptions
+): {
   categories: HeaderSearchCategoryHit[];
   subcategories: HeaderSearchSubcategoryHit[];
   brands: HeaderSearchBrandHit[];
@@ -56,44 +67,66 @@ export function searchHeaderCatalog(query: string): {
   }
 
   const categories: HeaderSearchCategoryHit[] = [];
-  for (const cat of CATALOG_CATEGORIES) {
-    if (categories.length >= MAX_EACH) break;
-    if (
-      matches(cat.name, query) ||
-      matches(cat.slug, query) ||
-      matches(cat.slug.replace(/-/g, ' '), query)
-    ) {
-      categories.push({
-        kind: 'category',
-        slug: cat.slug,
-        label: cat.name,
-      });
-    }
-  }
+  const apiList = opts?.apiCategories;
+  const useApiCategories = apiList != null;
 
-  const subcategories: HeaderSearchSubcategoryHit[] = [];
-  outer: for (const cat of CATALOG_CATEGORIES) {
-    for (const sub of cat.subcategories) {
-      if (subcategories.length >= MAX_EACH) break outer;
+  if (useApiCategories) {
+    for (const cat of apiList) {
+      if (categories.length >= MAX_EACH) break;
+      if (matches(cat.categoryName, query)) {
+        categories.push({
+          kind: 'category',
+          slug: '',
+          label: cat.categoryName,
+          sectionId: cat.id,
+        });
+      }
+    }
+  } else {
+    for (const cat of CATALOG_CATEGORIES) {
+      if (categories.length >= MAX_EACH) break;
       if (
-        matches(sub.name, query) ||
-        matches(sub.slug, query) ||
-        matches(sub.slug.replace(/-/g, ' '), query) ||
-        matches(`${cat.name} ${sub.name}`, query)
+        matches(cat.name, query) ||
+        matches(cat.slug, query) ||
+        matches(cat.slug.replace(/-/g, ' '), query)
       ) {
-        subcategories.push({
-          kind: 'subcategory',
-          categorySlug: cat.slug,
-          subSlug: sub.slug,
-          label: sub.name,
-          categoryLabel: cat.name,
+        categories.push({
+          kind: 'category',
+          slug: cat.slug,
+          label: cat.name,
         });
       }
     }
   }
 
+  const subcategories: HeaderSearchSubcategoryHit[] = [];
+  if (!useApiCategories) {
+    outer: for (const cat of CATALOG_CATEGORIES) {
+      for (const sub of cat.subcategories) {
+        if (subcategories.length >= MAX_EACH) break outer;
+        if (
+          matches(sub.name, query) ||
+          matches(sub.slug, query) ||
+          matches(sub.slug.replace(/-/g, ' '), query) ||
+          matches(`${cat.name} ${sub.name}`, query)
+        ) {
+          subcategories.push({
+            kind: 'subcategory',
+            categorySlug: cat.slug,
+            subSlug: sub.slug,
+            label: sub.name,
+            categoryLabel: cat.name,
+          });
+        }
+      }
+    }
+  }
+
   const brands: HeaderSearchBrandHit[] = [];
-  for (const brandName of getUniqueBrandNames()) {
+  const brandSource = opts?.brandNames?.length
+    ? opts.brandNames
+    : [];
+  for (const brandName of brandSource) {
     if (brands.length >= MAX_EACH) break;
     if (matches(brandName, query)) {
       brands.push({ kind: 'brand', brandName });
@@ -106,6 +139,9 @@ export function searchHeaderCatalog(query: string): {
 export function getHeaderSearchNavigatePath(hit: HeaderSearchHit): string {
   switch (hit.kind) {
     case 'category':
+      if (hit.sectionId != null) {
+        return `/catalog/section/${hit.sectionId}`;
+      }
       return `/catalog/${hit.slug}`;
     case 'subcategory':
       return `/catalog/${hit.categorySlug}/${hit.subSlug}`;
@@ -114,8 +150,13 @@ export function getHeaderSearchNavigatePath(hit: HeaderSearchHit): string {
   }
 }
 
-/** Первый подходящий результат (для Enter в поле поиска). */
-export function getFirstHeaderSearchHit(query: string): HeaderSearchHit | null {
-  const { categories, subcategories, brands } = searchHeaderCatalog(query);
+export function getFirstHeaderSearchHit(
+  query: string,
+  opts?: CatalogSearchOptions
+): HeaderSearchHit | null {
+  const { categories, subcategories, brands } = searchHeaderCatalog(
+    query,
+    opts
+  );
   return categories[0] ?? subcategories[0] ?? brands[0] ?? null;
 }

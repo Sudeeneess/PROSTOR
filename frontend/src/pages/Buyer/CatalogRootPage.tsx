@@ -1,17 +1,29 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { CATALOG_CATEGORIES } from '../../data/categories';
-import {
-  emptyCatalogFilter,
-  filterCatalogProducts,
-  getAllCatalogProducts,
-  getProductsForCategory,
-} from '../../data/mockCatalogProducts';
 import ProductGrid from '../../components/ProductGrid';
 import styles from './CatalogRootPage.module.css';
 import { api } from '../../services/api';
+import type { Category } from '../../services/api';
+import {
+  filterCatalogProducts,
+  type CatalogFilterState,
+} from '../../data/mockCatalogProducts';
+import type { CatalogGridProduct } from '../../data/mockCatalogProducts';
+import { enrichProductListForGrid } from '../../utils/catalogFromApi';
+import CatalogFilters from '../../components/CatalogFilters';
 
-/** Корень каталога: список разделов (/catalog) или сетка по бренду (?brand=). */
+const GOODS_WORDS = ['товар', 'товара', 'товаров'] as const;
+
+function goodsWord(n: number): string {
+  const m = n % 10;
+  const m100 = n % 100;
+  if (m100 >= 11 && m100 <= 14) return GOODS_WORDS[2];
+  if (m === 1) return GOODS_WORDS[0];
+  if (m >= 2 && m <= 4) return GOODS_WORDS[1];
+  return GOODS_WORDS[2];
+}
+
+/** Корень каталога: разделы с сервера и опционально сетка по ?brand= */
 const CatalogRootPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const brandParam = searchParams.get('brand')?.trim() ?? '';
@@ -22,15 +34,91 @@ const CatalogRootPage: React.FC = () => {
     return token && role === 'customer' ? '/customer' : '/';
   }, []);
 
-  const brandProducts = useMemo(() => {
-    if (!brandParam) return null;
-    return filterCatalogProducts(getAllCatalogProducts(), {
-      ...emptyCatalogFilter(),
-      brands: [brandParam],
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoriesError, setCategoriesError] = useState<string | null>(null);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+
+  const [brandProducts, setBrandProducts] = useState<CatalogGridProduct[]>([]);
+  const [brandLoading, setBrandLoading] = useState(false);
+  const [brandError, setBrandError] = useState<string | null>(null);
+  const [filter, setFilter] = useState<CatalogFilterState>(() => ({
+    brands: [],
+    sizes: [],
+    subcategorySlugs: [],
+    priceMin: '',
+    priceMax: '',
+  }));
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setCategoriesLoading(true);
+      setCategoriesError(null);
+      const res = await api.getCategories(0, 100);
+      if (cancelled) return;
+      if (!res.success || !res.data?.content) {
+        setCategoriesError(res.error ?? 'Не удалось загрузить разделы');
+        setCategories([]);
+      } else {
+        setCategories(res.data.content);
+      }
+      setCategoriesLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!brandParam) {
+      setBrandProducts([]);
+      setBrandError(null);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      setBrandLoading(true);
+      setBrandError(null);
+      const res = await api.getProducts({ page: 0, size: 80 });
+      if (cancelled) return;
+      if (!res.success || !res.data?.content?.length) {
+        setBrandError(res.error ?? 'Не удалось загрузить товары');
+        setBrandProducts([]);
+        setBrandLoading(false);
+        return;
+      }
+      const enriched = await enrichProductListForGrid(res.data.content, {
+        categoryKey: 'catalog',
+        subKey: 'brand',
+      });
+      if (cancelled) return;
+      const match = enriched.filter(
+        (p) => p.brandName.toLowerCase() === brandParam.toLowerCase()
+      );
+      setBrandProducts(match);
+      setBrandLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [brandParam]);
+
+  const filteredBrandProducts = useMemo(
+    () => filterCatalogProducts(brandProducts, filter),
+    [brandProducts, filter]
+  );
+
+  useEffect(() => {
+    setFilter({
+      brands: [],
+      sizes: [],
+      subcategorySlugs: [],
+      priceMin: '',
+      priceMax: '',
     });
   }, [brandParam]);
 
-  if (brandParam && brandProducts) {
+  if (brandParam) {
     return (
       <div className={styles['page']}>
         <div className={styles['inner']}>
@@ -57,13 +145,40 @@ const CatalogRootPage: React.FC = () => {
             </Link>
           </p>
 
-          {brandProducts.length === 0 ? (
-            <p className={styles['brandEmpty']}>
-              Товаров с таким брендом нет. Попробуйте другой запрос в поиске или
-              перейдите в раздел каталога.
+          {brandLoading && <p className={styles['lead']}>Загрузка…</p>}
+          {brandError && (
+            <p className={styles['lead']} role="alert">
+              {brandError}
             </p>
-          ) : (
-            <ProductGrid products={brandProducts} />
+          )}
+          {!brandLoading && !brandError && brandProducts.length === 0 && (
+            <p className={styles['brandEmpty']}>
+              Товаров с таким брендом нет в выгрузке с сервера.
+            </p>
+          )}
+          {!brandLoading && !brandError && brandProducts.length > 0 && (
+            <>
+              <p className={styles['meta']}>
+                Показано {filteredBrandProducts.length} из {brandProducts.length}{' '}
+                {goodsWord(brandProducts.length)}
+              </p>
+              <div className={styles['body']}>
+                <CatalogFilters
+                  products={brandProducts}
+                  value={filter}
+                  onChange={setFilter}
+                />
+                <div className={styles['gridWrap']}>
+                  {filteredBrandProducts.length === 0 ? (
+                    <p className={styles['empty']}>
+                      Нет товаров по фильтрам. Сбросьте фильтры.
+                    </p>
+                  ) : (
+                    <ProductGrid products={filteredBrandProducts} />
+                  )}
+                </div>
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -85,26 +200,32 @@ const CatalogRootPage: React.FC = () => {
 
         <h1 className={styles['title']}>Каталог</h1>
         <p className={styles['lead']}>
-          Выберите раздел — откроется сетка товаров с фильтрами.
+          Разделы приходят с сервера. Выберите категорию — откроется список
+          товаров.
         </p>
 
+        {categoriesLoading && <p className={styles['lead']}>Загрузка разделов…</p>}
+        {categoriesError && (
+          <p className={styles['lead']} role="alert">
+            {categoriesError}
+          </p>
+        )}
+        {!categoriesLoading && !categoriesError && categories.length === 0 && (
+          <p className={styles['lead']}>На сервере пока нет категорий.</p>
+        )}
+
         <ul className={styles['grid']}>
-          {CATALOG_CATEGORIES.map((cat) => {
-            const count = getProductsForCategory(cat.slug).length;
-            return (
-              <li key={cat.slug}>
-                <Link
-                  to={`/catalog/${cat.slug}`}
-                  className={styles['card']}
-                >
-                  <span className={styles['cardTitle']}>{cat.name}</span>
-                  <span className={styles['cardMeta']}>
-                    {count} товаров
-                  </span>
-                </Link>
-              </li>
-            );
-          })}
+          {categories.map((cat) => (
+            <li key={cat.id}>
+              <Link
+                to={`/catalog/section/${cat.id}`}
+                className={styles['card']}
+              >
+                <span className={styles['cardTitle']}>{cat.categoryName}</span>
+                <span className={styles['cardMeta']}>Смотреть товары →</span>
+              </Link>
+            </li>
+          ))}
         </ul>
       </div>
     </div>

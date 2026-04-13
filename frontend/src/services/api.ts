@@ -216,6 +216,15 @@ export interface AuthResponse {
 
 // ========== НОВЫЕ ТИПЫ ==========
 
+/** Ответ Spring Data Page (товары, категории, бренды). */
+export interface PageDto<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+}
+
 export interface Product {
   id: number;
   name: string;
@@ -223,14 +232,35 @@ export interface Product {
   sellerId: number;
   categoryId: number;
   parentId?: number | null;
+  createdAt?: string;
 }
 
-export interface ProductsResponse {
-  content: Product[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
+export type ProductsResponse = PageDto<Product>;
+
+export interface BrandDto {
+  id: number;
+  name: string;
+}
+
+export interface SizeDto {
+  id: number;
+  name: string;
+}
+
+export interface ProductCardResponse {
+  id: number;
+  productId: number;
+  brand?: BrandDto | null;
+  size?: SizeDto | null;
+  description?: string | null;
+  type?: string | null;
+  photo?: Array<Record<string, unknown>> | null;
+  isActive?: boolean | null;
+}
+
+export interface BrandRow {
+  id: number;
+  name: string;
 }
 
 export interface OrderItem {
@@ -240,8 +270,50 @@ export interface OrderItem {
 
 export interface CreateOrderRequest {
   customerId: number;
-  statusId: number;
+  statusId?: number;
   items: OrderItem[];
+}
+
+export interface OrderStatusDto {
+  id: number;
+  name: string;
+}
+
+export interface OrderItemResponseDto {
+  id: number;
+  productId: number;
+  productName?: string;
+  amount: number;
+  sellerCommission?: number;
+  netPayout?: number;
+  isOrdered?: boolean;
+  isFinalized?: boolean;
+  soldAt?: string;
+}
+
+export interface OrderResponseDto {
+  id: number;
+  customerId: number;
+  status: OrderStatusDto;
+  orderDate?: string;
+  totalAmount: number;
+  items: OrderItemResponseDto[];
+}
+
+export interface PaymentDto {
+  id: number;
+  orderItemId: number;
+  status: string;
+  createdAt: string;
+}
+
+/** Ответ GET /api/customer/dashboard (тело Map из бэкенда). */
+export interface CustomerDashboard {
+  role: string;
+  username: string;
+  message?: string;
+  status?: string;
+  redirect?: string;
 }
 
 export interface Category {
@@ -495,104 +567,222 @@ class ApiService {
     name?: string;
     page?: number;
     size?: number;
-  }): Promise<{ success: boolean; data?: ProductsResponse; error?: string }> {
+  }): Promise<{
+    success: boolean;
+    data?: ProductsResponse;
+    error?: string;
+    status?: number;
+  }> {
     try {
       const queryParams = new URLSearchParams();
-      if (filters) {
-        Object.entries(filters).forEach(([key, value]) => {
-          if (value !== undefined && value !== null) {
-            queryParams.append(key, value.toString());
-          }
-        });
-      }
-      
+      const merged = { page: 0, size: 20, ...filters };
+      Object.entries(merged).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          queryParams.append(key, value.toString());
+        }
+      });
+
       const queryString = queryParams.toString();
       const endpoint = `/api/products${queryString ? `?${queryString}` : ''}`;
-      
+
       const response = await this.request<ProductsResponse>(endpoint);
-      
+
       return {
         success: true,
-        data: response
+        data: response,
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Ошибка загрузки товаров'
+        error:
+          error instanceof Error ? error.message : 'Ошибка загрузки товаров',
+        status: (error as Error & { status?: number }).status,
       };
     }
   }
 
-  async getProductById(id: number): Promise<{ success: boolean; data?: Product; error?: string }> {
+  async getProductById(
+    id: number
+  ): Promise<{ success: boolean; data?: Product; error?: string; status?: number }> {
     try {
       const response = await this.request<Product>(`/api/products/${id}`);
       return {
         success: true,
-        data: response
+        data: response,
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Ошибка загрузки товара'
+        error:
+          error instanceof Error ? error.message : 'Ошибка загрузки товара',
+        status: (error as Error & { status?: number }).status,
+      };
+    }
+  }
+
+  async getProductCards(
+    productId: number
+  ): Promise<{
+    success: boolean;
+    data?: ProductCardResponse[];
+    error?: string;
+    status?: number;
+  }> {
+    try {
+      const response = await this.request<ProductCardResponse[]>(
+        `/api/products/${productId}/cards`
+      );
+      return { success: true, data: response };
+    } catch (error) {
+      return {
+        success: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Ошибка загрузки карточек товара',
+        status: (error as Error & { status?: number }).status,
       };
     }
   }
 
   // ========== КАТЕГОРИИ ==========
 
-  async getCategories(page: number = 0): Promise<{ success: boolean; data?: Category[]; error?: string }> {
+  async getCategories(
+    page: number = 0,
+    size: number = 50
+  ): Promise<{
+    success: boolean;
+    data?: PageDto<Category>;
+    error?: string;
+    status?: number;
+  }> {
     try {
-      const response = await this.request<any>(`/api/categories?page=${page}`);
-      
-      // API возвращает пагинированный ответ
-      const categories = response.content || response;
-      
-      return {
-        success: true,
-        data: Array.isArray(categories) ? categories : []
-      };
+      const response = await this.request<PageDto<Category>>(
+        `/api/categories?page=${page}&size=${size}`
+      );
+      return { success: true, data: response };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Ошибка загрузки категорий'
+        error:
+          error instanceof Error ? error.message : 'Ошибка загрузки категорий',
+        status: (error as Error & { status?: number }).status,
+      };
+    }
+  }
+
+  async getCategoryById(
+    id: number
+  ): Promise<{ success: boolean; data?: Category; error?: string; status?: number }> {
+    try {
+      const response = await this.request<Category>(`/api/categories/${id}`);
+      return { success: true, data: response };
+    } catch (error) {
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'Ошибка загрузки категории',
+        status: (error as Error & { status?: number }).status,
+      };
+    }
+  }
+
+  // ========== БРЕНДЫ (витрина / поиск) ==========
+
+  async getBrands(
+    page: number = 0,
+    size: number = 100
+  ): Promise<{
+    success: boolean;
+    data?: PageDto<BrandRow>;
+    error?: string;
+    status?: number;
+  }> {
+    try {
+      const response = await this.request<PageDto<BrandRow>>(
+        `/api/brands?page=${page}&size=${size}`
+      );
+      return { success: true, data: response };
+    } catch (error) {
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'Ошибка загрузки брендов',
+        status: (error as Error & { status?: number }).status,
       };
     }
   }
 
   // ========== ЗАКАЗЫ ==========
 
-  async createOrder(orderData: CreateOrderRequest): Promise<{ success: boolean; data?: any; error?: string }> {
+  async createOrder(
+    orderData: CreateOrderRequest
+  ): Promise<{ success: boolean; data?: OrderResponseDto; error?: string; status?: number }> {
     try {
-      const response = await this.request('/api/orders', {
+      const response = await this.request<OrderResponseDto>('/api/orders', {
         method: 'POST',
-        body: JSON.stringify(orderData)
+        body: JSON.stringify(orderData),
       });
-      
-      return {
-        success: true,
-        data: response
-      };
+      return { success: true, data: response };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Ошибка создания заказа'
+        error: error instanceof Error ? error.message : 'Ошибка создания заказа',
+        status: (error as Error & { status?: number }).status,
+      };
+    }
+  }
+
+  async createPaymentForOrderItem(
+    orderItemId: number
+  ): Promise<{ success: boolean; data?: PaymentDto; error?: string; status?: number }> {
+    try {
+      const data = await this.request<PaymentDto>(`/api/payments/order-item/${orderItemId}`, {
+        method: 'POST',
+      });
+      return { success: true, data };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Ошибка создания платежа',
+        status: (error as Error & { status?: number }).status,
+      };
+    }
+  }
+
+  async confirmPayment(
+    paymentId: number
+  ): Promise<{ success: boolean; data?: PaymentDto; error?: string; status?: number }> {
+    try {
+      const data = await this.request<PaymentDto>(`/api/payments/${paymentId}/confirm`, {
+        method: 'PUT',
+      });
+      return { success: true, data };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Ошибка подтверждения платежа',
+        status: (error as Error & { status?: number }).status,
       };
     }
   }
 
   // ========== ПРОФИЛЬ ==========
 
-  async getCustomerDashboard(): Promise<{ success: boolean; data?: any; error?: string }> {
+  async getCustomerDashboard(): Promise<{
+    success: boolean;
+    data?: CustomerDashboard;
+    error?: string;
+    status?: number;
+  }> {
     try {
-      const response = await this.request('/api/customer/dashboard');
-      return {
-        success: true,
-        data: response
-      };
+      const response = await this.request<CustomerDashboard>('/api/customer/dashboard');
+      return { success: true, data: response };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Ошибка загрузки данных покупателя'
+        error: error instanceof Error ? error.message : 'Ошибка загрузки данных покупателя',
+        status: (error as Error & { status?: number }).status,
       };
     }
   }

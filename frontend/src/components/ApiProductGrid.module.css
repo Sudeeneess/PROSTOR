@@ -1,0 +1,9 @@
+.api-grid-message {
+  margin: 2rem auto;
+  max-width: 36rem;
+  padding: 1rem 1.25rem;
+  text-align: center;
+  color: var(--shop-text-muted, #4b5563);
+  font-size: 1rem;
+  line-height: 1.5;
+}

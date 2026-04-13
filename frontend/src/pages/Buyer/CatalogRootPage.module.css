@@ -109,3 +109,32 @@
   font-size: 1rem;
   max-width: 36rem;
 }
+
+.meta {
+  margin: 0 0 1rem;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.body {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .body {
+    grid-template-columns: 1fr;
+  }
+}
+
+.gridWrap {
+  min-width: 0;
+}
+
+.empty {
+  margin: 1rem 0;
+  color: #555;
+  font-size: 1rem;
+}

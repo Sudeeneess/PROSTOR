@@ -88,6 +88,7 @@ const AuthPageBuyer: React.FC = () => {
           password: formData.password,
           confirmPassword: formData.confirmPassword,
           phone: formData.phone,
+          role: 'CUSTOMER',
           displayName: formData.name.trim() || undefined,
         });
 

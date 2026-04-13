@@ -2,17 +2,24 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate, useParams } from 'react-router-dom';
 import { IoCheckmark } from 'react-icons/io5';
-import { getMockProductDetail } from '../../data/mockProductDetails';
+import type { ProductDetail } from '../../data/mockProductDetails';
 import {
   CART_UPDATE_EVENT,
   getQuantityForProduct,
   readCart,
   writeCart,
 } from '../../utils/cartStorage';
-import { api } from '../../services/api';
+import { api, type Product, type ProductCardResponse } from '../../services/api';
+import {
+  firstPhotoUrlFromCard,
+  pickDisplayCard,
+} from '../../utils/catalogFromApi';
 import styles from './ProductDetailPage.module.css';
 
 const TOAST_MS = 1500;
+
+const PLACEHOLDER_DETAIL =
+  'https://placehold.co/800x1000/e8eef8/447add?text=PROSTOR';
 
 function formatPriceRub(value: number): string {
   return new Intl.NumberFormat('ru-RU', {
@@ -22,16 +29,74 @@ function formatPriceRub(value: number): string {
   }).format(value);
 }
 
+function buildDetailFromApi(
+  p: Product,
+  cards: ProductCardResponse[]
+): ProductDetail {
+  const card = pickDisplayCard(cards);
+  const photoUrls: string[] = [];
+  for (const c of cards) {
+    const u = firstPhotoUrlFromCard(c.photo);
+    if (u) photoUrls.push(u);
+  }
+  if (photoUrls.length === 0) {
+    photoUrls.push(PLACEHOLDER_DETAIL);
+  }
+  return {
+    id: p.id,
+    name: p.name,
+    price: Number(p.price),
+    description:
+      card?.description?.trim() || 'Описание уточняется у продавца.',
+    brandName: card?.brand?.name ?? '—',
+    sizeName: card?.size?.name ?? '—',
+    type: card?.type ?? '—',
+    photos: photoUrls,
+  };
+}
+
 const ProductDetailPage: React.FC = () => {
   const { id: idParam } = useParams();
   const navigate = useNavigate();
   const id = idParam ? parseInt(idParam, 10) : NaN;
 
-  const product = Number.isFinite(id) ? getMockProductDetail(id) : undefined;
+  const [product, setProduct] = useState<ProductDetail | undefined>(undefined);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const [activePhoto, setActivePhoto] = useState(0);
   const [quantity, setQuantity] = useState(0);
   const [toastVisible, setToastVisible] = useState(false);
+
+  useEffect(() => {
+    if (!Number.isFinite(id) || id < 1) {
+      setProduct(undefined);
+      setLoadError(null);
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      setLoadError(null);
+      const pr = await api.getProductById(id);
+      if (cancelled) return;
+      if (!pr.success || !pr.data) {
+        setProduct(undefined);
+        setLoadError(pr.error ?? 'Товар не найден');
+        setLoading(false);
+        return;
+      }
+      const cr = await api.getProductCards(id);
+      const cards = cr.success && cr.data ? cr.data : [];
+      if (cancelled) return;
+      setProduct(buildDetailFromApi(pr.data, cards));
+      setLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
 
   const isBuyer = (() => {
     const token = localStorage.getItem('token');
@@ -46,7 +111,7 @@ const ProductDetailPage: React.FC = () => {
 
   useEffect(() => {
     setActivePhoto(0);
-  }, [id]);
+  }, [id, product?.id]);
 
   useEffect(() => {
     if (!product) return;
@@ -137,11 +202,23 @@ const ProductDetailPage: React.FC = () => {
     // Тост только у кнопки «Добавить в корзину», не у «+»
   };
 
+  if (loading) {
+    return (
+      <div className={styles['page']}>
+        <div className={styles['inner']}>
+          <p className={styles['notFound']}>Загрузка товара…</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!product) {
     return (
       <div className={styles['page']}>
         <div className={styles['inner']}>
-          <p className={styles['notFound']}>Товар не найден.</p>
+          <p className={styles['notFound']} role="alert">
+            {loadError ?? 'Товар не найден.'}
+          </p>
           <button type="button" className={styles['back']} onClick={() => navigate('/')}>
             На главную
           </button>

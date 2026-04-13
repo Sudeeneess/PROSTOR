@@ -3,12 +3,12 @@ import React from 'react';
 import styles from './BasketProductCard.module.css';
 
 export type BasketProductCardProps = {
-  id: string;
+  id: number;
   name: string;
   price: number;
   quantity: number;
-  onQuantityChange: (id: string, newQuantity: number) => void;
-  onRemove: (id: string) => void;
+  onQuantityChange: (id: number, newQuantity: number) => void;
+  onRemove: (id: number) => void;
 };
 
 const BasketProductCard: React.FC<BasketProductCardProps> = ({
