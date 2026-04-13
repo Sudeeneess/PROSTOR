@@ -113,6 +113,12 @@ function parseLoginPayload(raw: unknown): LoginResponse | null {
   };
 }
 
+function createHttpError(status: number, message: string): Error & { status: number } {
+  const error = new Error(message) as Error & { status: number };
+  error.status = status;
+  return error;
+}
+
 export interface LoginData {
   username: string;
   password: string;
@@ -235,7 +241,11 @@ class ApiService {
 
       if (!responseText) {
         if (!response.ok) {
-          throw new Error(`Ошибка ${response.status}: Пустой ответ от сервера`);
+          const message =
+            response.status === 401
+              ? 'Неверное имя пользователя или пароль'
+              : `Ошибка ${response.status}: Пустой ответ от сервера`;
+          throw createHttpError(response.status, message);
         }
         return {} as T;
       }
@@ -251,7 +261,7 @@ class ApiService {
 
       if (!response.ok) {
         const errText = extractApiErrorMessage(data);
-        throw new Error(errText || `Ошибка ${response.status}`);
+        throw createHttpError(response.status, errText || `Ошибка ${response.status}`);
       }
 
       return data as T;
