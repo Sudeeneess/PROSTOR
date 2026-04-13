@@ -2,12 +2,6 @@ const API_BASE_URL = (
   import.meta.env.VITE_API_BASE_URL as string | undefined
 )?.replace(/\/$/, '') || 'http://localhost:8080';
 
-/**
- * Временная заглушка авторизации покупателя:
- * вместо вызовов /api/auth/login и /api/auth/register создаётся локальная сессия.
- */
-const BUYER_AUTH_STUB_ENABLED = true;
-
 /** Роль из JWT/API: ADMIN, ROLE_CUSTOMER, customer → каноническое имя для guards. */
 export function normalizeRole(role: string | undefined | null): string {
   if (role == null || String(role).trim() === '') return 'customer';
@@ -193,17 +187,6 @@ export interface Category {
 // ========== API СЕРВИС ==========
 
 class ApiService {
-  private createBuyerStubAuth(username: string): LoginResponse {
-    return {
-      token: `buyer-stub-token-${Date.now()}`,
-      type: 'Bearer',
-      username: username.trim() || 'buyer',
-      role: 'customer',
-      expiresIn: 3600,
-      redirectUrl: '/customer',
-    };
-  }
-
   /** Единая запись сессии: localStorage + sessionStorage для существующих guards. */
   persistAuth(response: LoginResponse): void {
     localStorage.setItem('token', response.token);
@@ -282,15 +265,6 @@ class ApiService {
   // ========== АУТЕНТИФИКАЦИЯ ==========
   
   async login(credentials: LoginData): Promise<AuthResponse> {
-    if (BUYER_AUTH_STUB_ENABLED) {
-      const stubAuth = this.createBuyerStubAuth(credentials.username);
-      this.persistAuth(stubAuth);
-      return {
-        success: true,
-        data: stubAuth,
-      };
-    }
-
     try {
       const raw = await this.request<unknown>('/api/auth/login', {
         method: 'POST',
@@ -324,28 +298,6 @@ class ApiService {
   }
 
   async register(userData: RegisterData): Promise<AuthResponse> {
-    if (BUYER_AUTH_STUB_ENABLED) {
-      if (userData.password !== userData.confirmPassword) {
-        return {
-          success: false,
-          error: 'Пароли не совпадают',
-        };
-      }
-      if (userData.password.length < 6) {
-        return {
-          success: false,
-          error: 'Пароль должен быть не менее 6 символов',
-        };
-      }
-
-      const stubAuth = this.createBuyerStubAuth(userData.username);
-      this.persistAuth(stubAuth);
-      return {
-        success: true,
-        data: stubAuth,
-      };
-    }
-
     try {
       if (userData.password !== userData.confirmPassword) {
         throw new Error('Пароли не совпадают');
