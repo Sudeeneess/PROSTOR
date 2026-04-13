@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './HeaderManager.module.css';
+import { api } from '../../services/api';
 
 interface HeaderProps {
   onManagementClick?: () => void;
@@ -39,18 +40,15 @@ const Header: React.FC<HeaderProps> = ({ onManagementClick, onMenuItemChange }) 
           onMenuItemChange('assembling'); // Передаем, что выбран пункт "Сборка"
         }
         break;
+      case 'guest':
+        api.logout();
+        sessionStorage.removeItem('userName');
+        window.location.replace('/');
+        break;
       default:
         break;
     }
   };
-
-  if (location.pathname === '/warehouse/auth') {
-    return (
-      <header className={styles['manager-header']}>
-        <div className={styles['manager-logo']}>prostor</div>
-      </header>
-    );
-  }
 
   return (
     <header className={styles['manager-header']}>
@@ -87,6 +85,13 @@ const Header: React.FC<HeaderProps> = ({ onManagementClick, onMenuItemChange }) 
           onClick={() => handleMenuClick('assembling')}
         >
           Сборка
+        </button>
+        <button
+          type="button"
+          className={styles['manager-menu-item']}
+          onClick={() => handleMenuClick('guest')}
+        >
+          Выйти к гостю
         </button>
       </div>
     </header>

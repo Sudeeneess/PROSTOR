@@ -7,7 +7,7 @@
 
 body {
   font-family: Arial, Helvetica, sans-serif;
-  background-color: #fafafa;
+  background-color: var(--shop-bg);
   color: #333;
   min-height: 100vh;
 }
@@ -17,7 +17,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #f5f5f5;
+  background-color: var(--shop-bg);
 }
 
 /* Центрирование */
@@ -59,7 +59,7 @@ body {
 .admin-reg-auth-form-header {
   text-align: start;
   margin-bottom: 2rem;
-  color: #0a0a0a;
+  color: var(--shop-heading);
   font-size: 1.5rem;
   font-weight: 600;
   display: flex;
@@ -79,7 +79,7 @@ body {
   max-width: 100%;
   padding: 12px;
   padding-left: 15px;
-  border: 1px solid #C0C0C0;
+  border: 1px solid var(--shop-border);
   border-radius: 20px;
   font-size: 14px;
   outline: none;
@@ -90,16 +90,16 @@ body {
 
 .admin-reg-input-field:focus,
 .admin-reg-input-select:focus {
-  border-color: #8d8d8d;
-  box-shadow: 0 0 0 2px rgba(192, 192, 192, 0.2);
+  border-color: var(--shop-primary);
+  box-shadow: 0 0 0 2px var(--shop-primary-soft);
 }
 
 /* Кнопка */
 .admin-reg-save-button {
   width: 100%;
   padding: 13px;
-  background-color: #e0e0e0;
-  color: #000000;
+  background-color: var(--shop-primary);
+  color: var(--shop-on-primary);
   border: none;
   border-radius: 20px;
   font-size: 1rem;
@@ -110,12 +110,13 @@ body {
 }
 
 .admin-reg-save-button:hover:not(:disabled) {
-  background-color: #acacac;
+  background-color: var(--shop-primary-hover);
 }
 
 .admin-reg-save-button:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
   cursor: not-allowed;
+  background-color: var(--shop-primary);
 }
 
 /* Сообщения */
@@ -169,7 +170,7 @@ body {
 .admin-reg-login-footer a {
   background: none;
   border: none;
-  color: #1f54c7;
+  color: var(--shop-primary);
   cursor: pointer;
   font-size: 0.9rem;
   text-decoration: underline;
@@ -178,7 +179,7 @@ body {
 }
 
 .admin-reg-login-footer a:hover {
-  color: #003772;
+  color: var(--shop-primary-hover);
 }
 
 /* Стили для инпута с ошибкой */
@@ -196,13 +197,13 @@ body {
 
 /* Стили для disabled состояния кнопки */
 .admin-reg-save-button:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
   cursor: not-allowed;
-  background-color: #e0e0e0;
+  background-color: var(--shop-primary);
 }
 
 .admin-reg-save-button:disabled:hover {
-  background-color: #e0e0e0;
+  background-color: var(--shop-primary);
 }
 
 /* Стили для disabled состояния ссылок */

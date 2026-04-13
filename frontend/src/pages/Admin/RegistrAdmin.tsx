@@ -7,7 +7,7 @@ const RegistrAdmin: React.FC = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    login: "",
+    username: "",
     password: "",
   });
 
@@ -40,7 +40,7 @@ const RegistrAdmin: React.FC = () => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const adminProfile = {
-        login: formData.login,
+        username: formData.username,
         password: formData.password,
       };
 
@@ -75,9 +75,9 @@ const RegistrAdmin: React.FC = () => {
           <div className={styles['admin-reg-form-container']}>
             <input
               type="text"
-              name="login"
-              placeholder="Логин"
-              value={formData.login}
+              name="username"
+              placeholder="Username"
+              value={formData.username}
               onChange={handleChange}
               className={styles['admin-reg-input-field']}
               required

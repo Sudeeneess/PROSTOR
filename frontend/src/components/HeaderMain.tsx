@@ -103,6 +103,10 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
     }
 
     switch (role) {
+      case 'guest':
+        api.logout();
+        navigate('/', { replace: true });
+        break;
       case 'seller':
         navigate('/seller/main');
         break;
@@ -428,6 +432,15 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
                 >
                   Войти как администратор
                 </div>
+                {variant === 'buyer' && (
+                  <div
+                    className={styles['hm-role-item']}
+                    role="menuitem"
+                    onClick={() => handleRoleClick('guest')}
+                  >
+                    Выйти к гостю
+                  </div>
+                )}
               </div>
             )}
           </div>

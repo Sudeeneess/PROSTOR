@@ -12,24 +12,14 @@ export function normalizeRole(role: string | undefined | null): string {
   return r;
 }
 
-/** Куда вести после успешного логина (redirectUrl от API или роль). */
-export function resolveAfterLogin(data: LoginResponse): string {
-  const url = data.redirectUrl?.trim();
-  if (url) {
-    try {
-      if (url.startsWith('http://') || url.startsWith('https://')) {
-        const u = new URL(url);
-        if (u.origin === window.location.origin) {
-          return `${u.pathname}${u.search}${u.hash}`;
-        }
-      } else if (url.startsWith('/')) {
-        return url;
-      }
-    } catch {
-      /* ignore */
-    }
-  }
-  switch (data.role) {
+/** Роль считается покупательской (витрина + личный кабинет клиента). */
+export function isBuyerPortalRole(role: string | undefined | null): boolean {
+  const r = (role ?? '').toLowerCase();
+  return r === 'customer' || r === 'user';
+}
+
+function defaultPathForRole(role: string): string {
+  switch (role) {
     case 'admin':
       return '/admin';
     case 'seller':
@@ -39,6 +29,71 @@ export function resolveAfterLogin(data: LoginResponse): string {
     default:
       return '/customer';
   }
+}
+
+/** Разрешить redirectUrl только если путь соответствует роли (иначе ловим «покупатель → /seller»). */
+function isRedirectAllowedForRole(role: string, pathnameWithQuery: string): boolean {
+  const path = pathnameWithQuery.split('#')[0] ?? pathnameWithQuery;
+  const pathname = path.split('?')[0] || path;
+  switch (role) {
+    case 'admin':
+      return pathname === '/admin' || pathname.startsWith('/admin/');
+    case 'seller':
+      return pathname.startsWith('/seller');
+    case 'warehouse_manager':
+      return pathname.startsWith('/warehouse');
+    case 'customer':
+    case 'user':
+      return (
+        pathname.startsWith('/customer') ||
+        pathname.startsWith('/profile') ||
+        pathname.startsWith('/orders') ||
+        pathname.startsWith('/basket') ||
+        pathname.startsWith('/order-formalization') ||
+        pathname.startsWith('/catalog') ||
+        pathname.startsWith('/product/')
+      );
+    default:
+      return pathname.startsWith('/customer') || pathname.startsWith('/profile');
+  }
+}
+
+/** Куда вести после успешного логина (redirectUrl от API только если безопасен для роли). */
+export function resolveAfterLogin(data: LoginResponse): string {
+  const fallback = defaultPathForRole(data.role);
+  const url = data.redirectUrl?.trim();
+  if (url) {
+    try {
+      let path = '';
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        const u = new URL(url);
+        if (u.origin === window.location.origin) {
+          path = `${u.pathname}${u.search}${u.hash}`;
+        }
+      } else if (url.startsWith('/')) {
+        path = url;
+      }
+      if (path && isRedirectAllowedForRole(data.role, path)) {
+        return path;
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+  return fallback;
+}
+
+/** Выбор роли из списка authorities (не только [0] — порядок в Spring не гарантирован). */
+function pickRoleFromAuthorities(authorities: unknown): string {
+  if (!Array.isArray(authorities)) return '';
+  const normalized = authorities
+    .filter((a): a is string => typeof a === 'string' && a.length > 0)
+    .map((a) => normalizeRole(a));
+  const priority = ['admin', 'warehouse_manager', 'seller', 'customer', 'user'];
+  for (const p of priority) {
+    if (normalized.includes(p)) return p;
+  }
+  return normalized[0] ?? '';
 }
 
 function pickToken(body: Record<string, unknown>): string | undefined {
@@ -84,11 +139,11 @@ function parseLoginPayload(raw: unknown): LoginResponse | null {
     (typeof body.username === 'string' && body.username) ||
     (typeof body.sub === 'string' && body.sub) ||
     '';
+  const roleFromField = typeof body.role === 'string' ? body.role.trim() : '';
+  const roleFromAuthorities = pickRoleFromAuthorities(body.authorities);
   const roleRaw =
-    (typeof body.role === 'string' && body.role) ||
-    (Array.isArray(body.authorities) && typeof body.authorities[0] === 'string'
-      ? (body.authorities[0] as string)
-      : '') ||
+    roleFromField ||
+    (roleFromAuthorities.trim() ? roleFromAuthorities : '') ||
     'customer';
   const type = typeof body.type === 'string' ? body.type : 'Bearer';
   const expiresIn =
@@ -130,8 +185,12 @@ export interface RegisterData {
   confirmPassword: string;
   /** 11 цифр, как ожидает бэкенд (например 79001234567). */
   phone: string;
-  /** Роль в терминах API; для покупателя — CUSTOMER. */
+  /** Роль в терминах API; для покупателя — CUSTOMER, для продавца — SELLER. */
   role?: string;
+  /** Для регистрации продавца. */
+  inn?: string;
+  /** Для регистрации продавца. */
+  companyName?: string;
   /** Локальное имя (не в JSON регистрации, только для UI). */
   displayName?: string;
 }
@@ -323,6 +382,8 @@ class ApiService {
       }
 
       const role = (userData.role ?? 'CUSTOMER').toUpperCase();
+      const innDigits = userData.inn ? userData.inn.replace(/\D/g, '') : '';
+      const companyName = userData.companyName?.trim() ?? '';
 
       const raw = await this.request<unknown>('/api/auth/register', {
         method: 'POST',
@@ -331,6 +392,8 @@ class ApiService {
           password: userData.password,
           phone: phoneDigits,
           role,
+          inn: innDigits || null,
+          companyName: companyName || null,
         }),
       });
 
@@ -371,14 +434,19 @@ class ApiService {
       if (raw) {
         const u = JSON.parse(raw) as { role?: string };
         if (u?.role != null && String(u.role).trim() !== '') {
-          return String(u.role).toLowerCase();
+          const r = String(u.role).toLowerCase();
+          // На бэкенде при отсутствии роли в БД подставляется USER — для витрины это клиент
+          if (r === 'user') return 'customer';
+          return r;
         }
       }
     } catch {
       /* ignore */
     }
     const s = sessionStorage.getItem('userRole');
-    return s ? s.toLowerCase() : null;
+    if (!s) return null;
+    const low = s.toLowerCase();
+    return low === 'user' ? 'customer' : low;
   }
 
   getCurrentUser(): { username: string; role: string } | null {

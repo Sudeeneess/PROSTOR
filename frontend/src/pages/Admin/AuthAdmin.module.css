@@ -1,19 +1,10 @@
-body {
-  font-family: Arial, Helvetica, sans-serif;
-  background-color: #f4f6f9;
-  color: #333;
-  min-height: 100vh;
-}
-
-/* Главный контейнер */
 .admin-auth-app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #f5f5f5;
+  background-color: var(--shop-bg);
 }
 
-/* Основная секция */
 .admin-auth-content-section {
   flex: 1;
   display: flex;
@@ -22,13 +13,9 @@ body {
   padding: 2rem;
 }
 
-/* Форма авторизации */
 .admin-auth-form {
   background: white;
-  padding-bottom: 1.2rem;
-  padding-top: 1.2rem;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  padding: 1.2rem 1.5rem;
   border-radius: 30px;
   width: 100%;
   max-width: 400px;
@@ -52,21 +39,19 @@ body {
 .admin-auth-form-header {
   text-align: start;
   margin-bottom: 2rem;
-  color: #0a0a0a;
+  color: var(--shop-heading);
   font-size: 1.5rem;
   font-weight: 600;
   display: flex;
   align-items: center;
 }
 
-/* Контейнер формы */
 .admin-auth-form-container {
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
-/* Поля формы */
 .admin-auth-form-field {
   margin-bottom: 1.5rem;
   width: 100%;
@@ -77,33 +62,32 @@ body {
   margin-bottom: 8px;
   font-size: 14px;
   font-weight: 600;
-  color: #1a2634;
+  color: var(--shop-text);
 }
 
 .admin-auth-input-field {
   width: 100%;
-  max-width: 100%;
-  padding: 12px;
-  padding-left: 15px;
-  border: 1px solid #C0C0C0;
+  padding: 12px 12px 12px 15px;
+  border: 1px solid var(--shop-border);
   border-radius: 20px;
   font-size: 14px;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
   box-sizing: border-box;
+  color: var(--shop-text);
+  background: var(--shop-surface);
 }
 
 .admin-auth-input-field:focus {
-  border-color: #8d8d8d;
-  box-shadow: 0 0 0 2px rgba(192, 192, 192, 0.2);
+  border-color: var(--shop-primary);
+  box-shadow: 0 0 0 2px var(--shop-primary-soft);
 }
 
-/* Кнопка */
 .admin-auth-save-button {
   width: 100%;
   padding: 13px;
-  background-color: #e0e0e0;
-  color: #000000;
+  background-color: var(--shop-primary);
+  color: var(--shop-on-primary);
   border: none;
   border-radius: 20px;
   font-size: 1rem;
@@ -114,15 +98,15 @@ body {
 }
 
 .admin-auth-save-button:hover:not(:disabled) {
-  background-color: #acacac;
+  background-color: var(--shop-primary-hover);
 }
 
 .admin-auth-save-button:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
   cursor: not-allowed;
+  background-color: var(--shop-primary);
 }
 
-/* Сообщения */
 .admin-auth-error-message {
   background-color: #ffebee;
   color: #c62828;
@@ -144,20 +128,6 @@ body {
   20%, 40%, 60%, 80% { transform: translateX(5px); }
 }
 
-.admin-auth-success-message {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-  padding: 12px 16px;
-  border-radius: 20px;
-  margin-bottom: 20px;
-  text-align: center;
-  font-size: 14px;
-  border: 1px solid #c8e6c9;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* Ссылка регистрации */
 .admin-auth-registration-link {
   text-align: center;
   margin-top: 1rem;
@@ -173,19 +143,19 @@ body {
 .admin-auth-registration-link a {
   background: none;
   border: none;
-  color: #1f54c7;
+  color: var(--shop-primary);
   cursor: pointer;
   font-size: 0.9rem;
+  font-weight: 600;
   text-decoration: underline;
   padding: 0;
   margin-left: 0.3rem;
 }
 
 .admin-auth-registration-link a:hover {
-  color: #003772;
+  color: var(--shop-primary-hover);
 }
 
-/* Стили для инпута с ошибкой */
 .admin-auth-input-field.admin-auth-error {
   border-color: #c62828;
   background-color: #ffebee;
@@ -196,33 +166,16 @@ body {
   box-shadow: 0 0 0 2px rgba(198, 40, 40, 0.2);
 }
 
-/* Стили для disabled состояния кнопки */
-.admin-auth-save-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  background-color: #e0e0e0;
-}
-
 .admin-auth-save-button:disabled:hover {
-  background-color: #e0e0e0;
+  background-color: var(--shop-primary);
 }
 
-/* Стили для disabled состояния ссылок */
-.admin-auth-registration-link a:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  color: #999;
-  text-decoration: none;
-}
-
-/* Стили для disabled состояния инпутов */
 .admin-auth-input-field:disabled {
   background-color: #f5f5f5;
   cursor: not-allowed;
   opacity: 0.7;
 }
 
-/* Стили для индикатора загрузки на кнопке */
 .admin-auth-save-button.admin-auth-loading {
   position: relative;
   color: transparent;
@@ -248,7 +201,6 @@ body {
   to { transform: rotate(360deg); }
 }
 
-/* Адаптивность для мобильных устройств */
 @media (max-width: 480px) {
   .admin-auth-content-section {
     padding: 1rem;

@@ -1,6 +1,7 @@
 .admin-prod-container {
-  padding: 30px 60px;
+  padding: 36px 64px;
   font-family: Arial, sans-serif;
+  background: var(--shop-bg);
 }
 
 .admin-prod-header {
@@ -11,15 +12,17 @@
 
 .admin-prod-header h2 {
   margin: 0;
+  font-size: 2rem;
 }
 
 .admin-prod-back-link {
-  color: #888;
+  color: var(--shop-primary);
   cursor: pointer;
+  font-weight: 600;
 }
 
 .admin-prod-tabs {
-  margin: 20px 0;
+  margin: 24px 0;
   display: flex;
   gap: 20px;
 }
@@ -28,33 +31,36 @@
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 16px;
   color: #666;
   border-bottom: 2px solid transparent;
   padding-bottom: 4px;
 }
 
 .admin-prod-tabs button.admin-prod-active {
-  color: #000;
-  border-bottom: 2px solid #000;
+  color: var(--shop-primary);
+  border-bottom: 2px solid var(--shop-primary);
 }
 
 .admin-prod-table {
   width: 100%;
   border-collapse: collapse;
-  background: #fafafa;
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(68, 122, 221, 0.1);
 }
 
 .admin-prod-table th,
 .admin-prod-table td {
-  border: 1px solid #ddd;
-  padding: 10px;
+  border: 1px solid #e6ecf7;
+  padding: 14px 12px;
   text-align: left;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .admin-prod-table th {
-  background: #f0f0f0;
+  background: #f5f8ff;
   font-weight: 600;
 }
 
@@ -70,12 +76,15 @@
 
 .admin-prod-actions button {
   border: none;
-  background: none;
+  background: var(--shop-primary);
+  color: var(--shop-on-primary);
+  border-radius: 20px;
+  padding: 10px 16px;
   cursor: pointer;
-  font-size: 14px;
-  color: #333;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .admin-prod-actions button:hover {
-  text-decoration: underline;
+  background: var(--shop-primary-hover);
 }

@@ -95,7 +95,7 @@ const Dashboard: React.FC = () => {
     const role = sessionStorage.getItem('userRole');
     
     if (!token || role !== 'warehouse_manager') {
-      navigate('/auth/warehouse', { replace: true });
+      navigate('/warehouse/auth', { replace: true });
       return;
     }
     

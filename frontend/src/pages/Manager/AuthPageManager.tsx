@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { BsPersonFill } from "react-icons/bs";
 import HeaderManager from './HeaderManager';
 import styles from './AuthPageManager.module.css'; // Тот же файл с новыми стилями
+import { api, resolveAfterLogin } from '../../services/api';
 
 const AuthPageManager: React.FC = () => {
   const navigate = useNavigate();
@@ -40,18 +41,23 @@ const AuthPageManager: React.FC = () => {
     }
 
     try {
-      console.log('Вход менеджера склада:', { username: formData.username });
-      
-      // Сохраняем данные пользователя
-      localStorage.setItem('token', 'test-token-manager');
-      sessionStorage.setItem('userName', formData.username);
-      sessionStorage.setItem('userRole', 'warehouse_manager');
-      
-      console.log('Вход успешен! Перенаправление на страницу склада');
-      
-      // Используем replace, чтобы пользователь не мог вернуться на страницу авторизации через кнопку "Назад"
-      navigate('/warehouse', { replace: true });
-      
+      const response = await api.login({
+        username: formData.username,
+        password: formData.password,
+      });
+
+      if (!response.success || !response.data) {
+        setError(response.error || 'Неверное имя пользователя или пароль');
+        return;
+      }
+
+      if (response.data.role !== 'warehouse_manager') {
+        api.logout();
+        setError('Вход доступен только для роли менеджера склада');
+        return;
+      }
+
+      navigate(resolveAfterLogin(response.data), { replace: true });
     } catch (err) {
       console.error('Ошибка:', err);
       setError('Произошла ошибка при входе');
@@ -86,7 +92,7 @@ const AuthPageManager: React.FC = () => {
                 name="username"
                 value={formData.username}
                 onChange={handleInputChange}
-                placeholder="Логин/Email"
+                placeholder="Username"
                 required
                 disabled={loading}
               />

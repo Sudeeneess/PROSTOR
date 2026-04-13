@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import HeaderManager from './HeaderManager';
 import WindWarehouseReceiving from './WindWarehouseReceiving';
 import styles from './WarehouseReceiving.module.css';
@@ -45,6 +46,7 @@ const receptionData: Record<string, { sellerName: string; products: any[] }> = {
 };
 
 const WarehouseReceiving: React.FC<WarehouseReceivingProps> = ({ onBack }) => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState<ProductItem[]>([
     {
       id: '#S-45',
@@ -81,10 +83,10 @@ const WarehouseReceiving: React.FC<WarehouseReceivingProps> = ({ onBack }) => {
     const role = sessionStorage.getItem('userRole');
     
     if (!token || role !== 'warehouse_manager') {
-      window.location.href = '/auth/warehouse';
+      navigate('/warehouse/auth', { replace: true });
       return;
     }
-  }, []);
+  }, [navigate]);
 
   const handleSelectProduct = (id: string) => {
     setProducts(prevProducts =>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import HeaderManager from './HeaderManager';
 import WindWarehouseShipment from './WindWarehouseShipment';
 import styles from './WarehouseShipment.module.css';
@@ -23,6 +24,7 @@ interface WarehouseShipmentProps {
 }
 
 const WarehouseShipment: React.FC<WarehouseShipmentProps> = ({ onBack }) => {
+  const navigate = useNavigate();
   const [userName, setUserName] = useState<string>('И. И. Иванов');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [isWindowOpen, setIsWindowOpen] = useState<boolean>(false);
@@ -38,7 +40,7 @@ const WarehouseShipment: React.FC<WarehouseShipmentProps> = ({ onBack }) => {
     const role = sessionStorage.getItem('userRole');
     
     if (!token || role !== 'warehouse_manager') {
-      window.location.href = '/auth/warehouse';
+      navigate('/warehouse/auth', { replace: true });
       return;
     }
     
@@ -46,7 +48,7 @@ const WarehouseShipment: React.FC<WarehouseShipmentProps> = ({ onBack }) => {
     if (storedUserName) {
       setUserName(storedUserName);
     }
-  }, []);
+  }, [navigate]);
 
   const handleBack = () => {
     onBack();

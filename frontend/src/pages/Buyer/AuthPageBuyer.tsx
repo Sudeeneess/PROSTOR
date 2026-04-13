@@ -4,7 +4,7 @@ import InputMask from 'react-input-mask';
 import { BsPersonFill } from 'react-icons/bs';
 import HeaderMain from '../../components/HeaderMain';
 import styles from './AuthPageBuyer.module.css';
-import { api, resolveAfterLogin } from '../../services/api';
+import { api, isBuyerPortalRole } from '../../services/api';
 
 function persistRegistrationPhone(phoneMasked: string) {
   const digits = phoneMasked.replace(/\D/g, '');
@@ -48,6 +48,14 @@ const AuthPageBuyer: React.FC = () => {
         });
 
         if (response.success && response.data) {
+          if (!isBuyerPortalRole(response.data.role)) {
+            api.logout();
+            setError(
+              'Этот логин относится к другой роли (продавец, склад или администратор). Войдите через соответствующий раздел на главной странице.'
+            );
+            setLoading(false);
+            return;
+          }
           if (formData.name.trim()) {
             localStorage.setItem('userName', formData.name.trim());
             const nameParts = formData.name.trim().split(/\s+/);
@@ -59,7 +67,7 @@ const AuthPageBuyer: React.FC = () => {
               localStorage.removeItem('userLastName');
             }
           }
-          navigate(resolveAfterLogin(response.data), { replace: true });
+          navigate('/customer', { replace: true });
         } else {
           setError(response.error || 'Неверное имя пользователя или пароль');
         }
@@ -104,11 +112,19 @@ const AuthPageBuyer: React.FC = () => {
         }
 
         if (response.data) {
+          if (!isBuyerPortalRole(response.data.role)) {
+            api.logout();
+            setError(
+              'Этот логин относится к другой роли (продавец, склад или администратор). Войдите через соответствующий раздел на главной странице.'
+            );
+            setLoading(false);
+            return;
+          }
           if (formData.name.trim()) {
             localStorage.setItem('userName', formData.name.trim());
           }
           persistRegistrationPhone(formData.phone);
-          navigate(resolveAfterLogin(response.data), { replace: true });
+          navigate('/customer', { replace: true });
         }
       }
     } catch (err) {

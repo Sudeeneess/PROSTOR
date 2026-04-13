@@ -1,30 +1,31 @@
-/* Единый стиль с Header / HeaderBuyer */
 .manager-header {
-  background: #c0c0c0;
+  background: var(--shop-header-bg);
   padding: 0.5rem 2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 14px rgba(68, 122, 221, 0.28);
   gap: 20px;
 }
 
 .manager-logo {
   font-size: 36px;
-  font-weight: 775;
-  color: #000000;
+  font-weight: 800;
+  color: #ffffff;
   text-transform: uppercase;
   display: flex;
   align-items: baseline;
   gap: 10px;
   white-space: nowrap;
+  letter-spacing: 0.02em;
 }
 
 .manager-badge {
-  font-size: 14px;
-  font-weight: 600;
-  color: #333333;
+  font-size: 26px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
   text-transform: none;
+  letter-spacing: 0.03em;
 }
 
 .manager-menu {
@@ -35,22 +36,28 @@
 }
 
 .manager-menu-item {
-  background: none;
+  background: transparent;
   border: none;
   font-size: 15px;
-  font-weight: 600;
-  color: #111;
+  font-weight: 500;
+  color: #ffffff;
   cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 8px;
-  transition: background-color 0.2s ease;
+  padding: 10px 18px;
+  border-radius: 999px;
+  transition:
+    background 0.2s ease,
+    transform 0.15s ease;
   font-family: inherit;
 }
 
 .manager-menu-item:hover {
-  background-color: rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.18);
 }
 
-.manager-menu-item.active {
-  background-color: rgba(0, 0, 0, 0.08);
+.active {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.manager-menu-item:active {
+  transform: scale(0.98);
 }

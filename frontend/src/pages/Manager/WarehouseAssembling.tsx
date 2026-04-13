@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import HeaderManager from './HeaderManager';
 import WindWarehouseAssembling from './WindWarehouseAssembling';
 import styles from './WarehouseAssembling.module.css';
@@ -8,6 +9,7 @@ interface WarehouseAssemblingProps {
 }
 
 const WarehouseAssembling: React.FC<WarehouseAssemblingProps> = ({ onBack }) => {
+  const navigate = useNavigate();
   const [isWindowOpen, setIsWindowOpen] = useState(false);
 
   useEffect(() => {
@@ -15,10 +17,10 @@ const WarehouseAssembling: React.FC<WarehouseAssemblingProps> = ({ onBack }) => 
     const role = sessionStorage.getItem('userRole');
     
     if (!token || role !== 'warehouse_manager') {
-      window.location.href = '/auth/warehouse';
+      navigate('/warehouse/auth', { replace: true });
       return;
     }
-  }, []);
+  }, [navigate]);
 
   const handleBack = () => {
     onBack(); // Вызываем callback

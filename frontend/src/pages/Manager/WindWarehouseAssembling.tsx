@@ -42,8 +42,8 @@ const WindWarehouseAssembling: React.FC<WindWarehouseAssemblingProps> = ({
     }
   };
 
-  const handleCompleteAcceptance = () => {
-    console.log('Приемка завершена');
+  const handleCompleteAssembly = () => {
+    console.log('Сборка завершена');
     onClose();
   };
 
@@ -93,9 +93,9 @@ const WindWarehouseAssembling: React.FC<WindWarehouseAssemblingProps> = ({
           <div className={styles['wind-warehouse-assembling-actions']}>
             <button 
               className={styles['wind-warehouse-assembling-complete-btn']}
-              onClick={handleCompleteAcceptance}
+              onClick={handleCompleteAssembly}
             >
-              Завершить приемку
+              Завершить сборку
             </button>
             <button 
               className={styles['wind-warehouse-assembling-draft-btn']}

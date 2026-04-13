@@ -1,6 +1,6 @@
 .warehouse-receiving-wrapper {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: var(--shop-bg);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -14,9 +14,9 @@
 
 .warehouse-receiving-container {
   background-color: white;
-  border-radius: 8px;
-  padding: 24px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 10px 24px rgba(68, 122, 221, 0.1);
 }
 
 .warehouse-receiving-header {
@@ -34,7 +34,7 @@
   font-size: 14px;
   font-weight: 500;
   padding: 8px 12px;
-  border-radius: 4px;
+  border-radius: 12px;
   transition: all 0.2s;
   order: 2;
 }
@@ -70,19 +70,19 @@
 }
 
 .warehouse-receiving-table th {
-  padding: 12px 16px;
+  padding: 15px 18px;
   text-align: left;
   font-weight: 700;
   color: #2c3e50;
-  font-size: 14px;
+  font-size: 16px;
   letter-spacing: 0.3px;
 }
 
 .warehouse-receiving-table td {
-  padding: 12px 16px;
+  padding: 15px 18px;
   border-bottom: 1px solid #ddd;
   color: #2c3e50;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
 }
 
@@ -98,8 +98,8 @@
 
 /* Стили для чекбокса - такие же как в WarehouseShipment */
 .warehouse-receiving-checkbox {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   cursor: pointer;
   accent-color: #808080;
 }
@@ -111,9 +111,9 @@
 
 .warehouse-receiving-status-badge {
   display: inline-block;
-  padding: 4px 12px;
+  padding: 6px 14px;
   border-radius: 12px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
 }
 
@@ -144,7 +144,7 @@
 .warehouse-receiving-action-button {
   padding: 10px 20px;
   border: none;
-  border-radius: 6px;
+  border-radius: 20px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -157,30 +157,30 @@
 }
 
 .warehouse-receiving-accept-button {
-  background-color: #6c757d;
-  color: white;
+  background-color: var(--shop-primary);
+  color: var(--shop-on-primary);
 }
 
 .warehouse-receiving-accept-button:hover {
-  background-color: #5a6268;
+  background-color: var(--shop-primary-hover);
 }
 
 .warehouse-receiving-download-button {
-  background-color: #6c757d;
-  color: white;
+  background-color: var(--shop-primary);
+  color: var(--shop-on-primary);
 }
 
 .warehouse-receiving-download-button:hover {
-  background-color: #5a6268;
+  background-color: var(--shop-primary-hover);
 }
 
 .warehouse-receiving-export-button {
-  background-color: #6c757d;
-  color: white;
+  background-color: var(--shop-primary);
+  color: var(--shop-on-primary);
 }
 
 .warehouse-receiving-export-button:hover {
-  background-color: #5a6268;
+  background-color: var(--shop-primary-hover);
 }
 
 /* Responsive design */
