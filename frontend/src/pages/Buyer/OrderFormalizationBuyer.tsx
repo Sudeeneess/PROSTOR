@@ -50,13 +50,24 @@ interface LocalOrder {
 
 const PICKUP_ADDRESS = 'г. Новосибирск, Улица Блюхера 28';
 
-function parseCustomerId(value: unknown): number {
-  if (typeof value === 'number' && Number.isFinite(value)) return value;
-  if (typeof value === 'string' && value.trim() !== '') {
-    const n = Number.parseInt(value, 10);
-    if (Number.isFinite(n)) return n;
+function parseCustomerIdValue(value: unknown): number | null {
+  if (typeof value === 'number' && Number.isFinite(value) && Number.isInteger(value) && value > 0) {
+    return value;
   }
-  return Number.NaN;
+  if (typeof value === 'string' && value.trim() !== '') {
+    const n = Number.parseInt(value.trim(), 10);
+    if (Number.isFinite(n) && n > 0) return n;
+  }
+  return null;
+}
+
+/** Сначала id из логина (localStorage), иначе GET /api/customer/dashboard. */
+async function resolveCustomerId(): Promise<number | null> {
+  const fromLogin = api.getStoredCustomerId();
+  if (fromLogin != null) return fromLogin;
+  const dash = await api.getCustomerDashboard();
+  if (!dash.success || !dash.data) return null;
+  return parseCustomerIdValue(dash.data.customerId);
 }
 
 // Функция для получения только цифр из номера
@@ -196,17 +207,10 @@ const OrderFormalizationBuyer: React.FC = () => {
         return;
       }
 
-      const dash = await api.getCustomerDashboard();
-      if (!dash.success || !dash.data) {
+      const customerId = await resolveCustomerId();
+      if (customerId == null) {
         throw new Error(
-          dash.error || 'Не удалось открыть панель покупателя. Войдите заново.'
-        );
-      }
-
-      const customerId = parseCustomerId(dash.data.customerId);
-      if (!Number.isFinite(customerId) || customerId <= 0) {
-        throw new Error(
-          'В ответе GET /api/customer/dashboard нет корректного customerId. Проверьте профиль покупателя в БД.'
+          'Не удалось получить id покупателя: в ответе логина нет customerId (как сейчас у API), а эндпоинт дашборда тоже не вернул его. Нужна правка бэкенда (отдавать customerId в POST /api/auth/login и/или в GET /api/customer/dashboard) и запись покупателя в БД для этого пользователя.'
         );
       }
 

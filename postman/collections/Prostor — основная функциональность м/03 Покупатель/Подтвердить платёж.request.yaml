@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{baseUrl}}/api/payments/{{paymentId}}/confirm"
+method: PUT
+headers:
+  Authorization: Bearer {{customerToken}}
+scripts:
+  - type: afterResponse
+    code: pm.test('Ответ получен', () => pm.response.code !== 0);
+    language: text/javascript
+order: 8000

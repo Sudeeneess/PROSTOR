@@ -1,0 +1,12 @@
+$kind: http-request
+name: Заказ — подтвердить (резерв на складе)
+description: Только для заказа в статусе PENDING и при наличии остатков на складе.
+url: "{{baseUrl}}/api/orders/{{orderId}}/confirm"
+method: PUT
+headers:
+  Authorization: Bearer {{managerToken}}
+scripts:
+  - type: afterResponse
+    code: pm.test('Ответ получен', () => pm.response.code !== 0);
+    language: text/javascript
+order: 5000

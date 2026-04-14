@@ -54,7 +54,7 @@ const CatalogRootPage: React.FC = () => {
     (async () => {
       setCategoriesLoading(true);
       setCategoriesError(null);
-      const res = await api.getCategories(0, 100);
+      const res = await api.getCategoriesListForUi();
       if (cancelled) return;
       if (!res.success || !res.data?.content) {
         setCategoriesError(res.error ?? 'Не удалось загрузить разделы');

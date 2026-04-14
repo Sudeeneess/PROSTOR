@@ -2,6 +2,10 @@
 workspace:
   id: bea3039e-2522-438b-880a-3875c67b03db
 
+cloudResources:
+  collections:
+    ..\postman\collections\Prostor — основная функциональность м: 62d806df-3328-4b41-84e0-cae29703c671
+
 # All resources in the `postman/` folder are automatically registered in Local View.
 # Point to additional files outside the `postman/` folder to register them individually. Example:
 #localResources:

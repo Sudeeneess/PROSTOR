@@ -163,7 +163,7 @@ const AuthPageBuyer: React.FC = () => {
 
   return (
     <div className={styles['buyer-auth-page']}>
-      <HeaderMain variant="buyer" />
+      <HeaderMain variant="landing" />
       <div className={styles['buyer-auth-container']}>
         <div className={styles['buyer-auth-card']}>
           <h2 className={styles['buyer-auth-title']}>

@@ -36,7 +36,7 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const catRes = await api.getCategories(0, 80);
+      const catRes = await api.getCategoriesListForUi();
       const brRes = await api.getBrands(0, 120);
       if (cancelled) return;
       if (catRes.success && catRes.data?.content?.length) {
@@ -141,7 +141,7 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
     switch (role) {
       case 'guest':
         api.logout();
-        navigate('/', { replace: true });
+        window.location.replace('/');
         break;
       case 'seller':
         navigate('/seller/main');

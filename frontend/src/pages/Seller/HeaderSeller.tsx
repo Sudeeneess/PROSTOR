@@ -16,8 +16,7 @@ const HeaderSeller: React.FC = () => {
 
   const handleGuestHomeClick = () => {
     api.logout();
-    localStorage.removeItem("sellerProfile");
-    navigate("/", { replace: true });
+    window.location.replace("/");
   };
 
   return (

@@ -1,0 +1,25 @@
+$kind: http-request
+url: "{{baseUrl}}/api/auth/register"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "{{regSellerName}}",
+      "password": "pass12345",
+      "phone": "79007654321",
+      "role": "SELLER",
+      "inn": "1234567890",
+      "companyName": "ООО Postman Test"
+    }
+scripts:
+  - type: afterResponse
+    code: pm.test('201 или 400', () => pm.expect([201,
+      400]).to.include(pm.response.code));
+    language: text/javascript
+  - type: beforeRequest
+    code: pm.environment.set('regSellerName', 'pm_s_' + Date.now());
+    language: text/javascript
+order: 2000

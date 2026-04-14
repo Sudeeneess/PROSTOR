@@ -1,0 +1,31 @@
+$kind: http-request
+description: Переменные `customerId` и `productId` в окружении (после папки 01
+  для productId). Сумма `amount` подберите под цену товара при необходимости.
+url: "{{baseUrl}}/api/orders"
+method: POST
+headers:
+  Authorization: Bearer {{customerToken}}
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "customerId": {{customerId}},
+      "items": [
+        { "productId": {{productId}}, "amount": 1500.0 }
+      ]
+    }
+scripts:
+  - type: afterResponse
+    code: >-
+      if (pm.response.code === 201) {
+        const j = pm.response.json();
+        if (j.id != null) pm.environment.set('orderId', String(j.id));
+        if (j.items && j.items[0] && j.items[0].id != null)
+          pm.environment.set('orderItemId', String(j.items[0].id));
+      }
+
+      pm.test('Создан или ошибка валидации', () => pm.expect([201, 400,
+      404]).to.include(pm.response.code));
+    language: text/javascript
+order: 4000

@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import HeaderSeller from './HeaderSeller';
 import styles from './ProductSeller.module.css';
-import { CATALOG_CATEGORIES, findCategoryBySlug } from '../../data/categories';
+import { api, type Category, type Product, type ProductRequest } from '../../services/api';
 
 export interface SellerProductRow {
   id: number;
@@ -10,38 +10,29 @@ export interface SellerProductRow {
   sku: string;
   price: string;
   quantity: number;
-  /** slug категории — как в справочнике / product.category_id → категория */
-  categorySlug: string;
-  /** URL фото (в БД — путь или ссылка на медиа) */
+  /** id категории с сервера (GET /api/categories) */
+  categoryId: number;
+  sellerId: number;
   imageUrl: string;
   selected: boolean;
 }
 
-function categoryLabel(slug: string): string {
-  return findCategoryBySlug(slug)?.name ?? slug;
-}
-
-function normalizeLoadedProduct(raw: Record<string, unknown>, id: number): SellerProductRow {
+function productToRow(p: Product): SellerProductRow {
   return {
-    id,
-    name: String(raw.name ?? ''),
-    description: String(raw.description ?? ''),
-    sku: String(raw.sku ?? ''),
-    price: String(raw.price ?? '0'),
-    quantity:
-      typeof raw.quantity === 'number'
-        ? raw.quantity
-        : Number(raw.quantity) || 0,
-    categorySlug:
-      typeof raw.categorySlug === 'string' && raw.categorySlug
-        ? raw.categorySlug
-        : CATALOG_CATEGORIES[0]?.slug ?? 'other',
-    imageUrl: String(raw.imageUrl ?? ''),
-    selected: Boolean(raw.selected),
+    id: p.id,
+    name: p.name,
+    description: '',
+    sku: '',
+    price: String(p.price),
+    quantity: 0,
+    categoryId: p.categoryId,
+    sellerId: p.sellerId,
+    imageUrl: '',
+    selected: false,
   };
 }
 
-function createEmptyDraft(): SellerProductRow {
+function createEmptyDraft(defaultCategoryId: number, sellerId: number): SellerProductRow {
   return {
     id: 0,
     name: '',
@@ -49,7 +40,8 @@ function createEmptyDraft(): SellerProductRow {
     sku: '',
     price: '0',
     quantity: 0,
-    categorySlug: CATALOG_CATEGORIES[0]?.slug ?? 'other',
+    categoryId: defaultCategoryId,
+    sellerId,
     imageUrl: '',
     selected: false,
   };
@@ -57,95 +49,53 @@ function createEmptyDraft(): SellerProductRow {
 
 const ProductSeller: React.FC = () => {
   const [products, setProducts] = useState<SellerProductRow[]>([]);
+  const [apiCategories, setApiCategories] = useState<Category[]>([]);
+  const [listError, setListError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
   const [filterName, setFilterName] = useState('');
   const [filterSku, setFilterSku] = useState('');
   const [filterPrice, setFilterPrice] = useState('');
-  const [filterCategory, setFilterCategory] = useState('');
+  const [filterCategoryId, setFilterCategoryId] = useState<number | ''>('');
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('edit');
   const [draft, setDraft] = useState<SellerProductRow | null>(null);
+  const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    loadProducts();
+  const defaultCategoryId = apiCategories[0]?.id ?? 1;
+  const fallbackSellerId = products[0]?.sellerId ?? 1;
+
+  const loadProducts = useCallback(async () => {
+    setLoading(true);
+    setListError(null);
+
+    const catRes = await api.getCategoriesListForUi();
+    const cats =
+      catRes.success && catRes.data?.content?.length ? catRes.data.content : [];
+    setApiCategories(cats);
+
+    const res = await api.getSellerProducts(0, 100);
+    if (!res.success) {
+      setProducts([]);
+      setListError(res.error ?? 'Не удалось загрузить товары');
+      setLoading(false);
+      return;
+    }
+    const rows = (res.data?.content ?? []).map(productToRow);
+    setProducts(rows);
+    setLoading(false);
   }, []);
 
-  const loadProducts = () => {
-    const saved = localStorage.getItem('sellerProducts');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved) as Record<string, unknown>[];
-        let next = parsed.map((row, i) => {
-          const rawId = row.id;
-          const id =
-            typeof rawId === 'number'
-              ? rawId
-              : Number(rawId) > 0
-                ? Number(rawId)
-                : i + 1;
-          return normalizeLoadedProduct(row, id);
-        });
-        const photosRaw = localStorage.getItem('sellerProductPhotos');
-        if (photosRaw) {
-          try {
-            const photos = JSON.parse(photosRaw) as Record<string, string>;
-            next = next.map((p) => ({
-              ...p,
-              imageUrl:
-                p.imageUrl ||
-                photos[String(p.id)] ||
-                '',
-            }));
-          } catch {
-            /* ignore */
-          }
-        }
-        setProducts(next);
-        saveToLocalStorage(next);
-        return;
-      } catch {
-        /* fallback */
-      }
-    }
-    const initial: SellerProductRow[] = [
-      {
-        id: 1,
-        name: 'Товар 1',
-        description: 'Описание товара 1',
-        sku: 'SKU001',
-        price: '1000',
-        quantity: 12,
-        categorySlug: 'tops',
-        imageUrl: 'https://picsum.photos/seed/seller-p1/80/80',
-        selected: false,
-      },
-      {
-        id: 2,
-        name: 'Товар 2',
-        description: 'Описание товара 2',
-        sku: 'SKU002',
-        price: '2000',
-        quantity: 5,
-        categorySlug: 'shoes',
-        imageUrl: 'https://picsum.photos/seed/seller-p2/80/80',
-        selected: false,
-      },
-    ];
-    setProducts(initial);
-    saveToLocalStorage(initial);
-  };
+  useEffect(() => {
+    void loadProducts();
+  }, [loadProducts]);
 
-  const saveToLocalStorage = (list: SellerProductRow[]) => {
-    if (list.length > 0) {
-      localStorage.setItem('sellerProducts', JSON.stringify(list));
-    } else {
-      localStorage.removeItem('sellerProducts');
-    }
-  };
+  const categoryLabel = (categoryId: number) =>
+    apiCategories.find((c) => c.id === categoryId)?.categoryName ?? `id ${categoryId}`;
 
   const updateProducts = (list: SellerProductRow[]) => {
     setProducts(list);
-    saveToLocalStorage(list);
   };
 
   const filteredProducts = useMemo(() => {
@@ -156,10 +106,10 @@ const ProductSeller: React.FC = () => {
       if (nameQ && !p.name.toLowerCase().includes(nameQ)) return false;
       if (skuQ && !p.sku.toLowerCase().includes(skuQ)) return false;
       if (priceQ && !String(p.price).includes(priceQ)) return false;
-      if (filterCategory && p.categorySlug !== filterCategory) return false;
+      if (filterCategoryId !== '' && p.categoryId !== filterCategoryId) return false;
       return true;
     });
-  }, [products, filterName, filterSku, filterPrice, filterCategory]);
+  }, [products, filterName, filterSku, filterPrice, filterCategoryId]);
 
   const toggleSelect = (id: number) => {
     updateProducts(
@@ -177,14 +127,27 @@ const ProductSeller: React.FC = () => {
   };
 
   const openAddModal = () => {
+    if (!apiCategories.length) {
+      window.alert('Сначала должны загрузиться категории с сервера. Проверьте бэкенд.');
+      return;
+    }
     setModalMode('add');
-    setDraft(createEmptyDraft());
+    setDraft(createEmptyDraft(defaultCategoryId, fallbackSellerId));
     setModalOpen(true);
   };
 
-  const deleteSelected = () => {
-    const remaining = products.filter((p) => !p.selected);
-    updateProducts(remaining);
+  const deleteSelected = async () => {
+    const toDelete = products.filter((p) => p.selected);
+    if (!toDelete.length) return;
+    if (!window.confirm(`Удалить выбранные товары (${toDelete.length})?`)) return;
+    for (const p of toDelete) {
+      const res = await api.deleteSellerProduct(p.id);
+      if (!res.success) {
+        window.alert(res.error ?? 'Ошибка удаления');
+        break;
+      }
+    }
+    await loadProducts();
   };
 
   const openEditModal = () => {
@@ -200,25 +163,45 @@ const ProductSeller: React.FC = () => {
     setDraft(null);
   };
 
-  const saveModal = () => {
+  const saveModal = async () => {
     if (!draft) return;
-    if (modalMode === 'add') {
-      const newId =
-        products.length > 0 ? Math.max(...products.map((p) => p.id)) + 1 : 1;
-      const row: SellerProductRow = {
-        ...draft,
-        id: newId,
-        selected: false,
-      };
-      updateProducts([...products, row]);
-    } else {
-      updateProducts(
-        products.map((p) =>
-          p.id === draft.id ? { ...draft, selected: p.selected } : p
-        )
-      );
+    const price = Number(String(draft.price).replace(',', '.'));
+    if (!draft.name.trim()) {
+      window.alert('Укажите название товара');
+      return;
     }
-    closeModal();
+    if (!Number.isFinite(price) || price <= 0) {
+      window.alert('Укажите цену больше нуля');
+      return;
+    }
+
+    const body: ProductRequest = {
+      name: draft.name.trim(),
+      price,
+      sellerId: draft.sellerId,
+      categoryId: draft.categoryId,
+    };
+
+    setSaving(true);
+    try {
+      if (modalMode === 'add') {
+        const res = await api.createSellerProduct(body);
+        if (!res.success) {
+          window.alert(res.error ?? 'Не удалось создать товар');
+          return;
+        }
+      } else {
+        const res = await api.updateSellerProduct(draft.id, body);
+        if (!res.success) {
+          window.alert(res.error ?? 'Не удалось сохранить товар');
+          return;
+        }
+      }
+      closeModal();
+      await loadProducts();
+    } finally {
+      setSaving(false);
+    }
   };
 
   const updateDraft = (patch: Partial<SellerProductRow>) => {
@@ -236,43 +219,46 @@ const ProductSeller: React.FC = () => {
             <div className={styles['seller-prod-filters-block']}>
               <p className={styles['seller-prod-filters-label']}>Фильтры</p>
               <div className={styles['seller-prod-filters']} role="search">
-              <input
-                type="search"
-                className={styles['seller-prod-filter-input']}
-                placeholder="Название"
-                value={filterName}
-                onChange={(e) => setFilterName(e.target.value)}
-                aria-label="Фильтр по названию"
-              />
-              <input
-                type="search"
-                className={styles['seller-prod-filter-input']}
-                placeholder="Артикул"
-                value={filterSku}
-                onChange={(e) => setFilterSku(e.target.value)}
-                aria-label="Фильтр по артикулу"
-              />
-              <input
-                type="search"
-                className={styles['seller-prod-filter-input']}
-                placeholder="Цена"
-                value={filterPrice}
-                onChange={(e) => setFilterPrice(e.target.value)}
-                aria-label="Фильтр по цене"
-              />
-              <select
-                className={styles['seller-prod-filter-select']}
-                value={filterCategory}
-                onChange={(e) => setFilterCategory(e.target.value)}
-                aria-label="Фильтр по категории"
-              >
-                <option value="">Все категории</option>
-                {CATALOG_CATEGORIES.map((c) => (
-                  <option key={c.slug} value={c.slug}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+                <input
+                  type="search"
+                  className={styles['seller-prod-filter-input']}
+                  placeholder="Название"
+                  value={filterName}
+                  onChange={(e) => setFilterName(e.target.value)}
+                  aria-label="Фильтр по названию"
+                />
+                <input
+                  type="search"
+                  className={styles['seller-prod-filter-input']}
+                  placeholder="Артикул"
+                  value={filterSku}
+                  onChange={(e) => setFilterSku(e.target.value)}
+                  aria-label="Фильтр по артикулу"
+                />
+                <input
+                  type="search"
+                  className={styles['seller-prod-filter-input']}
+                  placeholder="Цена"
+                  value={filterPrice}
+                  onChange={(e) => setFilterPrice(e.target.value)}
+                  aria-label="Фильтр по цене"
+                />
+                <select
+                  className={styles['seller-prod-filter-select']}
+                  value={filterCategoryId === '' ? '' : String(filterCategoryId)}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setFilterCategoryId(v === '' ? '' : Number(v));
+                  }}
+                  aria-label="Фильтр по категории"
+                >
+                  <option value="">Все категории</option>
+                  {apiCategories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.categoryName}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
           </div>
@@ -295,7 +281,7 @@ const ProductSeller: React.FC = () => {
             <button
               type="button"
               className={styles['seller-prod-tool-btn']}
-              onClick={deleteSelected}
+              onClick={() => void deleteSelected()}
             >
               Удалить выбранные
             </button>
@@ -303,15 +289,23 @@ const ProductSeller: React.FC = () => {
               type="button"
               className={styles['seller-prod-add-btn']}
               onClick={openAddModal}
+              disabled={loading}
             >
               + Добавить товар
             </button>
           </div>
         </div>
 
-        {products.length === 0 ? (
+        {loading && <p className={styles['seller-prod-empty-state']}>Загрузка…</p>}
+        {listError && !loading && (
+          <p className={styles['seller-prod-empty-state']} role="alert">
+            {listError}
+          </p>
+        )}
+
+        {!loading && !listError && products.length === 0 ? (
           <div className={styles['seller-prod-empty-state']}>
-            <p>У вас пока нет товаров</p>
+            <p>У вас пока нет товаров на сервере</p>
             <button
               type="button"
               onClick={openAddModal}
@@ -320,7 +314,7 @@ const ProductSeller: React.FC = () => {
               Добавить первый товар
             </button>
           </div>
-        ) : filteredProducts.length === 0 ? (
+        ) : !loading && !listError && filteredProducts.length === 0 ? (
           <div className={styles['seller-prod-empty-state']}>
             <p>Нет товаров по текущим фильтрам</p>
             <button
@@ -330,13 +324,13 @@ const ProductSeller: React.FC = () => {
                 setFilterName('');
                 setFilterSku('');
                 setFilterPrice('');
-                setFilterCategory('');
+                setFilterCategoryId('');
               }}
             >
               Сбросить фильтры
             </button>
           </div>
-        ) : (
+        ) : !loading && !listError ? (
           <div className={styles['seller-prod-table']}>
             <div className={styles['seller-prod-table-header']}>
               <span className={styles['seller-prod-col-photo']}>Фото</span>
@@ -399,7 +393,7 @@ const ProductSeller: React.FC = () => {
                 />
                 <input
                   type="text"
-                  value={categoryLabel(product.categorySlug)}
+                  value={categoryLabel(product.categoryId)}
                   readOnly
                   className={styles['seller-prod-readonly-input']}
                 />
@@ -413,7 +407,7 @@ const ProductSeller: React.FC = () => {
               </div>
             ))}
           </div>
-        )}
+        ) : null}
       </div>
 
       {modalOpen && draft && (
@@ -427,14 +421,14 @@ const ProductSeller: React.FC = () => {
 
             <div className={styles['seller-prod-edit-form']}>
               <div className={styles['seller-prod-form-group']}>
-                <label htmlFor="sp-photo-url">Фото (URL)</label>
+                <label htmlFor="sp-photo-url">Фото (URL, только в таблице на экране)</label>
                 <input
                   id="sp-photo-url"
                   type="url"
                   value={draft.imageUrl}
                   onChange={(e) => updateDraft({ imageUrl: e.target.value })}
                   className={styles['seller-prod-edit-input']}
-                  placeholder="https://…"
+                  placeholder="https://..."
                 />
                 <div
                   className={
@@ -465,7 +459,7 @@ const ProductSeller: React.FC = () => {
               </div>
 
               <div className={styles['seller-prod-form-group']}>
-                <label htmlFor="sp-desc">Описание</label>
+                <label htmlFor="sp-desc">Описание (не уходит в API)</label>
                 <textarea
                   id="sp-desc"
                   value={draft.description}
@@ -476,7 +470,7 @@ const ProductSeller: React.FC = () => {
               </div>
 
               <div className={styles['seller-prod-form-group']}>
-                <label htmlFor="sp-sku">Артикул</label>
+                <label htmlFor="sp-sku">Артикул (не уходит в API)</label>
                 <input
                   id="sp-sku"
                   type="text"
@@ -487,7 +481,7 @@ const ProductSeller: React.FC = () => {
               </div>
 
               <div className={styles['seller-prod-form-group']}>
-                <label htmlFor="sp-price">Цена (₽)</label>
+                <label htmlFor="sp-price">Цена (руб.)</label>
                 <input
                   id="sp-price"
                   type="number"
@@ -499,7 +493,7 @@ const ProductSeller: React.FC = () => {
               </div>
 
               <div className={styles['seller-prod-form-group']}>
-                <label htmlFor="sp-qty">Количество на складе</label>
+                <label htmlFor="sp-qty">Количество (не уходит в API)</label>
                 <input
                   id="sp-qty"
                   type="number"
@@ -515,16 +509,18 @@ const ProductSeller: React.FC = () => {
               </div>
 
               <div className={styles['seller-prod-form-group']}>
-                <label htmlFor="sp-cat">Категория</label>
+                <label htmlFor="sp-cat">Категория (с сервера)</label>
                 <select
                   id="sp-cat"
-                  value={draft.categorySlug}
-                  onChange={(e) => updateDraft({ categorySlug: e.target.value })}
+                  value={draft.categoryId}
+                  onChange={(e) =>
+                    updateDraft({ categoryId: Number(e.target.value) })
+                  }
                   className={styles['seller-prod-edit-input']}
                 >
-                  {CATALOG_CATEGORIES.map((c) => (
-                    <option key={c.slug} value={c.slug}>
-                      {c.name}
+                  {apiCategories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.categoryName}
                     </option>
                   ))}
                 </select>
@@ -534,15 +530,21 @@ const ProductSeller: React.FC = () => {
             <div className={styles['seller-prod-modal-buttons']}>
               <button
                 type="button"
-                onClick={saveModal}
+                onClick={() => void saveModal()}
                 className={styles['seller-prod-save-btn']}
+                disabled={saving}
               >
-                {modalMode === 'add' ? 'Добавить' : 'Сохранить изменения'}
+                {saving
+                  ? 'Сохранение…'
+                  : modalMode === 'add'
+                    ? 'Добавить'
+                    : 'Сохранить изменения'}
               </button>
               <button
                 type="button"
                 onClick={closeModal}
                 className={styles['seller-prod-cancel-btn']}
+                disabled={saving}
               >
                 Отмена
               </button>

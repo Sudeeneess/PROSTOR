@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{baseUrl}}/api/customer/dashboard"
+method: GET
+headers:
+  Authorization: Bearer {{customerToken}}
+scripts:
+  - type: afterResponse
+    code: pm.test('200', () => pm.response.to.have.status(200));
+    language: text/javascript
+order: 2000

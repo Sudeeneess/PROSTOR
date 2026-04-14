@@ -1,0 +1,23 @@
+$kind: http-request
+url: "{{baseUrl}}/api/auth/register"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "{{regCustomerName}}",
+      "password": "pass12345",
+      "phone": "79001234567",
+      "role": "CUSTOMER"
+    }
+scripts:
+  - type: afterResponse
+    code: pm.test('201 или 400 (логин занят)', () => pm.expect([201,
+      400]).to.include(pm.response.code));
+    language: text/javascript
+  - type: beforeRequest
+    code: pm.environment.set('regCustomerName', 'pm_c_' + Date.now());
+    language: text/javascript
+order: 1000
