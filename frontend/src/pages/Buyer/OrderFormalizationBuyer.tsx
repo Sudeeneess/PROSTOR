@@ -7,6 +7,7 @@ import InputMask from 'react-input-mask';
 import HeaderMain from '../../components/HeaderMain';
 import styles from './OrderFormalizationBuyer.module.css';
 import { api } from '../../services/api';
+import { writeCart } from '../../utils/cartStorage';
 
 interface CartItem {
   id: number;
@@ -29,7 +30,34 @@ interface SavedCard {
   cardholderName: string;
 }
 
+interface LocalOrder {
+  id: string;
+  status: 'pending' | 'confirmed' | 'reserved' | 'shipped' | 'completed' | 'cancelled';
+  items: {
+    productId: string;
+    productName: string;
+    quantity: number;
+    price: number;
+    reservedAt?: string;
+  }[];
+  customer: { firstName: string; lastName?: string; phone?: string };
+  totalPrice: number;
+  totalItems: number;
+  createdAt: string;
+  paymentStatus: 'pending' | 'simulated';
+  deliveryAddress: string;
+}
+
 const PICKUP_ADDRESS = 'г. Новосибирск, Улица Блюхера 28';
+
+function parseCustomerId(value: unknown): number {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string' && value.trim() !== '') {
+    const n = Number.parseInt(value, 10);
+    if (Number.isFinite(n)) return n;
+  }
+  return Number.NaN;
+}
 
 // Функция для получения только цифр из номера
 const getRawPhoneDigits = (phone: string): string => {
@@ -175,9 +203,103 @@ const OrderFormalizationBuyer: React.FC = () => {
         );
       }
 
-      throw new Error(
-        'С текущим API нельзя оформить заказ с этой страницы. В теле POST /api/orders поле называется customerId, но по смыслу это то же число, что колонка id в таблице customer (менять БД не нужно). Сейчас ни GET /api/customer/dashboard, ни POST /api/auth/login это число клиенту не отдают, поэтому фронт не знает, какой id из customer относится к вошедшему пользователю. Нужно, чтобы одно из этих API вернуло это значение.'
-      );
+      const customerId = parseCustomerId(dash.data.customerId);
+      if (!Number.isFinite(customerId) || customerId <= 0) {
+        throw new Error(
+          'В ответе GET /api/customer/dashboard нет корректного customerId. Проверьте профиль покупателя в БД.'
+        );
+      }
+
+      const orderLines: { productId: number; amount: number }[] = [];
+      for (const item of cartItems) {
+        const productId = item.id;
+        if (!Number.isFinite(productId) || productId <= 0) {
+          throw new Error(
+            `В корзине указан некорректный товар «${item.name}». Добавьте товар из каталога заново.`
+          );
+        }
+        const qty = Math.max(0, Math.floor(item.quantity));
+        for (let i = 0; i < qty; i++) {
+          orderLines.push({ productId, amount: item.price });
+        }
+      }
+
+      if (orderLines.length === 0) {
+        throw new Error('Корзина пуста или количество товаров некорректно.');
+      }
+
+      const created = await api.createOrder({ customerId, items: orderLines });
+      if (!created.success || !created.data) {
+        throw new Error(created.error || 'Не удалось создать заказ на сервере.');
+      }
+
+      const backendOrder = created.data;
+      const paymentErrors: string[] = [];
+
+      for (const line of backendOrder.items) {
+        const pay = await api.createPaymentForOrderItem(line.id);
+        if (!pay.success || !pay.data) {
+          paymentErrors.push(
+            `Позиция #${line.id} (${line.productName ?? line.productId}): ${pay.error ?? 'создание платежа'}`
+          );
+          continue;
+        }
+        const ok = await api.confirmPayment(pay.data.id);
+        if (!ok.success) {
+          paymentErrors.push(
+            `Позиция #${line.id} (${line.productName ?? line.productId}): ${ok.error ?? 'подтверждение платежа'}`
+          );
+        }
+      }
+
+      const fullName = lastName.trim() ? `${firstName} ${lastName}` : firstName;
+
+      const newOrder: LocalOrder = {
+        id: String(backendOrder.id),
+        status:
+          backendOrder.status?.name?.toLowerCase() === 'pending'
+            ? 'pending'
+            : 'reserved',
+        items: cartItems.map((item) => ({
+          productId: String(item.id),
+          productName: item.name,
+          quantity: item.quantity,
+          price: item.price,
+          reservedAt: new Date().toISOString(),
+        })),
+        customer: {
+          firstName: firstName.trim(),
+          lastName: lastName.trim() || undefined,
+          phone: phoneDigits.length === 11 ? phoneDigits : undefined,
+        },
+        totalPrice: totalPrice,
+        totalItems: totalItems,
+        createdAt: new Date().toISOString(),
+        paymentStatus: paymentErrors.length ? 'pending' : 'simulated',
+        deliveryAddress: PICKUP_ADDRESS,
+      };
+
+      const orders = JSON.parse(localStorage.getItem('orders') || '[]') as LocalOrder[];
+      orders.push(newOrder);
+      localStorage.setItem('orders', JSON.stringify(orders));
+
+      writeCart([]);
+
+      localStorage.setItem('userName', fullName);
+      if (phoneDigits.length === 11) {
+        localStorage.setItem('userPhone', phoneDigits);
+      }
+
+      if (paymentErrors.length) {
+        console.warn('Часть платежей не прошла:', paymentErrors);
+        alert(
+          `Заказ №${backendOrder.id} создан, но оплата не завершена по всем позициям.\n\n${paymentErrors.slice(0, 3).join('\n')}`
+        );
+      } else {
+        alert(`Заказ №${backendOrder.id} успешно оформлен и оплачен.`);
+      }
+
+      navigate('/orders');
     } catch (error: any) {
       console.error('Ошибка при оформлении заказа:', error);
       alert(`Ошибка: ${error.message || 'Не удалось оформить заказ. Пожалуйста, попробуйте позже.'}`);
