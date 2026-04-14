@@ -1,21 +1,20 @@
 package com.prostor.prostorApp.modules.auth.dto;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
+@NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class LoginResponse {
     private String token;
     private String type = "Bearer";
     private String username;
     private String role;
     private Long expiresIn;
-
-    public LoginResponse(String token, String username, String role, Long expiresIn) {
-        this.token = token;
-        this.username = username;
-        this.role = role;
-        this.expiresIn = expiresIn;
-    }
+    private Integer customerId;
+    private Integer adminId;
+    private Integer sellerId;
+    private Integer warehouseManagerId;
 }

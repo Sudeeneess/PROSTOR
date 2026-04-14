@@ -76,7 +76,9 @@ class AuthControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.token").exists())
                     .andExpect(jsonPath("$.username").value("admin_user"))
-                    .andExpect(jsonPath("$.role").value("ADMIN"));
+                    .andExpect(jsonPath("$.role").value("ADMIN"))
+                    .andExpect(jsonPath("$.adminId").exists())
+                    .andExpect(jsonPath("$.adminId").isNumber());
         }
 
         @Test
@@ -92,7 +94,9 @@ class AuthControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.token").exists())
                     .andExpect(jsonPath("$.username").value("john_doe"))
-                    .andExpect(jsonPath("$.role").value("CUSTOMER"));
+                    .andExpect(jsonPath("$.role").value("CUSTOMER"))
+                    .andExpect(jsonPath("$.customerId").exists())
+                    .andExpect(jsonPath("$.customerId").isNumber());
         }
 
         @Test
@@ -108,7 +112,9 @@ class AuthControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.token").exists())
                     .andExpect(jsonPath("$.username").value("seller_pro"))
-                    .andExpect(jsonPath("$.role").value("SELLER"));
+                    .andExpect(jsonPath("$.role").value("SELLER"))
+                    .andExpect(jsonPath("$.sellerId").exists())
+                    .andExpect(jsonPath("$.sellerId").isNumber());
         }
 
         @Test
