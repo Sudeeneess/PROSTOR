@@ -32,7 +32,7 @@ app:
     rate: 0.10  #комиссия
 
 server:
-  port: 8083
+  port: 8080
 
 logging:
   level:
