@@ -158,10 +158,11 @@
   display: grid;
   grid-template-columns:
     56px minmax(120px, 1.35fr) minmax(160px, 1.85fr) minmax(88px, 0.95fr)
-    minmax(72px, 0.75fr) minmax(56px, 0.55fr) minmax(100px, 1fr) 48px;
+    minmax(110px, 1fr) minmax(90px, 0.8fr) minmax(72px, 0.75fr)
+    minmax(56px, 0.55fr) minmax(100px, 1fr) 48px;
   gap: 10px;
   align-items: center;
-  min-width: 960px;
+  min-width: 1200px;
 }
 
 .seller-prod-table-header {

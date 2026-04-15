@@ -27,12 +27,12 @@ app:
     expiration: 86400000
   security:
     cors:
-      allowed-origins: "http://localhost:3001,http://localhost:3000"
+      allowed-origins: "http://localhost:3001,http://localhost:3000,http://localhost:3002"
   commission:
     rate: 0.10  #комиссия
 
 server:
-  port: 8080
+  port: 8083
 
 logging:
   level:

@@ -3,9 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { FiLogOut, FiPackage, FiCreditCard, FiChevronRight, FiPlus, FiTrash2 } from 'react-icons/fi';
 import { FaUserCircle } from 'react-icons/fa';
 import { IoCardOutline } from "react-icons/io5";
-import InputMask from 'react-input-mask';
 import HeaderMain from '../../components/HeaderMain';
-import { formatRuPhoneFromDigits } from '../../utils/phoneFormat';
+import { formatRuPhoneFromDigits, formatRuPhoneInput } from '../../utils/phoneFormat';
 import styles from './ProfileBuyer.module.css';
 
 interface UserProfile {
@@ -145,12 +144,7 @@ const AccountPage: React.FC = () => {
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = e.target.value;
-    if (rawValue === '' || rawValue === '+') {
-      setEditProfile({ ...editProfile, phone: '+7' });
-      return;
-    }
-    setEditProfile({ ...editProfile, phone: rawValue });
+    setEditProfile({ ...editProfile, phone: formatRuPhoneInput(e.target.value) });
   };
 
   const handlePhoneBlur = () => {
@@ -311,17 +305,17 @@ const AccountPage: React.FC = () => {
                 
                 <div className={styles['profile-edit-field']}>
                   <label>Номер телефона</label>
-                  <InputMask
-                    mask="+7 (999) 999-99-99"
-                    maskChar="_"
+                  <input
+                    type="tel"
                     value={editProfile.phone}
                     onChange={handlePhoneChange}
                     onBlur={handlePhoneBlur}
+                    inputMode="tel"
+                    autoComplete="tel"
+                    maxLength={18}
                     className={styles['profile-edit-input']}
                     placeholder="+7 (___) ___-__-__"
-                  >
-                    {(inputProps: any) => <input {...inputProps} type="tel" />}
-                  </InputMask>
+                  />
                 </div>
                 
                 <div className={styles['profile-edit-actions']}>

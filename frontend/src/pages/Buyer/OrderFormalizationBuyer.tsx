@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { FaMapMarkerAlt, FaUserCircle, FaPhoneAlt, FaCreditCard } from 'react-icons/fa';
 import { SiVisa, SiMastercard } from 'react-icons/si';
 import { BsCreditCard } from 'react-icons/bs';
-import InputMask from 'react-input-mask';
 import HeaderMain from '../../components/HeaderMain';
 import styles from './OrderFormalizationBuyer.module.css';
 import { api } from '../../services/api';
@@ -76,6 +75,37 @@ const getRawPhoneDigits = (phone: string): string => {
   if (digits.length === 0) return '';
   if (digits[0] === '8') return '7' + digits.slice(1);
   return digits;
+};
+
+const formatPhoneInput = (value: string): string => {
+  let digits = value.replace(/\D/g, '');
+  if (digits.startsWith('8')) {
+    digits = `7${digits.slice(1)}`;
+  } else if (digits.length > 0 && !digits.startsWith('7')) {
+    digits = `7${digits}`;
+  }
+  digits = digits.slice(0, 11);
+
+  const local = digits.startsWith('7') ? digits.slice(1) : digits;
+  let formatted = '+7';
+
+  if (local.length > 0) {
+    formatted += ` (${local.slice(0, 3)}`;
+  }
+  if (local.length >= 3) {
+    formatted += ')';
+  }
+  if (local.length > 3) {
+    formatted += ` ${local.slice(3, 6)}`;
+  }
+  if (local.length > 6) {
+    formatted += `-${local.slice(6, 8)}`;
+  }
+  if (local.length > 8) {
+    formatted += `-${local.slice(8, 10)}`;
+  }
+
+  return formatted;
 };
 
 const OrderFormalizationBuyer: React.FC = () => {
@@ -169,12 +199,7 @@ const OrderFormalizationBuyer: React.FC = () => {
   }, [state, navigate]);
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = e.target.value;
-    if (rawValue === '' || rawValue === '+') {
-      setPhone('+7');
-      return;
-    }
-    setPhone(rawValue);
+    setPhone(formatPhoneInput(e.target.value));
   };
 
   const handlePhoneBlur = () => {
@@ -400,18 +425,16 @@ const OrderFormalizationBuyer: React.FC = () => {
                   <div className={styles['contact-label']}>
                     Номер телефона <span className={styles['optional']}>(необязательно)</span>
                   </div>
-                  <InputMask
-                    mask="+7 (999) 999-99-99"
-                    maskChar="_"
+                  <input
+                    type="tel"
                     value={phone}
                     onChange={handlePhoneChange}
                     onBlur={handlePhoneBlur}
                     className={styles['phone-input']}
-                    placeholder="+7 (___) ___-__-__"
+                    placeholder="+7 (999) 999-99-99"
+                    inputMode="numeric"
                     disabled={isSubmitting}
-                  >
-                    {(inputProps: any) => <input {...inputProps} type="tel" />}
-                  </InputMask>
+                  />
                 </div>
               </div>
             </div>

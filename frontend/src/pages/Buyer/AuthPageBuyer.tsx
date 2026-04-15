@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import InputMask from 'react-input-mask';
 import { BsPersonFill } from 'react-icons/bs';
 import HeaderMain from '../../components/HeaderMain';
 import styles from './AuthPageBuyer.module.css';
 import { api, isBuyerPortalRole } from '../../services/api';
+import { formatRuPhoneInput } from '../../utils/phoneFormat';
 
 function persistRegistrationPhone(phoneMasked: string) {
   const digits = phoneMasked.replace(/\D/g, '');
@@ -30,6 +30,12 @@ const AuthPageBuyer: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setError(null);
+    setInfo(null);
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({ ...prev, phone: formatRuPhoneInput(e.target.value) }));
     setError(null);
     setInfo(null);
   };
@@ -212,22 +218,19 @@ const AuthPageBuyer: React.FC = () => {
                 </div>
 
                 <div className={styles['buyer-auth-form-group']}>
-                  <InputMask
-                    mask="+7 (999) 999-99-99"
-                    maskChar="_"
+                  <input
+                    type="tel"
                     id="phone-reg"
                     name="phone"
                     value={formData.phone}
-                    onChange={handleInputChange}
+                    onChange={handlePhoneChange}
                     placeholder="+7 (___) ___-__-__"
                     disabled={loading}
                     required
                     autoComplete="tel"
-                  >
-                    {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => (
-                      <input {...inputProps} type="tel" />
-                    )}
-                  </InputMask>
+                    inputMode="tel"
+                    maxLength={18}
+                  />
                 </div>
 
                 <div className={styles['buyer-auth-form-group']}>

@@ -9,10 +9,15 @@ export type {
   Product,
   ProductsResponse,
   ProductRequest,
+  SellerProduct,
+  SellerProductCreateRequest,
+  SellerProductsResponse,
   BrandDto,
   SizeDto,
   ProductCardResponse,
   ProductCardRequest,
+  WarehouseStockResponse,
+  WarehouseStockRequest,
 } from './product';
 export type { BrandRow, BrandRequest } from './brand';
 export type { SizeRequest } from './size';

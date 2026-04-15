@@ -12,11 +12,7 @@ export interface Product {
 
 export type ProductsResponse = PageDto<Product>;
 
-/**
- * Тело POST/PUT товара (как ProductRequest в Java).
- * Для POST из кабинета продавца: `sellerId` в JSON всё равно обязателен для валидации,
- * бэкенд потом подставит id текущего продавца — можно временно передать любое положительное число, напр. `1`.
- */
+
 export interface ProductRequest {
   name: string;
   price: number;
@@ -24,6 +20,28 @@ export interface ProductRequest {
   categoryId: number;
   parentId?: number | null;
 }
+
+export interface SellerProduct {
+  id: number;
+  name: string;
+  price: number;
+  sellerId: number;
+  categoryId: number;
+  parentId?: number | null;
+  createdAt?: string;
+  availableQuantity: number;
+}
+
+export interface SellerProductCreateRequest {
+  name: string;
+  price: number;
+  categoryId: number;
+  parentId?: number | null;
+  warehouseId: number;
+  initialQuantity: number;
+}
+
+export type SellerProductsResponse = PageDto<SellerProduct>;
 
 export interface BrandDto {
   id: number;
@@ -46,7 +64,7 @@ export interface ProductCardResponse {
   isActive?: boolean | null;
 }
 
-/** Тело POST/PUT /api/products/{productId}/cards — поля как в ProductCardRequest на бэкенде. */
+/* POST/PUT /api/products/{productId}/cards */
 export interface ProductCardRequest {
   productId: number;
   brandId?: number | null;
@@ -55,4 +73,21 @@ export interface ProductCardRequest {
   type: string;
   photo?: Array<Record<string, unknown>> | null;
   isActive?: boolean;
+}
+
+export interface WarehouseStockResponse {
+  id: number;
+  warehouseId: number;
+  productId: number;
+  productName?: string;
+  quantity: number;
+  reservedQuantity?: number;
+  soldQuantity?: number;
+  updatedAt?: string;
+}
+
+export interface WarehouseStockRequest {
+  warehouseId: number;
+  productId: number;
+  quantity: number;
 }

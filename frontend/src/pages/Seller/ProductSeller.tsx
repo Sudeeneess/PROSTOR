@@ -1,33 +1,46 @@
 ﻿import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import HeaderSeller from './HeaderSeller';
 import styles from './ProductSeller.module.css';
-import { api, type Category, type Product, type ProductRequest } from '../../services/api';
+import {
+  api,
+  type Category,
+  type ProductRequest,
+  type SellerProduct,
+  type SellerProductCreateRequest,
+} from '../../services/api';
 
 export interface SellerProductRow {
   id: number;
   name: string;
   description: string;
-  sku: string;
+  type: string;
+  brand: string;
+  size: string;
   price: string;
   quantity: number;
   /** id категории с сервера (GET /api/categories) */
   categoryId: number;
   sellerId: number;
   imageUrl: string;
+  warehouseId: number | null;
   selected: boolean;
 }
 
-function productToRow(p: Product): SellerProductRow {
+function productToRow(p: SellerProduct): SellerProductRow {
   return {
     id: p.id,
     name: p.name,
     description: '',
-    sku: '',
+    type: '',
+    brand: '',
+    size: '',
     price: String(p.price),
-    quantity: 0,
+    quantity: p.availableQuantity ?? 0,
     categoryId: p.categoryId,
     sellerId: p.sellerId,
     imageUrl: '',
+    warehouseId: null,
     selected: false,
   };
 }
@@ -37,24 +50,41 @@ function createEmptyDraft(defaultCategoryId: number, sellerId: number): SellerPr
     id: 0,
     name: '',
     description: '',
-    sku: '',
+    type: '',
+    brand: '',
+    size: '',
     price: '0',
     quantity: 0,
     categoryId: defaultCategoryId,
     sellerId,
     imageUrl: '',
+    warehouseId: 1,
     selected: false,
   };
 }
 
+function toDeleteErrorMessage(raw?: string): string {
+  const text = (raw ?? '').toLowerCase();
+  if (
+    text.includes('orders_items_products_id_fkey') ||
+    text.includes('всё ещё есть ссылки в таблице "orders_items"') ||
+    text.includes('violates foreign key constraint')
+  ) {
+    return 'Товар уже участвует в заказах и не может быть удален.';
+  }
+  if (raw && raw.trim()) return raw;
+  return 'Ошибка удаления товара.';
+}
+
 const ProductSeller: React.FC = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState<SellerProductRow[]>([]);
   const [apiCategories, setApiCategories] = useState<Category[]>([]);
   const [listError, setListError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const [filterName, setFilterName] = useState('');
-  const [filterSku, setFilterSku] = useState('');
+  const [filterType, setFilterType] = useState('');
   const [filterPrice, setFilterPrice] = useState('');
   const [filterCategoryId, setFilterCategoryId] = useState<number | ''>('');
 
@@ -77,15 +107,38 @@ const ProductSeller: React.FC = () => {
 
     const res = await api.getSellerProducts(0, 100);
     if (!res.success) {
+      if (res.status === 401 || res.status === 403) {
+        api.logout();
+        setListError('Сессия продавца недействительна. Войдите заново.');
+        setLoading(false);
+        navigate('/seller/auth', { replace: true });
+        return;
+      }
       setProducts([]);
       setListError(res.error ?? 'Не удалось загрузить товары');
       setLoading(false);
       return;
     }
     const rows = (res.data?.content ?? []).map(productToRow);
-    setProducts(rows);
+    const enrichedRows = await Promise.all(
+      rows.map(async (row) => {
+        const cardsRes = await api.getProductCards(row.id);
+        const cards = cardsRes.success ? cardsRes.data ?? [] : [];
+        const primaryCard =
+          cards.find((card) => card.isActive !== false) ?? cards[0] ?? null;
+
+        return {
+          ...row,
+          description: primaryCard?.description ?? '',
+          type: primaryCard?.type ?? '',
+          brand: primaryCard?.brand?.name ?? '—',
+          size: primaryCard?.size?.name ?? '—',
+        };
+      })
+    );
+    setProducts(enrichedRows);
     setLoading(false);
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     void loadProducts();
@@ -100,16 +153,16 @@ const ProductSeller: React.FC = () => {
 
   const filteredProducts = useMemo(() => {
     const nameQ = filterName.trim().toLowerCase();
-    const skuQ = filterSku.trim().toLowerCase();
+    const typeQ = filterType.trim().toLowerCase();
     const priceQ = filterPrice.trim();
     return products.filter((p) => {
       if (nameQ && !p.name.toLowerCase().includes(nameQ)) return false;
-      if (skuQ && !p.sku.toLowerCase().includes(skuQ)) return false;
+      if (typeQ && !p.type.toLowerCase().includes(typeQ)) return false;
       if (priceQ && !String(p.price).includes(priceQ)) return false;
       if (filterCategoryId !== '' && p.categoryId !== filterCategoryId) return false;
       return true;
     });
-  }, [products, filterName, filterSku, filterPrice, filterCategoryId]);
+  }, [products, filterName, filterType, filterPrice, filterCategoryId]);
 
   const toggleSelect = (id: number) => {
     updateProducts(
@@ -140,14 +193,36 @@ const ProductSeller: React.FC = () => {
     const toDelete = products.filter((p) => p.selected);
     if (!toDelete.length) return;
     if (!window.confirm(`Удалить выбранные товары (${toDelete.length})?`)) return;
+
+    let deletedCount = 0;
+    const failed: string[] = [];
+
     for (const p of toDelete) {
       const res = await api.deleteSellerProduct(p.id);
       if (!res.success) {
-        window.alert(res.error ?? 'Ошибка удаления');
-        break;
+        failed.push(`• ${p.name}: ${toDeleteErrorMessage(res.error)}`);
+        continue;
       }
+      deletedCount += 1;
     }
+
     await loadProducts();
+
+    if (failed.length === 0) {
+      window.alert(`Удалено товаров: ${deletedCount}.`);
+      return;
+    }
+
+    const lines = [
+      `Удалено: ${deletedCount}.`,
+      `Не удалось удалить: ${failed.length}.`,
+      '',
+      ...failed.slice(0, 5),
+    ];
+    if (failed.length > 5) {
+      lines.push(`... и еще ${failed.length - 5}.`);
+    }
+    window.alert(lines.join('\n'));
   };
 
   const openEditModal = () => {
@@ -175,22 +250,33 @@ const ProductSeller: React.FC = () => {
       return;
     }
 
-    const body: ProductRequest = {
-      name: draft.name.trim(),
-      price,
-      sellerId: draft.sellerId,
-      categoryId: draft.categoryId,
-    };
-
     setSaving(true);
     try {
       if (modalMode === 'add') {
-        const res = await api.createSellerProduct(body);
+        if (!draft.warehouseId || draft.warehouseId <= 0) {
+          window.alert('Укажите корректный ID склада');
+          return;
+        }
+        const createBody: SellerProductCreateRequest = {
+          name: draft.name.trim(),
+          price,
+          categoryId: draft.categoryId,
+          parentId: null,
+          warehouseId: draft.warehouseId,
+          initialQuantity: Math.max(0, draft.quantity),
+        };
+        const res = await api.createSellerProduct(createBody);
         if (!res.success) {
           window.alert(res.error ?? 'Не удалось создать товар');
           return;
         }
       } else {
+        const body: ProductRequest = {
+          name: draft.name.trim(),
+          price,
+          sellerId: draft.sellerId,
+          categoryId: draft.categoryId,
+        };
         const res = await api.updateSellerProduct(draft.id, body);
         if (!res.success) {
           window.alert(res.error ?? 'Не удалось сохранить товар');
@@ -230,10 +316,10 @@ const ProductSeller: React.FC = () => {
                 <input
                   type="search"
                   className={styles['seller-prod-filter-input']}
-                  placeholder="Артикул"
-                  value={filterSku}
-                  onChange={(e) => setFilterSku(e.target.value)}
-                  aria-label="Фильтр по артикулу"
+                  placeholder="Тип"
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+                  aria-label="Фильтр по типу"
                 />
                 <input
                   type="search"
@@ -322,7 +408,7 @@ const ProductSeller: React.FC = () => {
               className={styles['seller-prod-add-first-btn']}
               onClick={() => {
                 setFilterName('');
-                setFilterSku('');
+                  setFilterType('');
                 setFilterPrice('');
                 setFilterCategoryId('');
               }}
@@ -336,7 +422,9 @@ const ProductSeller: React.FC = () => {
               <span className={styles['seller-prod-col-photo']}>Фото</span>
               <span>Название</span>
               <span>Описание</span>
-              <span>Артикул</span>
+              <span>Тип</span>
+              <span>Бренд</span>
+              <span>Размер</span>
               <span>Цена</span>
               <span>Кол-во</span>
               <span>Категория</span>
@@ -375,7 +463,19 @@ const ProductSeller: React.FC = () => {
                 />
                 <input
                   type="text"
-                  value={product.sku}
+                  value={product.type}
+                  readOnly
+                  className={styles['seller-prod-readonly-input']}
+                />
+                <input
+                  type="text"
+                  value={product.brand}
+                  readOnly
+                  className={styles['seller-prod-readonly-input']}
+                />
+                <input
+                  type="text"
+                  value={product.size}
                   readOnly
                   className={styles['seller-prod-readonly-input']}
                 />
@@ -421,7 +521,7 @@ const ProductSeller: React.FC = () => {
 
             <div className={styles['seller-prod-edit-form']}>
               <div className={styles['seller-prod-form-group']}>
-                <label htmlFor="sp-photo-url">Фото (URL, только в таблице на экране)</label>
+                <label htmlFor="sp-photo-url">Фото (URL)</label>
                 <input
                   id="sp-photo-url"
                   type="url"
@@ -459,7 +559,7 @@ const ProductSeller: React.FC = () => {
               </div>
 
               <div className={styles['seller-prod-form-group']}>
-                <label htmlFor="sp-desc">Описание (не уходит в API)</label>
+                <label htmlFor="sp-desc">Описание</label>
                 <textarea
                   id="sp-desc"
                   value={draft.description}
@@ -470,12 +570,12 @@ const ProductSeller: React.FC = () => {
               </div>
 
               <div className={styles['seller-prod-form-group']}>
-                <label htmlFor="sp-sku">Артикул (не уходит в API)</label>
+                <label htmlFor="sp-type">Тип</label>
                 <input
-                  id="sp-sku"
+                  id="sp-type"
                   type="text"
-                  value={draft.sku}
-                  onChange={(e) => updateDraft({ sku: e.target.value })}
+                  value={draft.type}
+                  onChange={(e) => updateDraft({ type: e.target.value })}
                   className={styles['seller-prod-edit-input']}
                 />
               </div>
@@ -493,7 +593,7 @@ const ProductSeller: React.FC = () => {
               </div>
 
               <div className={styles['seller-prod-form-group']}>
-                <label htmlFor="sp-qty">Количество (не уходит в API)</label>
+                <label htmlFor="sp-qty">Количество</label>
                 <input
                   id="sp-qty"
                   type="number"
@@ -505,11 +605,35 @@ const ProductSeller: React.FC = () => {
                     })
                   }
                   className={styles['seller-prod-edit-input']}
+                  disabled={modalMode === 'edit'}
                 />
+                {modalMode === 'edit' && (
+                  <small>
+                    Изменение количества в этом окне недоступно.
+                  </small>
+                )}
               </div>
 
+              {modalMode === 'add' && (
+                <div className={styles['seller-prod-form-group']}>
+                  <label htmlFor="sp-warehouse-id">ID склада</label>
+                  <input
+                    id="sp-warehouse-id"
+                    type="number"
+                    min={1}
+                    value={draft.warehouseId ?? ''}
+                    onChange={(e) =>
+                      updateDraft({
+                        warehouseId: Math.max(1, Number(e.target.value) || 1),
+                      })
+                    }
+                    className={styles['seller-prod-edit-input']}
+                  />
+                </div>
+              )}
+
               <div className={styles['seller-prod-form-group']}>
-                <label htmlFor="sp-cat">Категория (с сервера)</label>
+                <label htmlFor="sp-cat">Категория</label>
                 <select
                   id="sp-cat"
                   value={draft.categoryId}

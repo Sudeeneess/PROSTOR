@@ -1,5 +1,14 @@
 import type { RequestFn } from '../client';
-import type { Product, ProductsResponse, ProductRequest } from '../types/product';
+import type {
+  Product,
+  ProductsResponse,
+  ProductRequest,
+  SellerProduct,
+  SellerProductCreateRequest,
+  SellerProductsResponse,
+  WarehouseStockRequest,
+  WarehouseStockResponse,
+} from '../types/product';
 import type { ProductCardRequest, ProductCardResponse } from '../types/product';
 import { getErrorStatus } from '../utils/httpError';
 
@@ -71,12 +80,12 @@ export function createProductsService(request: RequestFn) {
       size: number = 20
     ): Promise<{
       success: boolean;
-      data?: ProductsResponse;
+      data?: SellerProductsResponse;
       error?: string;
       status?: number;
     }> {
       try {
-        const data = await request<ProductsResponse>(
+        const data = await request<SellerProductsResponse>(
           `/api/seller/products?page=${page}&size=${size}`
         );
         return { success: true, data };
@@ -92,9 +101,9 @@ export function createProductsService(request: RequestFn) {
 
     async getSellerProductById(
       id: number
-    ): Promise<{ success: boolean; data?: Product; error?: string; status?: number }> {
+    ): Promise<{ success: boolean; data?: SellerProduct; error?: string; status?: number }> {
       try {
-        const data = await request<Product>(`/api/seller/products/${id}`);
+        const data = await request<SellerProduct>(`/api/seller/products/${id}`);
         return { success: true, data };
       } catch (error) {
         return {
@@ -107,10 +116,10 @@ export function createProductsService(request: RequestFn) {
     },
 
     async createSellerProduct(
-      body: ProductRequest
-    ): Promise<{ success: boolean; data?: Product; error?: string; status?: number }> {
+      body: SellerProductCreateRequest
+    ): Promise<{ success: boolean; data?: SellerProduct; error?: string; status?: number }> {
       try {
-        const data = await request<Product>('/api/seller/products', {
+        const data = await request<SellerProduct>('/api/seller/products', {
           method: 'POST',
           body: JSON.stringify(body),
         });
@@ -290,6 +299,65 @@ export function createProductsService(request: RequestFn) {
           success: false,
           error:
             error instanceof Error ? error.message : 'Ошибка удаления карточки товара',
+          status: getErrorStatus(error),
+        };
+      }
+    },
+
+    async getWarehouseStocks(filters?: {
+      warehouseId?: number;
+      productId?: number;
+    }): Promise<{
+      success: boolean;
+      data?: WarehouseStockResponse[];
+      error?: string;
+      status?: number;
+    }> {
+      try {
+        const queryParams = new URLSearchParams();
+        if (filters?.warehouseId != null) {
+          queryParams.set('warehouseId', String(filters.warehouseId));
+        }
+        if (filters?.productId != null) {
+          queryParams.set('productId', String(filters.productId));
+        }
+        const query = queryParams.toString();
+        const endpoint = `/api/warehouses/stocks${query ? `?${query}` : ''}`;
+        const data = await request<WarehouseStockResponse[]>(endpoint);
+        return { success: true, data };
+      } catch (error) {
+        return {
+          success: false,
+          error:
+            error instanceof Error ? error.message : 'Ошибка загрузки остатков товара',
+          status: getErrorStatus(error),
+        };
+      }
+    },
+
+    async updateWarehouseStock(
+      stockId: number,
+      body: WarehouseStockRequest
+    ): Promise<{
+      success: boolean;
+      data?: WarehouseStockResponse;
+      error?: string;
+      status?: number;
+    }> {
+      try {
+        const data = await request<WarehouseStockResponse>(
+          `/api/warehouses/stocks/${stockId}`,
+          {
+            method: 'PUT',
+            body: JSON.stringify(body),
+          }
+        );
+        return { success: true, data };
+      } catch (error) {
+        return {
+          success: false,
+          error:
+            error instanceof Error ? error.message : 'Ошибка обновления остатка товара',
           status: getErrorStatus(error),
         };
       }
