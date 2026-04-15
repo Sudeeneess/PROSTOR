@@ -39,7 +39,7 @@ public class OrderController {
     }
 
     @GetMapping("/customer/{customerId}")
-    @PreAuthorize("hasRole('ADMIN') or #customerId == authentication.principal.id")
+    @PreAuthorize("hasRole('ADMIN') or @orderSecurity.isCustomerOwnerByCustomerId(#customerId, authentication)")
     public ResponseEntity<List<OrderResponse>> getByCustomer(@PathVariable Integer customerId) {
         log.debug("GET /api/orders/customer/{}", customerId);
         return ResponseEntity.ok(orderService.getByCustomer(customerId));
