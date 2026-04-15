@@ -8,6 +8,8 @@ import com.prostor.prostorApp.modules.product.repository.CategoryRepository;
 import com.prostor.prostorApp.modules.product.repository.ProductRepository;
 import com.prostor.prostorApp.modules.user.model.Seller;
 import com.prostor.prostorApp.modules.user.repository.SellerRepository;
+import com.prostor.prostorApp.modules.warehouse.dto.WarehouseStockRequest;
+import com.prostor.prostorApp.modules.warehouse.service.WarehouseStockService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +29,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final SellerRepository sellerRepository;
     private final CategoryRepository categoryRepository;
+    private final WarehouseStockService warehouseStockService;
 
     private ProductResponse toResponse(Product product) {
         if (product == null) return null;
@@ -116,6 +119,19 @@ public class ProductService {
         Product saved = productRepository.save(product);
         log.info("Product created successfully with id: {}", saved.getId());
         return toResponse(saved);
+    }
+
+    @Transactional
+    public ProductResponse createForSellerWithInitialStock(ProductRequest request, Integer warehouseId, Integer initialQuantity) {
+        ProductResponse createdProduct = create(request);
+
+        WarehouseStockRequest stockRequest = new WarehouseStockRequest();
+        stockRequest.setWarehouseId(warehouseId);
+        stockRequest.setProductId(createdProduct.getId());
+        stockRequest.setQuantity(initialQuantity);
+
+        warehouseStockService.create(stockRequest);
+        return createdProduct;
     }
 
     @Transactional

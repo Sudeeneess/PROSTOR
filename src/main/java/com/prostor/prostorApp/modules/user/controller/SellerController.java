@@ -3,9 +3,12 @@ package com.prostor.prostorApp.modules.user.controller;
 import com.prostor.prostorApp.modules.product.dto.ProductRequest;
 import com.prostor.prostorApp.modules.product.dto.ProductResponse;
 import com.prostor.prostorApp.modules.product.service.ProductService;
+import com.prostor.prostorApp.modules.user.dto.SellerProductCreateRequest;
+import com.prostor.prostorApp.modules.user.dto.SellerProductResponse;
 import com.prostor.prostorApp.modules.user.model.Seller;
 import com.prostor.prostorApp.modules.user.repository.SellerRepository;
 import com.prostor.prostorApp.modules.user.repository.UserRepository;
+import com.prostor.prostorApp.modules.warehouse.service.WarehouseStockService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +33,7 @@ public class SellerController {
     private final ProductService productService;
     private final UserRepository userRepository;
     private final SellerRepository sellerRepository;
+    private final WarehouseStockService warehouseStockService;
 
     private Integer getSellerIdByUsername(String username) {
         com.prostor.prostorApp.modules.user.model.User user = userRepository.findByUserName(username)
@@ -41,19 +45,44 @@ public class SellerController {
         return seller.getId();
     }
 
+    private SellerProductResponse toSellerResponse(ProductResponse product) {
+        SellerProductResponse response = new SellerProductResponse();
+        response.setId(product.getId());
+        response.setName(product.getName());
+        response.setPrice(product.getPrice());
+        response.setSellerId(product.getSellerId());
+        response.setCategoryId(product.getCategoryId());
+        response.setParentId(product.getParentId());
+        response.setCreatedAt(product.getCreatedAt());
+        response.setAvailableQuantity(warehouseStockService.getTotalAvailableQuantity(product.getId()));
+        return response;
+    }
+
+    private ProductRequest toProductRequest(SellerProductCreateRequest request, Integer sellerId) {
+        ProductRequest productRequest = new ProductRequest();
+        productRequest.setName(request.getName());
+        productRequest.setPrice(request.getPrice());
+        productRequest.setSellerId(sellerId);
+        productRequest.setCategoryId(request.getCategoryId());
+        productRequest.setParentId(request.getParentId());
+        return productRequest;
+    }
+
     @GetMapping
-    public ResponseEntity<Page<ProductResponse>> getMyProducts(
+    public ResponseEntity<Page<SellerProductResponse>> getMyProducts(
             @AuthenticationPrincipal User principal,
             @PageableDefault(size = 20) Pageable pageable) {
 
         Integer sellerId = getSellerIdByUsername(principal.getUsername());
         log.info("Seller {} getting their products", sellerId);
 
-        return ResponseEntity.ok(productService.getProductsBySeller(sellerId, pageable));
+        Page<SellerProductResponse> response = productService.getProductsBySeller(sellerId, pageable)
+                .map(this::toSellerResponse);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponse> getProductById(
+    public ResponseEntity<SellerProductResponse> getProductById(
             @AuthenticationPrincipal User principal,
             @PathVariable Integer id) {
 
@@ -66,20 +95,25 @@ public class SellerController {
             throw new SecurityException("You don't have permission to view this product");
         }
 
-        return ResponseEntity.ok(product);
+        return ResponseEntity.ok(toSellerResponse(product));
     }
 
     @PostMapping
-    public ResponseEntity<ProductResponse> createProduct(
+    public ResponseEntity<SellerProductResponse> createProduct(
             @AuthenticationPrincipal User principal,
-            @Valid @RequestBody ProductRequest request) {
+            @Valid @RequestBody SellerProductCreateRequest request) {
 
         Integer sellerId = getSellerIdByUsername(principal.getUsername());
         log.info("Seller {} creating new product: {}", sellerId, request.getName());
 
-        request.setSellerId(sellerId);
+        ProductRequest productRequest = toProductRequest(request, sellerId);
+        ProductResponse created = productService.createForSellerWithInitialStock(
+                productRequest,
+                request.getWarehouseId(),
+                request.getInitialQuantity()
+        );
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(productService.create(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(toSellerResponse(created));
     }
 
     @PutMapping("/{id}")
