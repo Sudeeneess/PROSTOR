@@ -73,7 +73,7 @@ public class PaymentService {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new EntityNotFoundException("Платеж с идентификатором не найден: " + paymentId));
 
-        PaymentsStatus paidStatus = paymentsStatusRepository.findByName("PAID")
+        PaymentsStatus paidStatus = paymentsStatusRepository.findByName("SUCCESS")
                 .orElseThrow(() -> new EntityNotFoundException("Статус платежа ОПЛАЧЕН, не найден"));
         payment.setPaymentsStatus(paidStatus);
 

@@ -16,6 +16,7 @@ import java.util.List;
 public interface OrderRepository extends JpaRepository<Order, Integer> {
 
     List<Order> findByCustomerId(Integer customerId);
+    boolean existsByIdAndCustomerUserUserName(Integer id, String userName);
 
     Page<Order> findByOrdersStatusId(Integer statusId, Pageable pageable);
 

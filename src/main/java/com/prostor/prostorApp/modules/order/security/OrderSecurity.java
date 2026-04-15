@@ -1,8 +1,6 @@
 package com.prostor.prostorApp.modules.order.security;
 
-import com.prostor.prostorApp.modules.order.model.Order;
 import com.prostor.prostorApp.modules.order.repository.OrderRepository;
-import com.prostor.prostorApp.modules.user.model.Customer;
 import com.prostor.prostorApp.modules.user.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,14 +28,7 @@ public class OrderSecurity {
         }
 
         try {
-            Order order = orderRepository.findById(orderId)
-                    .orElse(null);
-
-            if (order == null || order.getCustomer() == null || order.getCustomer().getUser() == null) {
-                return false;
-            }
-
-            boolean isOwner = username.equals(order.getCustomer().getUser().getUserName());
+            boolean isOwner = orderRepository.existsByIdAndCustomerUserUserName(orderId, username);
 
             if (isOwner) {
                 log.debug("User {} is owner of order {}", username, orderId);
@@ -64,13 +55,7 @@ public class OrderSecurity {
         }
 
         try {
-            Customer customer = customerRepository.findById(customerId).orElse(null);
-
-            if (customer == null || customer.getUser() == null) {
-                return false;
-            }
-
-            boolean isOwner = username.equals(customer.getUser().getUserName());
+            boolean isOwner = customerRepository.existsByIdAndUserUserName(customerId, username);
 
             if (isOwner) {
                 log.debug("User {} is owner of customer {}", username, customerId);
