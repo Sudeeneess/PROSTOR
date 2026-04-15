@@ -1,6 +1,7 @@
 import type { CatalogGridProduct } from '../data/mockCatalogProducts';
 import type { Product, ProductCardResponse } from '../services/api';
 import { api } from '../services/api';
+import { API_BASE_URL } from '../services/api/client';
 
 const PLACEHOLDER_IMAGE =
   'https://placehold.co/400x520/e8eef8/447add?text=PROSTOR';
@@ -11,7 +12,14 @@ export function firstPhotoUrlFromCard(
   if (!photo || !Array.isArray(photo) || photo.length === 0) return null;
   const first = photo[0] as Record<string, unknown>;
   const url = first.url ?? first.src ?? first['imageUrl'];
-  return typeof url === 'string' && url.length > 0 ? url : null;
+  if (typeof url !== 'string' || url.length === 0) return null;
+  if (/^https?:\/\//i.test(url) || url.startsWith('data:')) {
+    return url;
+  }
+  if (url.startsWith('/')) {
+    return `${API_BASE_URL}${url}`;
+  }
+  return `${API_BASE_URL}/${url}`;
 }
 
 export function apiProductToGrid(
