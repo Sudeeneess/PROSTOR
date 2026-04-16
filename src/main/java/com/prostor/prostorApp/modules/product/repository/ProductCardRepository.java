@@ -14,4 +14,6 @@ public interface ProductCardRepository extends JpaRepository<ProductCard, Intege
     List<ProductCard> findByBrandId(Integer brandId);
 
     List<ProductCard> findByIsActiveTrue();
+
+    void deleteByProductId(Integer productId);
 }

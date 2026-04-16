@@ -5,9 +5,12 @@ import com.prostor.prostorApp.modules.product.dto.ProductResponse;
 import com.prostor.prostorApp.modules.product.model.Category;
 import com.prostor.prostorApp.modules.product.model.Product;
 import com.prostor.prostorApp.modules.product.repository.CategoryRepository;
+import com.prostor.prostorApp.modules.product.repository.ProductCardRepository;
 import com.prostor.prostorApp.modules.product.repository.ProductRepository;
+import com.prostor.prostorApp.modules.order.repository.OrderItemRepository;
 import com.prostor.prostorApp.modules.user.model.Seller;
 import com.prostor.prostorApp.modules.user.repository.SellerRepository;
+import com.prostor.prostorApp.modules.warehouse.repository.WarehouseStockRepository;
 import com.prostor.prostorApp.modules.warehouse.dto.WarehouseStockRequest;
 import com.prostor.prostorApp.modules.warehouse.service.WarehouseStockService;
 import jakarta.persistence.EntityNotFoundException;
@@ -30,6 +33,9 @@ public class ProductService {
     private final SellerRepository sellerRepository;
     private final CategoryRepository categoryRepository;
     private final WarehouseStockService warehouseStockService;
+    private final ProductCardRepository productCardRepository;
+    private final WarehouseStockRepository warehouseStockRepository;
+    private final OrderItemRepository orderItemRepository;
 
     private ProductResponse toResponse(Product product) {
         if (product == null) return null;
@@ -184,6 +190,14 @@ public class ProductService {
         if (!productRepository.existsById(id)) {
             throw new EntityNotFoundException("Product not found with id: " + id);
         }
+
+        if (orderItemRepository.existsByProductId(id)) {
+            throw new IllegalStateException("Товар участвует в заказах и не может быть удален");
+        }
+
+        productCardRepository.deleteByProductId(id);
+        warehouseStockRepository.deleteByProductId(id);
+
         productRepository.deleteById(id);
 
         log.info("Product deleted successfully with id: {}", id);

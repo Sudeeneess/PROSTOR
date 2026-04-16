@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -238,6 +239,25 @@ class SellerControllerTest {
 
         mockMvc.perform(delete("/api/seller/products/8").with(user("seller_pro").roles("SELLER")))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("DELETE /api/seller/products/{id} returns 409 when product is used in orders")
+    void deleteProduct_conflictWhenInOrders() throws Exception {
+        stubSellerPrincipal("seller_pro", 5, 99);
+        when(productService.getById(8)).thenReturn(sampleProduct(8, 99));
+        doThrow(new IllegalStateException("Товар участвует в заказах и не может быть удален"))
+                .when(productService).delete(8);
+
+        String json = mockMvc.perform(delete("/api/seller/products/8").with(user("seller_pro").roles("SELLER")))
+                .andExpect(status().isConflict())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        ErrorResponse err = objectMapper.readValue(json, ErrorResponse.class);
+        assertEquals(409, err.getStatus());
+        assertEquals("Товар участвует в заказах и не может быть удален", err.getMessage());
     }
 
     private void stubSellerPrincipal(String username, int userId, int sellerId) {

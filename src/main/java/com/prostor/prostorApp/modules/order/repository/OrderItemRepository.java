@@ -24,6 +24,8 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
     // Товары, связанные с возвратом
     List<OrderItem> findByOrderReturnId(Integer orderReturnId);
 
+    boolean existsByProductId(Integer productId);
+
     @Query("""
             SELECT COUNT(oi)
             FROM OrderItem oi
