@@ -84,8 +84,8 @@ const ProductSeller: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   const [filterName, setFilterName] = useState('');
-  const [filterType, setFilterType] = useState('');
-  const [filterPrice, setFilterPrice] = useState('');
+  const [filterSubcategory, setFilterSubcategory] = useState('');
+  const [filterPriceRange, setFilterPriceRange] = useState('');
   const [filterCategoryId, setFilterCategoryId] = useState<number | ''>('');
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -151,18 +151,87 @@ const ProductSeller: React.FC = () => {
     setProducts(list);
   };
 
+  const resetFilters = () => {
+    setFilterName('');
+    setFilterSubcategory('');
+    setFilterPriceRange('');
+    setFilterCategoryId('');
+  };
+
+  const priceBounds = useMemo(() => {
+    const prices = products
+      .map((p) => Number(String(p.price).replace(',', '.')))
+      .filter((price) => Number.isFinite(price));
+
+    if (!prices.length) {
+      return { min: null as number | null, max: null as number | null };
+    }
+
+    return {
+      min: Math.min(...prices),
+      max: Math.max(...prices),
+    };
+  }, [products]);
+
+  const subcategoryOptions = useMemo(() => {
+    const unique = new Set<string>();
+    products.forEach((p) => {
+      const value = p.type.trim();
+      if (value && value !== '—') {
+        unique.add(value);
+      }
+    });
+    return Array.from(unique).sort((a, b) => a.localeCompare(b, 'ru'));
+  }, [products]);
+
+  const modalSubcategoryOptions = useMemo(() => {
+    const unique = new Set(subcategoryOptions);
+    const draftType = draft?.type.trim();
+    if (draftType && draftType !== '—') {
+      unique.add(draftType);
+    }
+    return Array.from(unique).sort((a, b) => a.localeCompare(b, 'ru'));
+  }, [subcategoryOptions, draft?.type]);
+
   const filteredProducts = useMemo(() => {
     const nameQ = filterName.trim().toLowerCase();
-    const typeQ = filterType.trim().toLowerCase();
-    const priceQ = filterPrice.trim();
+    const subcategoryQ = filterSubcategory.trim();
+    const rangeText = filterPriceRange.trim();
+    const rangeParts = rangeText
+      .split(/[-–—]/)
+      .map((part) => Number(part.trim().replace(',', '.')))
+      .filter((value) => Number.isFinite(value));
+
+    const rawFrom = rangeParts[0];
+    const rawTo = rangeParts.length > 1 ? rangeParts[1] : rangeParts[0];
+    const hasFrom = rangeText !== '' && Number.isFinite(rawFrom);
+    const hasTo = rangeText !== '' && Number.isFinite(rawTo);
+    const normalizedFrom = hasFrom && hasTo ? Math.min(rawFrom, rawTo) : rawFrom;
+    const normalizedTo = hasFrom && hasTo ? Math.max(rawFrom, rawTo) : rawTo;
+
+    const minPrice = hasFrom ? normalizedFrom : priceBounds.min;
+    const maxPrice = hasTo ? normalizedTo : priceBounds.max;
+
     return products.filter((p) => {
       if (nameQ && !p.name.toLowerCase().includes(nameQ)) return false;
-      if (typeQ && !p.type.toLowerCase().includes(typeQ)) return false;
-      if (priceQ && !String(p.price).includes(priceQ)) return false;
+      if (subcategoryQ && p.type !== subcategoryQ) return false;
+      const productPrice = Number(String(p.price).replace(',', '.'));
+      if (Number.isFinite(productPrice)) {
+        if (minPrice !== null && productPrice < minPrice) return false;
+        if (maxPrice !== null && productPrice > maxPrice) return false;
+      }
       if (filterCategoryId !== '' && p.categoryId !== filterCategoryId) return false;
       return true;
     });
-  }, [products, filterName, filterType, filterPrice, filterCategoryId]);
+  }, [
+    products,
+    filterName,
+    filterSubcategory,
+    filterPriceRange,
+    filterCategoryId,
+    priceBounds.max,
+    priceBounds.min,
+  ]);
 
   const toggleSelect = (id: number) => {
     updateProducts(
@@ -178,6 +247,16 @@ const ProductSeller: React.FC = () => {
       )
     );
   };
+
+  const clearSelected = () => {
+    updateProducts(products.map((p) => (p.selected ? { ...p, selected: false } : p)));
+  };
+
+  const hasActiveFilters =
+    filterName.trim() !== '' ||
+    filterSubcategory.trim() !== '' ||
+    filterPriceRange.trim() !== '' ||
+    filterCategoryId !== '';
 
   const openAddModal = () => {
     if (!apiCategories.length) {
@@ -253,16 +332,12 @@ const ProductSeller: React.FC = () => {
     setSaving(true);
     try {
       if (modalMode === 'add') {
-        if (!draft.warehouseId || draft.warehouseId <= 0) {
-          window.alert('Укажите корректный ID склада');
-          return;
-        }
         const createBody: SellerProductCreateRequest = {
           name: draft.name.trim(),
           price,
           categoryId: draft.categoryId,
           parentId: null,
-          warehouseId: draft.warehouseId,
+          warehouseId: 1,
           initialQuantity: Math.max(0, draft.quantity),
         };
         const res = await api.createSellerProduct(createBody);
@@ -313,21 +388,30 @@ const ProductSeller: React.FC = () => {
                   onChange={(e) => setFilterName(e.target.value)}
                   aria-label="Фильтр по названию"
                 />
+                <select
+                  className={styles['seller-prod-filter-select']}
+                  value={filterSubcategory}
+                  onChange={(e) => setFilterSubcategory(e.target.value)}
+                  aria-label="Фильтр по подкатегории"
+                >
+                  <option value="">Все подкатегории</option>
+                  {subcategoryOptions.map((subcategory) => (
+                    <option key={subcategory} value={subcategory}>
+                      {subcategory}
+                    </option>
+                  ))}
+                </select>
                 <input
                   type="search"
                   className={styles['seller-prod-filter-input']}
-                  placeholder="Тип"
-                  value={filterType}
-                  onChange={(e) => setFilterType(e.target.value)}
-                  aria-label="Фильтр по типу"
-                />
-                <input
-                  type="search"
-                  className={styles['seller-prod-filter-input']}
-                  placeholder="Цена"
-                  value={filterPrice}
-                  onChange={(e) => setFilterPrice(e.target.value)}
-                  aria-label="Фильтр по цене"
+                  placeholder={
+                    priceBounds.min === null || priceBounds.max === null
+                      ? 'Цена (например: 100-500)'
+                      : `Цена ${priceBounds.min}-${priceBounds.max}`
+                  }
+                  value={filterPriceRange}
+                  onChange={(e) => setFilterPriceRange(e.target.value)}
+                  aria-label="Фильтр по диапазону цены"
                 />
                 <select
                   className={styles['seller-prod-filter-select']}
@@ -345,6 +429,14 @@ const ProductSeller: React.FC = () => {
                     </option>
                   ))}
                 </select>
+                <button
+                  type="button"
+                  className={styles['seller-prod-filter-reset-btn']}
+                  onClick={resetFilters}
+                  disabled={!hasActiveFilters}
+                >
+                  Сбросить фильтры
+                </button>
               </div>
             </div>
           </div>
@@ -356,6 +448,13 @@ const ProductSeller: React.FC = () => {
               onClick={selectAllVisible}
             >
               Выбрать все
+            </button>
+            <button
+              type="button"
+              className={styles['seller-prod-tool-btn']}
+              onClick={clearSelected}
+            >
+              Пропустить
             </button>
             <button
               type="button"
@@ -406,12 +505,7 @@ const ProductSeller: React.FC = () => {
             <button
               type="button"
               className={styles['seller-prod-add-first-btn']}
-              onClick={() => {
-                setFilterName('');
-                  setFilterType('');
-                setFilterPrice('');
-                setFilterCategoryId('');
-              }}
+              onClick={resetFilters}
             >
               Сбросить фильтры
             </button>
@@ -569,15 +663,41 @@ const ProductSeller: React.FC = () => {
                 />
               </div>
 
-              <div className={styles['seller-prod-form-group']}>
-                <label htmlFor="sp-type">Тип</label>
-                <input
-                  id="sp-type"
-                  type="text"
-                  value={draft.type}
-                  onChange={(e) => updateDraft({ type: e.target.value })}
-                  className={styles['seller-prod-edit-input']}
-                />
+              <div className={styles['seller-prod-form-row']}>
+                <div className={styles['seller-prod-form-group']}>
+                  <label htmlFor="sp-cat">Категория</label>
+                  <select
+                    id="sp-cat"
+                    value={draft.categoryId}
+                    onChange={(e) =>
+                      updateDraft({ categoryId: Number(e.target.value) })
+                    }
+                    className={styles['seller-prod-edit-input']}
+                  >
+                    {apiCategories.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.categoryName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className={styles['seller-prod-form-group']}>
+                  <label htmlFor="sp-type">Подкатегории</label>
+                  <select
+                    id="sp-type"
+                    value={draft.type}
+                    onChange={(e) => updateDraft({ type: e.target.value })}
+                    className={styles['seller-prod-edit-input']}
+                  >
+                    <option value="">Выберите подкатегорию</option>
+                    {modalSubcategoryOptions.map((subcategory) => (
+                      <option key={subcategory} value={subcategory}>
+                        {subcategory}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div className={styles['seller-prod-form-group']}>
@@ -592,63 +712,43 @@ const ProductSeller: React.FC = () => {
                 />
               </div>
 
-              <div className={styles['seller-prod-form-group']}>
-                <label htmlFor="sp-qty">Количество</label>
-                <input
-                  id="sp-qty"
-                  type="number"
-                  min={0}
-                  value={draft.quantity}
-                  onChange={(e) =>
-                    updateDraft({
-                      quantity: Math.max(0, Number(e.target.value) || 0),
-                    })
-                  }
-                  className={styles['seller-prod-edit-input']}
-                  disabled={modalMode === 'edit'}
-                />
-                {modalMode === 'edit' && (
-                  <small>
-                    Изменение количества в этом окне недоступно.
-                  </small>
-                )}
-              </div>
-
-              {modalMode === 'add' && (
+              {modalMode === 'add' ? (
                 <div className={styles['seller-prod-form-group']}>
-                  <label htmlFor="sp-warehouse-id">ID склада</label>
+                  <label htmlFor="sp-qty">Количество на складе</label>
                   <input
-                    id="sp-warehouse-id"
+                    id="sp-qty"
                     type="number"
-                    min={1}
-                    value={draft.warehouseId ?? ''}
+                    min={0}
+                    value={draft.quantity}
                     onChange={(e) =>
                       updateDraft({
-                        warehouseId: Math.max(1, Number(e.target.value) || 1),
+                        quantity: Math.max(0, Number(e.target.value) || 0),
+                        warehouseId: 1,
                       })
                     }
                     className={styles['seller-prod-edit-input']}
                   />
                 </div>
+              ) : (
+                <div className={styles['seller-prod-form-group']}>
+                  <label htmlFor="sp-qty">Количество</label>
+                  <input
+                    id="sp-qty"
+                    type="number"
+                    min={0}
+                    value={draft.quantity}
+                    onChange={(e) =>
+                      updateDraft({
+                        quantity: Math.max(0, Number(e.target.value) || 0),
+                      })
+                    }
+                    className={styles['seller-prod-edit-input']}
+                    disabled
+                  />
+                  <small>Изменение количества в этом окне недоступно.</small>
+                </div>
               )}
 
-              <div className={styles['seller-prod-form-group']}>
-                <label htmlFor="sp-cat">Категория</label>
-                <select
-                  id="sp-cat"
-                  value={draft.categoryId}
-                  onChange={(e) =>
-                    updateDraft({ categoryId: Number(e.target.value) })
-                  }
-                  className={styles['seller-prod-edit-input']}
-                >
-                  {apiCategories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.categoryName}
-                    </option>
-                  ))}
-                </select>
-              </div>
             </div>
 
             <div className={styles['seller-prod-modal-buttons']}>
