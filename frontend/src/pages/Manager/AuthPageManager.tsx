@@ -19,7 +19,7 @@ const AuthPageManager: React.FC = () => {
     const token = localStorage.getItem('token');
     const role = sessionStorage.getItem('userRole');
     if (token && role === 'warehouse_manager') {
-      navigate('/warehouse', { replace: true });
+      navigate('/warehouse/dashboard', { replace: true });
     }
   }, [navigate]);
 

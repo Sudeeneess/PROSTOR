@@ -20,6 +20,12 @@
   color: var(--shop-heading, #111);
 }
 
+.seller-orders-status {
+  margin: 0 0 16px;
+  font-size: 14px;
+  color: var(--shop-text-muted, #666);
+}
+
 .seller-orders-back-button {
   background: none;
   border: none;

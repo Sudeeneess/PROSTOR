@@ -5,11 +5,34 @@ import type {
   OrderResponseDto,
   OrderStatusBody,
   OrderStatusDto,
+  SellerOrdersDashboardResponse,
 } from '../types/order';
 import { getErrorStatus } from '../utils/httpError';
 
 export function createOrdersService(request: RequestFn) {
   return {
+    /** Дашборд продавца по товарам/заказам (SELLER). */
+    async getSellerOrdersDashboard(): Promise<{
+      success: boolean;
+      data?: SellerOrdersDashboardResponse;
+      error?: string;
+      status?: number;
+    }> {
+      try {
+        const data = await request<SellerOrdersDashboardResponse>(
+          '/api/seller/orders/dashboard'
+        );
+        return { success: true, data };
+      } catch (error) {
+        return {
+          success: false,
+          error:
+            error instanceof Error ? error.message : 'Ошибка загрузки статистики продавца',
+          status: getErrorStatus(error),
+        };
+      }
+    },
+
     /** Список всех заказов (роли ADMIN, WAREHOUSE_MANAGER). */
     async getOrders(
       page: number = 0,

@@ -39,3 +39,10 @@ export interface OrderResponseDto {
   totalAmount: number;
   items: OrderItemResponseDto[];
 }
+
+export interface SellerOrdersDashboardResponse {
+  newProducts: number;
+  assembling: number;
+  onTheWay: number;
+  sold: number;
+}

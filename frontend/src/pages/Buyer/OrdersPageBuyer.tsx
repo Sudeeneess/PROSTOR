@@ -5,6 +5,7 @@ import HeaderMain from '../../components/HeaderMain';
 import OrderProductCard from '../../components/OrderProductCard';
 import { api } from '../../services/api';
 import type { OrderResponseDto } from '../../services/api/types/order';
+import { buyerOrderStatusLabelRu } from '../../utils/warehouseOrderStatus';
 import styles from './OrdersPageBuyer.module.css';
 
 const PICKUP_ADDRESS = 'г. Новосибирск, Улица Блюхера 28';
@@ -14,7 +15,6 @@ type OrderCardView = {
   name: string;
   price: string;
   statusLabel: string;
-  isReady: boolean;
 };
 
 function parseCustomerIdValue(value: unknown): number | null {
@@ -37,29 +37,19 @@ async function resolveCustomerId(): Promise<number | null> {
   return parseCustomerIdValue(dash.data.customerId);
 }
 
-function mapOrderStatusLabel(statusName?: string): string {
-  const normalized = (statusName ?? '').toUpperCase();
-  if (normalized === 'PENDING') return 'Ожидает подтверждения';
-  if (normalized === 'CONFIRMED') return 'Собран на складе';
-  if (normalized === 'DELIVERED') return 'Можно забирать';
-  if (normalized === 'CANCELLED') return 'Отменен';
-  return statusName ?? 'Статус уточняется';
+function orderStatusNorm(order: OrderResponseDto): string {
+  return (order.status?.name ?? '').toUpperCase();
 }
 
 function toCards(orders: OrderResponseDto[]): OrderCardView[] {
-  return orders.flatMap((order) => {
-    const normalizedStatus = (order.status?.name ?? '').toUpperCase();
-    const isReady = normalizedStatus === 'DELIVERED';
-    const statusLabel = mapOrderStatusLabel(order.status?.name);
-
-    return order.items.map((item) => ({
+  return orders.flatMap((order) =>
+    order.items.map((item) => ({
       id: `${order.id}-${item.id}`,
       name: item.productName?.trim() || `Товар #${item.productId}`,
       price: `${Number(item.amount || 0).toLocaleString('ru-RU')} ₽`,
-      statusLabel,
-      isReady,
-    }));
-  });
+      statusLabel: buyerOrderStatusLabelRu(order.status?.name),
+    }))
+  );
 }
 
 const OrdersPageBuyer: React.FC = () => {
@@ -104,9 +94,26 @@ const OrdersPageBuyer: React.FC = () => {
     };
   }, []);
 
-  const cards = useMemo(() => toCards(orders), [orders]);
-  const readyCards = useMemo(() => cards.filter((card) => card.isReady), [cards]);
-  const transitCards = useMemo(() => cards.filter((card) => !card.isReady), [cards]);
+  const readyOrders = useMemo(
+    () => orders.filter((o) => orderStatusNorm(o) === 'DELIVERED'),
+    [orders]
+  );
+  const completedOrders = useMemo(
+    () => orders.filter((o) => orderStatusNorm(o) === 'ISSUED'),
+    [orders]
+  );
+  const activeOrders = useMemo(
+    () =>
+      orders.filter((o) => {
+        const s = orderStatusNorm(o);
+        return s !== 'DELIVERED' && s !== 'ISSUED';
+      }),
+    [orders]
+  );
+
+  const readyCards = useMemo(() => toCards(readyOrders), [readyOrders]);
+  const activeCards = useMemo(() => toCards(activeOrders), [activeOrders]);
+  const completedCards = useMemo(() => toCards(completedOrders), [completedOrders]);
 
   const renderCards = (list: OrderCardView[], emptyText: string) => {
     if (list.length === 0) {
@@ -149,19 +156,40 @@ const OrdersPageBuyer: React.FC = () => {
             <div className={styles['buyer-orders-scroll']}>
               {isLoading && <p className={styles['buyer-orders-empty']}>Загрузка заказов...</p>}
               {!isLoading && error && <p className={styles['buyer-orders-empty']}>{error}</p>}
-              {!isLoading && !error && renderCards(readyCards, 'Пока нет заказов, готовых к выдаче.')}
+              {!isLoading &&
+                !error &&
+                renderCards(readyCards, 'Пока нет заказов, готовых к выдаче.')}
             </div>
           </section>
 
-          <section className={styles['buyer-orders-section']} aria-labelledby="orders-transit-heading">
-            <h2 id="orders-transit-heading" className={`${styles['buyer-orders-section-title']} ${styles['buyer-orders-section-title--solo']}`}>
-              В пути
+          <section className={styles['buyer-orders-section']} aria-labelledby="orders-active-heading">
+            <h2 id="orders-active-heading" className={`${styles['buyer-orders-section-title']} ${styles['buyer-orders-section-title--solo']}`}>
+              Активные заказы
             </h2>
 
             <div className={styles['buyer-orders-scroll']}>
               {isLoading && <p className={styles['buyer-orders-empty']}>Загрузка заказов...</p>}
               {!isLoading && error && <p className={styles['buyer-orders-empty']}>{error}</p>}
-              {!isLoading && !error && renderCards(transitCards, 'Пока нет заказов в обработке.')}
+              {!isLoading &&
+                !error &&
+                renderCards(
+                  activeCards,
+                  'Нет активных заказов (ожидается сборка, в пути и т.д.).'
+                )}
+            </div>
+          </section>
+
+          <section className={styles['buyer-orders-section']} aria-labelledby="orders-done-heading">
+            <h2 id="orders-done-heading" className={`${styles['buyer-orders-section-title']} ${styles['buyer-orders-section-title--solo']}`}>
+              Завершённые
+            </h2>
+
+            <div className={styles['buyer-orders-scroll']}>
+              {isLoading && <p className={styles['buyer-orders-empty']}>Загрузка заказов...</p>}
+              {!isLoading && error && <p className={styles['buyer-orders-empty']}>{error}</p>}
+              {!isLoading &&
+                !error &&
+                renderCards(completedCards, 'Пока нет выданных заказов.')}
             </div>
           </section>
         </div>

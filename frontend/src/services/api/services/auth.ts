@@ -33,6 +33,9 @@ export function createAuthService(request: RequestFn) {
     }
     localStorage.setItem('user', JSON.stringify(userPayload));
     sessionStorage.setItem('userRole', response.role);
+    if (response.username?.trim()) {
+      sessionStorage.setItem('userName', response.username.trim());
+    }
 
     if (response.type) {
       localStorage.setItem('tokenType', response.type);

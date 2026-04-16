@@ -189,6 +189,17 @@
   background-color: var(--shop-primary-hover);
 }
 
+.warehouse-shipment-status-select {
+  min-width: 280px;
+  max-width: 100%;
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 10px;
+  border: 1px solid #ced4da;
+  background: #fff;
+  color: #2c3e50;
+}
+
 @media (max-width: 768px) {
   .warehouse-shipment-main-content {
     padding: 15px;

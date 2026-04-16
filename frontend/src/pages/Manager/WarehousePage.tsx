@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 import HeaderManager from './HeaderManager';
 import styles from './WarehousePage.module.css';
 import WarehouseReceiving from './WarehouseReceiving';
 import WarehouseAssembling from './WarehouseAssembling';
 import WarehouseShipment from './WarehouseShipment';
+import { api } from '../../services/api';
+import type { OrderResponseDto, OrderStatusDto } from '../../services/api';
 
 interface Activity {
   id: string;
@@ -15,114 +17,147 @@ interface Activity {
   status: 'success' | 'pending' | 'warning' | 'error';
 }
 
-// Инициализация с примерами данных в формате #S-XX
-const initialActivities: Activity[] = [
-  {
-    id: '1',
-    time: '14:30',
-    action: 'Приемка товара',
-    number: '#S-45',
-    executor: 'Алексей С.',
-    status: 'success'
-  },
-  {
-    id: '2',
-    time: '14:15',
-    action: 'Сборка заказа',
-    number: '#S-46',
-    executor: 'Мария К.',
-    status: 'pending'
-  },
-  {
-    id: '3',
-    time: '13:50',
-    action: 'Отгрузка товара',
-    number: '#S-47',
-    executor: 'Дмитрий В.',
-    status: 'success'
-  },
-  {
-    id: '4',
-    time: '13:20',
-    action: 'Приемка товара',
-    number: '#S-44',
-    executor: 'Алексей С.',
-    status: 'success'
-  },
-  {
-    id: '5',
-    time: '12:45',
-    action: 'Сборка заказа',
-    number: '#S-43',
-    executor: 'Мария К.',
-    status: 'warning'
-  },
-  {
-    id: '6',
-    time: '12:10',
-    action: 'Проверка качества',
-    number: '#S-42',
-    executor: 'Игорь Н.',
-    status: 'success'
-  },
-  {
-    id: '7',
-    time: '11:35',
-    action: 'Отгрузка товара',
-    number: '#S-41',
-    executor: 'Дмитрий В.',
-    status: 'success'
-  },
-  {
-    id: '8',
-    time: '11:00',
-    action: 'Приемка товара',
-    number: '#S-40',
-    executor: 'Алексей С.',
-    status: 'pending'
-  }
-];
+interface DashboardStats {
+  pendingCount: number;
+  confirmedCount: number;
+  shippedCount: number;
+}
+
+const EMPTY_STATS: DashboardStats = {
+  pendingCount: 0,
+  confirmedCount: 0,
+  shippedCount: 0,
+};
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const [userName, setUserName] = useState<string>('Алексей С.');
+  const [userName, setUserName] = useState<string>(() => sessionStorage.getItem('userName') || 'Менеджер');
   const [activeTab, setActiveTab] = useState<string>('dashboard');
-  const [activities, setActivities] = useState<Activity[]>(initialActivities);
-  const [nextOrderNumber, setNextOrderNumber] = useState<number>(48);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [stats, setStats] = useState<DashboardStats>(EMPTY_STATS);
+  const [isLoadingDashboard, setIsLoadingDashboard] = useState<boolean>(true);
+  const [dashboardError, setDashboardError] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     const role = sessionStorage.getItem('userRole');
-    
+
     if (!token || role !== 'warehouse_manager') {
       navigate('/warehouse/auth', { replace: true });
       return;
     }
-    
+
     const storedUserName = sessionStorage.getItem('userName');
     if (storedUserName) {
       setUserName(storedUserName);
     }
+
+    const loadDashboardData = async () => {
+      setIsLoadingDashboard(true);
+      setDashboardError(null);
+
+      const statusesResponse = await api.getOrderStatuses(0, 100);
+      const ordersResponse = await api.getOrders(0, 100);
+
+      if (!statusesResponse.success || !statusesResponse.data) {
+        setDashboardError(statusesResponse.error || 'Не удалось загрузить статусы заказов');
+        setIsLoadingDashboard(false);
+        return;
+      }
+
+      if (!ordersResponse.success || !ordersResponse.data) {
+        setDashboardError(ordersResponse.error || 'Не удалось загрузить список заказов');
+        setIsLoadingDashboard(false);
+        return;
+      }
+
+      const statuses = statusesResponse.data.content;
+      const orders = ordersResponse.data.content;
+      const statusIds = getStatusIds(statuses);
+
+      setStats({
+        pendingCount: countOrdersByStatus(orders, statusIds.PENDING),
+        confirmedCount: countOrdersByStatus(orders, statusIds.CONFIRMED),
+        shippedCount: countOrdersByStatus(orders, statusIds.SHIPPED),
+      });
+
+      const executor = sessionStorage.getItem('userName')?.trim() || 'Менеджер';
+      setActivities(buildActivitiesFromOrders(orders, executor));
+      setIsLoadingDashboard(false);
+    };
+
+    void loadDashboardData();
   }, [navigate]);
 
-  const generateOrderNumber = (): string => {
-    const newNumber = nextOrderNumber;
-    setNextOrderNumber(prev => prev + 1);
-    return `#S-${newNumber}`;
+  const getStatusIds = (statuses: OrderStatusDto[]): Record<string, number | null> => {
+    const byName = new Map(statuses.map((s) => [s.name.toUpperCase(), s.id]));
+    return {
+      PENDING: byName.get('PENDING') ?? null,
+      CONFIRMED: byName.get('CONFIRMED') ?? null,
+      SHIPPED: byName.get('SHIPPED') ?? null,
+      IN_TRANSIT: byName.get('IN_TRANSIT') ?? null,
+      DELIVERED: byName.get('DELIVERED') ?? null,
+      ISSUED: byName.get('ISSUED') ?? null,
+      CANCELLED: byName.get('CANCELLED') ?? null,
+    };
   };
 
-  const addActivity = (newActivity: Omit<Activity, 'id' | 'time' | 'number'> & { number?: string }) => {
-    const activity: Activity = {
-      id: Date.now().toString(),
-      time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
-      number: newActivity.number || generateOrderNumber(),
-      ...newActivity
-    };
-    setActivities(prev => [activity, ...prev.slice(0, 14)]);
+  const countOrdersByStatus = (orders: OrderResponseDto[], statusId: number | null): number => {
+    if (!statusId) return 0;
+    return orders.filter((o) => o.status.id === statusId).length;
+  };
+
+  const buildActivitiesFromOrders = (orders: OrderResponseDto[], executor: string): Activity[] => {
+    const sorted = [...orders].sort((a, b) => {
+      const dateA = a.orderDate ? new Date(a.orderDate).getTime() : 0;
+      const dateB = b.orderDate ? new Date(b.orderDate).getTime() : 0;
+      return dateB - dateA;
+    });
+
+    return sorted.slice(0, 15).map((order, index) => {
+      const mapped = mapStatusToActivity(order.status.name);
+      return {
+        id: `order-${order.id}-${index}`,
+        time: order.orderDate
+          ? new Date(order.orderDate).toLocaleTimeString('ru-RU', {
+              hour: '2-digit',
+              minute: '2-digit',
+            })
+          : '--:--',
+        action: mapped.action,
+        number: `#S-${order.id}`,
+        executor,
+        status: mapped.status,
+      };
+    });
+  };
+
+  const mapStatusToActivity = (
+    statusName: string
+  ): { action: string; status: Activity['status'] } => {
+    const n = statusName.toUpperCase();
+    switch (n) {
+      case 'PENDING':
+        return { action: 'Заказ ожидает сборки', status: 'pending' };
+      case 'CONFIRMED':
+        return { action: 'Заказ собирается на складе', status: 'pending' };
+      case 'SHIPPED':
+        return { action: 'Заказ отправлен на отгрузку', status: 'pending' };
+      case 'IN_TRANSIT':
+        return { action: 'Заказ в пути', status: 'pending' };
+      case 'DELIVERED':
+        return { action: 'Заказ готов к выдаче', status: 'success' };
+      case 'ISSUED':
+        return { action: 'Заказ выдан', status: 'success' };
+      case 'CANCELLED':
+        return { action: 'Заказ отменён', status: 'warning' };
+      default:
+        return { action: `Статус ${statusName}`, status: 'pending' };
+    }
   };
 
   const getStatusClass = (status: Activity['status']) => {
-    switch(status) {
+    switch (status) {
       case 'success':
         return 'status-success';
       case 'pending':
@@ -137,13 +172,13 @@ const Dashboard: React.FC = () => {
   };
 
   const getStatusText = (status: Activity['status']) => {
-    switch(status) {
+    switch (status) {
       case 'success':
-        return 'Выполнено';
+        return 'Готово';
       case 'pending':
-        return 'В процессе';
+        return 'В работе';
       case 'warning':
-        return 'Требует внимания';
+        return 'Отмена';
       case 'error':
         return 'Ошибка';
       default:
@@ -151,82 +186,29 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  // Обработчики для меню
   const handleMenuItemChange = (menuItem: string) => {
     setActiveTab(menuItem);
-    // Добавляем активность при смене меню
-    if (menuItem !== 'dashboard') {
-      addActivity({
-        action: `Переход в раздел ${getMenuTitle(menuItem)}`,
-        executor: userName,
-        status: 'pending'
-      });
-    }
-  };
-
-  const getMenuTitle = (menuItem: string): string => {
-    switch(menuItem) {
-      case 'receiving':
-        return 'Приемка';
-      case 'assembling':
-        return 'Сборка';
-      case 'shipment':
-        return 'Отгрузка';
-      default:
-        return 'Управление';
-    }
   };
 
   const handleManagementClick = () => {
     setActiveTab('dashboard');
   };
 
-  const openReceiving = () => {
-    setActiveTab('receiving');
-    addActivity({
-      action: 'Открыта форма приемки',
-      executor: userName,
-      status: 'pending'
-    });
-  };
-
-  const openAssembling = () => {
-    setActiveTab('assembling');
-    addActivity({
-      action: 'Открыта форма сборки',
-      executor: userName,
-      status: 'pending'
-    });
-  };
-
-  const openShipment = () => {
-    setActiveTab('shipment');
-    addActivity({
-      action: 'Открыта форма отгрузки',
-      executor: userName,
-      status: 'pending'
-    });
-  };
+  const openReceiving = () => setActiveTab('receiving');
+  const openAssembling = () => setActiveTab('assembling');
+  const openShipment = () => setActiveTab('shipment');
 
   const handleBackToDashboard = () => {
     setActiveTab('dashboard');
   };
 
   const handleLogout = () => {
-    addActivity({
-      action: 'Выход из системы',
-      executor: userName,
-      status: 'success'
-    });
-    
-    localStorage.removeItem('token');
-    sessionStorage.removeItem('userName');
-    sessionStorage.removeItem('userRole');
+    api.logout();
     navigate('/', { replace: true });
   };
 
   const renderContent = () => {
-    switch(activeTab) {
+    switch (activeTab) {
       case 'receiving':
         return <WarehouseReceiving onBack={handleBackToDashboard} />;
       case 'assembling':
@@ -240,10 +222,7 @@ const Dashboard: React.FC = () => {
               <h1 className={styles['page-title']}>Панель управления складом</h1>
               <div className={styles['user-info']}>
                 <span className={styles['user-name']}>{userName}</span>
-                <button 
-                  className={styles['logout-button']}
-                  onClick={handleLogout}
-                >
+                <button type="button" className={styles['logout-button']} onClick={handleLogout}>
                   Выйти
                 </button>
               </div>
@@ -251,65 +230,70 @@ const Dashboard: React.FC = () => {
 
             <section className={styles['stats-cards']}>
               <div className={styles['card']}>
-                <div className={styles['card-title']}>Заказов к сборке сегодня</div>
-                <div className={styles['card-value']}>
-                  {activities.filter(a => a.action === 'Сборка заказа' && a.status === 'pending').length}
-                </div>
+                <div className={styles['card-title']}>Ожидают сборки (PENDING)</div>
+                <div className={styles['card-value']}>{stats.pendingCount}</div>
               </div>
               <div className={styles['card']}>
-                <div className={styles['card-title']}>Поставок на приемке</div>
-                <div className={styles['card-value']}>
-                  {activities.filter(a => a.action === 'Приемка товара' && a.status === 'pending').length}
-                </div>
+                <div className={styles['card-title']}>Собираются (CONFIRMED)</div>
+                <div className={styles['card-value']}>{stats.confirmedCount}</div>
               </div>
               <div className={styles['card']}>
-                <div className={styles['card-title']}>Заказов готово к отгрузке</div>
-                <div className={styles['card-value']}>
-                  {activities.filter(a => a.action === 'Отгрузка товара' && a.status === 'success').length}
-                </div>
+                <div className={styles['card-title']}>На отгрузке (SHIPPED)</div>
+                <div className={styles['card-value']}>{stats.shippedCount}</div>
               </div>
             </section>
 
             <section className={styles['quick-actions']}>
               <h2 className={styles['section-title']}>Быстрые действия</h2>
               <div className={styles['action-buttons']}>
-                <button 
-                  className={styles['action-btn']} 
-                  onClick={openReceiving}
-                >
+                <button type="button" className={styles['action-btn']} onClick={openReceiving}>
                   <span>Приемка товара</span>
                 </button>
-
-                <button 
-                  className={`${styles['action-btn']} ${styles['with-ring']}`} 
+                <button
+                  type="button"
+                  className={`${styles['action-btn']} ${styles['with-ring']}`}
                   onClick={openAssembling}
                 >
-                  <span>Заказы на сборку</span>
+                  <span>Сборка</span>
                 </button>
-                <button 
-                  className={styles['action-btn']} 
-                  onClick={openShipment}
-                >
-                  <span>Готово к отгрузке</span>
+                <button type="button" className={styles['action-btn']} onClick={openShipment}>
+                  <span>Отгрузка</span>
                 </button>
               </div>
             </section>
-            
+
             <section className={styles['recent-activity']}>
-              <h2 className={styles['section-title']}>Последние активности</h2>
+              <h2 className={styles['section-title']}>Последние заказы</h2>
+              {dashboardError && (
+                <div className={styles['empty-table']}>
+                  <div className={`${styles['table-row']} ${styles['empty']}`}>
+                    <div className={styles['col']} style={{ gridColumn: '1 / -1', textAlign: 'center' }}>
+                      {dashboardError}
+                    </div>
+                  </div>
+                </div>
+              )}
               <div className={styles['activity-table']}>
                 <div className={styles['table-header']}>
                   <div className={`${styles['col']} ${styles['time']}`}>Время</div>
-                  <div className={`${styles['col']} ${styles['action']}`}>Действие</div>
-                  <div className={`${styles['col']} ${styles['number']}`}>Номер заказа/Поставки</div>
-                  <div className={`${styles['col']} ${styles['executor']}`}>Исполнитель</div>
-                  <div className={`${styles['col']} ${styles['status']}`}>Статус</div>
+                  <div className={`${styles['col']} ${styles['action']}`}>Событие</div>
+                  <div className={`${styles['col']} ${styles['number']}`}>Заказ</div>
+                  <div className={`${styles['col']} ${styles['executor']}`}>Менеджер</div>
+                  <div className={`${styles['col']} ${styles['status']}`}>Этап</div>
                 </div>
-                {activities.length === 0 ? (
+                {isLoadingDashboard ? (
                   <div className={styles['empty-table']}>
                     <div className={`${styles['table-row']} ${styles['empty']}`}>
                       <div className={styles['col']} style={{ gridColumn: '1 / -1', textAlign: 'center' }}>
-                        Нет активностей
+                        Загрузка…
+                      </div>
+                    </div>
+                  </div>
+                ) : activities.length === 0 ? (
+                  <div className={styles['empty-table']}>
+                    <div className={`${styles['table-row']} ${styles['empty']}`}>
+                      <div className={styles['col']} style={{ gridColumn: '1 / -1', textAlign: 'center' }}>
+                        Нет заказов
                       </div>
                     </div>
                   </div>
@@ -343,13 +327,8 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className={styles['dashboard-wrapper']}>
-      <HeaderManager 
-        onMenuItemChange={handleMenuItemChange}
-        onManagementClick={handleManagementClick}
-      />
-      <main className={styles['main-content']}>
-        {renderContent()}
-      </main>
+      <HeaderManager onMenuItemChange={handleMenuItemChange} onManagementClick={handleManagementClick} />
+      <main className={styles['main-content']}>{renderContent()}</main>
     </div>
   );
 };

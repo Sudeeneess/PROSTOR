@@ -1,196 +1,246 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import HeaderManager from './HeaderManager';
-import WindWarehouseShipment from './WindWarehouseShipment';
 import styles from './WarehouseShipment.module.css';
-
-interface Order {
-  id: string;
-  items: string;
-  collector: string;
-  time: string;
-  selected: boolean;
-}
-
-interface SelectedOrderData {
-  id: string;
-  items: Array<{ name: string; quantity: number }>;
-  deliveryMethod: string;
-  address: string;
-}
+import { api } from '../../services/api';
+import type { OrderResponseDto } from '../../services/api';
+import { orderStatusIdsByName, shipmentStatusOptionLabel } from '../../utils/warehouseOrderStatus';
 
 interface WarehouseShipmentProps {
   onBack: () => void;
 }
 
+/** Заказы на вкладке «Отгрузка»: после отправки со сборки до выдачи */
+const SHIPMENT_PIPELINE = ['SHIPPED', 'IN_TRANSIT', 'DELIVERED'] as const;
+
 const WarehouseShipment: React.FC<WarehouseShipmentProps> = ({ onBack }) => {
   const navigate = useNavigate();
-  const [userName, setUserName] = useState<string>('И. И. Иванов');
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [isWindowOpen, setIsWindowOpen] = useState<boolean>(false);
-  const [selectedOrderData, setSelectedOrderData] = useState<SelectedOrderData | null>(null);
-  const [orders, setOrders] = useState<Order[]>([
-    { id: '#S-45', items: '3 позиции', collector: 'Иванов А.', time: '25.10 14:30', selected: false },
-    { id: '#S-46', items: '5 позиций', collector: 'Петров А.', time: '26.10 14:30', selected: false },
-    { id: '#S-47', items: '10 позиций', collector: 'Сидоров А.', time: '24.10 14:30', selected: false }
-  ]);
+  const [orders, setOrders] = useState<OrderResponseDto[]>([]);
+  const [statusByName, setStatusByName] = useState<Map<string, number>>(new Map());
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [rowError, setRowError] = useState<string | null>(null);
+  const [updatingOrderId, setUpdatingOrderId] = useState<number | null>(null);
+
+  const loadOrders = useCallback(async () => {
+    const ordersRes = await api.getOrders(0, 200);
+    if (!ordersRes.success || !ordersRes.data) {
+      setError(ordersRes.error || 'Не удалось загрузить заказы');
+      return;
+    }
+
+    const allowed = new Set<string>(SHIPMENT_PIPELINE);
+    const list = ordersRes.data.content.filter((o) =>
+      allowed.has((o.status?.name ?? '').toUpperCase())
+    );
+    list.sort((a, b) => {
+      const ta = a.orderDate ? new Date(a.orderDate).getTime() : 0;
+      const tb = b.orderDate ? new Date(b.orderDate).getTime() : 0;
+      return tb - ta;
+    });
+    setOrders(list);
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     const role = sessionStorage.getItem('userRole');
-    
     if (!token || role !== 'warehouse_manager') {
       navigate('/warehouse/auth', { replace: true });
       return;
     }
-    
-    const storedUserName = sessionStorage.getItem('userName');
-    if (storedUserName) {
-      setUserName(storedUserName);
+
+    const run = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      const statusesRes = await api.getOrderStatuses(0, 100);
+      if (!statusesRes.success || !statusesRes.data) {
+        setError(statusesRes.error || 'Не удалось загрузить статусы');
+        setIsLoading(false);
+        return;
+      }
+      setStatusByName(orderStatusIdsByName(statusesRes.data.content));
+
+      await loadOrders();
+      setIsLoading(false);
+    };
+    void run();
+  }, [navigate, loadOrders]);
+
+  const formatDate = (value?: string) => {
+    if (!value) return '—';
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return '—';
+    return d.toLocaleString('ru-RU', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const itemsLabel = (count: number) =>
+    `${count} ${count === 1 ? 'позиция' : count < 5 ? 'позиции' : 'позиций'}`;
+
+  const optionsForRow = (current: string): readonly string[] => {
+    switch (current) {
+      case 'SHIPPED':
+        return ['SHIPPED', 'IN_TRANSIT'] as const;
+      case 'IN_TRANSIT':
+        return ['IN_TRANSIT', 'DELIVERED'] as const;
+      case 'DELIVERED':
+        return ['DELIVERED', 'ISSUED'] as const;
+      default:
+        return [current];
     }
-  }, [navigate]);
-
-  const handleBack = () => {
-    onBack();
   };
 
-  const handleSelectOrder = (orderId: string) => {
-    setOrders(orders.map((order: Order) => 
-      order.id === orderId ? { ...order, selected: !order.selected } : order
-    ));
+  const optionDisabled = (current: string, code: string): boolean => {
+    if (current === 'SHIPPED' && code === 'DELIVERED') return true;
+    if (current === 'IN_TRANSIT' && code === 'SHIPPED') return true;
+    if (current === 'DELIVERED' && (code === 'SHIPPED' || code === 'IN_TRANSIT')) return true;
+    return false;
   };
 
-  const handleShipOrders = () => {
-    const selectedOrders = orders.filter((order: Order) => order.selected);
-    
-    if (selectedOrders.length > 0) {
-      setSelectedOrderData({
-        id: selectedOrders[0].id,
-        items: [
-          { name: 'Куртки', quantity: 50 },
-          { name: 'Штаны', quantity: 30 },
-          { name: 'Футболки', quantity: 100 }
-        ],
-        deliveryMethod: 'Курьерская служба "Доставка"',
-        address: 'г. Москва, ул. Примерная, д. 10, кв. 25'
-      });
-      setIsWindowOpen(true);
+  const handleStatusChange = async (order: OrderResponseDto, nextName: string) => {
+    const current = order.status.name.toUpperCase();
+    const next = nextName.toUpperCase();
+    if (current === next) return;
+
+    const nextId = statusByName.get(next);
+    if (nextId == null) {
+      setRowError(`Статус ${next} не найден в справочнике`);
+      return;
+    }
+
+    setRowError(null);
+    setUpdatingOrderId(order.id);
+
+    try {
+      const res = await api.setOrderStatus(order.id, nextId);
+      if (!res.success) {
+        throw new Error(res.error || 'Не удалось обновить статус');
+      }
+      await loadOrders();
+    } catch (e) {
+      setRowError(e instanceof Error ? e.message : 'Ошибка сохранения');
+    } finally {
+      setUpdatingOrderId(null);
     }
   };
 
-  const handleConfirmShipment = () => {
-    console.log('Отгрузка подтверждена для:', selectedOrderData);
-    
-    // Удаляем выбранные заказы из списка
-    setOrders(prevOrders => prevOrders.filter(order => !order.selected));
-    
-    // Закрываем окно и сбрасываем выбранные данные
-    setIsWindowOpen(false);
-    setSelectedOrderData(null);
-  };
-
-  const filteredOrders = orders.filter((order: Order) => 
-    order.id.toLowerCase().includes(searchTerm.toLowerCase())
+  const filtered = orders.filter((o) =>
+    `#S-${o.id}`.toLowerCase().includes(searchTerm.trim().toLowerCase())
   );
 
-  const totalReadyCount = orders.length;
-  const totalCost = 427800;
-  const selectedCount = orders.filter((order: Order) => order.selected).length;
+  const totalCost = filtered.reduce((s, o) => s + (o.totalAmount ?? 0), 0);
+
+  if (isLoading) {
+    return (
+      <div className={styles['warehouse-shipment-main-content']}>
+        <div className={styles['warehouse-shipment-header']}>
+          <h1 className={styles['warehouse-shipment-page-title']}>Отгрузка</h1>
+          <button type="button" className={styles['warehouse-shipment-back-button']} onClick={onBack}>
+            Назад
+          </button>
+        </div>
+        <div className={styles['warehouse-shipment-table-container']}>Загрузка…</div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles['warehouse-shipment-main-content']}>
       <div className={styles['warehouse-shipment-header']}>
         <h1 className={styles['warehouse-shipment-page-title']}>Отгрузка</h1>
-        <button 
-          className={styles['warehouse-shipment-back-button']}
-          onClick={handleBack}
-        >
+        <button type="button" className={styles['warehouse-shipment-back-button']} onClick={onBack}>
           Назад
         </button>
       </div>
 
       <div className={styles['warehouse-shipment-stats-row']}>
         <div className={styles['warehouse-shipment-ready-info']}>
-          <div className={styles['warehouse-shipment-ready-label']}>Готово к отгрузке</div>
-          <div className={styles['warehouse-shipment-ready-count']}>{totalReadyCount}</div>
+          <div className={styles['warehouse-shipment-ready-label']}>В работе на отгрузке</div>
+          <div className={styles['warehouse-shipment-ready-count']}>{filtered.length}</div>
         </div>
-        
         <div className={styles['warehouse-shipment-cost-info']}>
-          <div className={styles['warehouse-shipment-cost-label']}>Общая стоимость</div>
-          <div className={styles['warehouse-shipment-cost-value']}>{totalCost.toLocaleString()} ₽</div>
+          <div className={styles['warehouse-shipment-cost-label']}>Сумма (отфильтр.)</div>
+          <div className={styles['warehouse-shipment-cost-value']}>{totalCost.toLocaleString('ru-RU')} ₽</div>
         </div>
-        
         <div className={styles['warehouse-shipment-search-wrapper']}>
           <input
-            type="text"
+            type="search"
             className={styles['warehouse-shipment-search-input']}
-            placeholder="Поиск по номеру заказа"
+            placeholder="Поиск по номеру (#S-12)"
             value={searchTerm}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>
+
+      {error && (
+        <div className={styles['warehouse-shipment-table-container']} role="alert">
+          {error}
+        </div>
+      )}
+      {rowError && (
+        <div className={styles['warehouse-shipment-table-container']} role="alert">
+          {rowError}
+        </div>
+      )}
 
       <div className={styles['warehouse-shipment-table-container']}>
         <table className={styles['warehouse-shipment-table']}>
           <thead>
             <tr>
-              <th className={styles['warehouse-shipment-col-select']}></th>
               <th className={styles['warehouse-shipment-col-order']}>Заказ</th>
               <th className={styles['warehouse-shipment-col-items']}>Товары</th>
-              <th className={styles['warehouse-shipment-col-collector']}>Сборщик</th>
-              <th className={styles['warehouse-shipment-col-time']}>Время</th>
+              <th className={styles['warehouse-shipment-col-time']}>Дата</th>
+              <th>Статус</th>
             </tr>
           </thead>
           <tbody>
-            {filteredOrders.map((order: Order) => (
-              <tr key={order.id}>
-                <td className={styles['warehouse-shipment-col-select']}>
-                  <input
-                    type="checkbox"
-                    className={styles['warehouse-shipment-checkbox']}
-                    checked={order.selected}
-                    onChange={() => handleSelectOrder(order.id)}
-                  />
-                </td>
-                <td className={styles['warehouse-shipment-col-order']}>{order.id}</td>
-                <td className={styles['warehouse-shipment-col-items']}>{order.items}</td>
-                <td className={styles['warehouse-shipment-col-collector']}>{order.collector}</td>
-                <td className={styles['warehouse-shipment-col-time']}>{order.time}</td>
+            {filtered.length === 0 ? (
+              <tr>
+                <td colSpan={4}>Нет заказов в статусах SHIPPED, IN_TRANSIT или DELIVERED</td>
               </tr>
-            ))}
+            ) : (
+              filtered.map((order) => {
+                const current = order.status.name.toUpperCase();
+                const codes = optionsForRow(current);
+                const busy = updatingOrderId === order.id;
+                return (
+                  <tr key={order.id}>
+                    <td className={styles['warehouse-shipment-col-order']}>#S-{order.id}</td>
+                    <td className={styles['warehouse-shipment-col-items']}>
+                      {itemsLabel(order.items.length)}
+                    </td>
+                    <td className={styles['warehouse-shipment-col-time']}>{formatDate(order.orderDate)}</td>
+                    <td>
+                      <select
+                        className={styles['warehouse-shipment-status-select']}
+                        value={current}
+                        disabled={busy}
+                        onChange={(e) => void handleStatusChange(order, e.target.value)}
+                        aria-label={`Статус отгрузки #S-${order.id}`}
+                      >
+                        {codes.map((code) => (
+                          <option key={code} value={code} disabled={optionDisabled(current, code)}>
+                            {shipmentStatusOptionLabel(code)}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
           </tbody>
         </table>
       </div>
-
-      {selectedCount > 0 && (
-        <div className={styles['warehouse-shipment-action-buttons']}>
-          <button 
-            className={styles['warehouse-shipment-ship-button']}
-            onClick={handleShipOrders}
-          >
-            Отгрузить выбранные
-          </button>
-        </div>
-      )}
-
-      <WindWarehouseShipment
-        isOpen={isWindowOpen}
-        onClose={() => {
-          setIsWindowOpen(false);
-          setSelectedOrderData(null);
-        }}
-        onConfirm={handleConfirmShipment}
-        orderData={selectedOrderData || {
-          id: '',
-          items: [],
-          deliveryMethod: '',
-          address: ''
-        }}
-      />
     </div>
   );
 };
 
 export default WarehouseShipment;
-export { HeaderManager };

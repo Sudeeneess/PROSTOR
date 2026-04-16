@@ -29,6 +29,7 @@ export type {
   OrderStatusBody,
   OrderItemResponseDto,
   OrderResponseDto,
+  SellerOrdersDashboardResponse,
   PaymentDto,
   OrderMovementDto,
   CustomerDashboard,

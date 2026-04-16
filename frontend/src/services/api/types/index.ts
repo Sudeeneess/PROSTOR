@@ -28,6 +28,7 @@ export type {
   OrderStatusBody,
   OrderItemResponseDto,
   OrderResponseDto,
+  SellerOrdersDashboardResponse,
 } from './order';
 export type { PaymentDto } from './payment';
 export type { OrderMovementDto } from './orderMovement';
