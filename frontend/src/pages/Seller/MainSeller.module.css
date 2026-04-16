@@ -16,15 +16,15 @@
 }
 
 .seller-main {
-  padding: 32px 24px 56px;
+  padding: 44px 34px 74px;
 }
 
 .seller-wrapper {
-  max-width: 1120px;
+  max-width: 1360px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
-  gap: clamp(24px, 4vw, 48px);
+  grid-template-columns: minmax(0, 1.2fr) minmax(340px, 0.9fr);
+  gap: clamp(32px, 4vw, 60px);
   align-items: start;
 }
 
@@ -37,15 +37,15 @@
 /* Левая колонка — инфо + CTA */
 .seller-hero {
   background: rgba(255, 255, 255, 0.92);
-  border-radius: 28px;
-  padding: clamp(28px, 4vw, 44px);
+  border-radius: 34px;
+  padding: clamp(36px, 4vw, 56px);
   border: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 16px 46px rgba(0, 0, 0, 0.08);
 }
 
 .seller-hero-eyebrow {
-  margin: 0 0 10px;
-  font-size: 13px;
+  margin: 0 0 12px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -53,8 +53,8 @@
 }
 
 .seller-hero-title {
-  margin: 0 0 16px;
-  font-size: clamp(1.75rem, 4vw, 2.65rem);
+  margin: 0 0 20px;
+  font-size: clamp(2rem, 4vw, 3.1rem);
   font-weight: 800;
   line-height: 1.15;
   color: var(--shop-heading, #000);
@@ -62,21 +62,21 @@
 }
 
 .seller-hero-lead {
-  margin: 0 0 22px;
-  max-width: 38rem;
-  font-size: 1.05rem;
-  line-height: 1.6;
+  margin: 0 0 28px;
+  max-width: 42rem;
+  font-size: 1.2rem;
+  line-height: 1.65;
   color: var(--shop-text-muted, #4b5563);
 }
 
 .seller-benefits {
-  margin: 0 0 28px;
-  padding-left: 1.15rem;
+  margin: 0 0 34px;
+  padding-left: 1.35rem;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  font-size: 0.98rem;
-  line-height: 1.45;
+  gap: 12px;
+  font-size: 1.08rem;
+  line-height: 1.5;
   color: var(--shop-text, #111);
 }
 
@@ -88,7 +88,7 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 12px;
+  gap: 14px;
   width: 100%;
   max-width: 100%;
 }
@@ -98,9 +98,9 @@
   cursor: pointer;
   width: 100%;
   box-sizing: border-box;
-  padding: 18px 28px;
+  padding: 20px 34px;
   border-radius: 999px;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--shop-on-primary, #fff);
   background: linear-gradient(
@@ -130,9 +130,9 @@
 .seller-login-btn {
   width: 100%;
   box-sizing: border-box;
-  padding: 10px 20px;
+  padding: 12px 24px;
   border-radius: 999px;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--shop-primary, #447add);
   background: var(--shop-surface, #fff);
@@ -157,7 +157,7 @@
 
 .seller-cta-note {
   margin: 0;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--shop-text-muted, #6b7280);
   text-align: center;
 }
@@ -165,34 +165,34 @@
 /* Правая панель */
 .seller-info-panel {
   background: rgba(255, 255, 255, 0.95);
-  border-radius: 24px;
-  padding: 26px 24px;
+  border-radius: 30px;
+  padding: 34px 30px;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.07);
 }
 
 .seller-panel-title {
-  margin: 0 0 18px;
-  font-size: 1.1rem;
+  margin: 0 0 22px;
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--shop-heading, #000);
 }
 
 .seller-steps {
-  margin: 0 0 22px;
+  margin: 0 0 28px;
   padding: 0;
   list-style: none;
   counter-reset: step;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 18px;
 }
 
 .seller-steps li {
   counter-increment: step;
   position: relative;
-  padding-left: 36px;
-  min-height: 44px;
+  padding-left: 44px;
+  min-height: 52px;
 }
 
 .seller-steps li::before {
@@ -200,12 +200,12 @@
   position: absolute;
   left: 0;
   top: 0;
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: var(--shop-primary-soft, rgba(81, 153, 235, 0.15));
   color: var(--shop-primary, #5199eb);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 800;
   display: flex;
   align-items: center;
@@ -214,54 +214,54 @@
 
 .seller-steps strong {
   display: block;
-  font-size: 0.95rem;
-  margin-bottom: 4px;
+  font-size: 1.05rem;
+  margin-bottom: 6px;
   color: var(--shop-heading, #000);
 }
 
 .seller-steps span {
-  font-size: 0.88rem;
+  font-size: 0.96rem;
   color: var(--shop-text-muted, #4b5563);
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 .seller-review {
-  margin: 0 0 20px;
-  padding: 14px 16px;
+  margin: 0 0 24px;
+  padding: 18px 20px;
   background: #f0f4f8;
-  border-radius: 16px;
+  border-radius: 20px;
   border-left: 4px solid var(--shop-primary, #5199eb);
 }
 
 .seller-review blockquote {
-  margin: 0 0 8px;
-  font-size: 0.9rem;
+  margin: 0 0 10px;
+  font-size: 1rem;
   font-style: italic;
   color: var(--shop-text, #111);
-  line-height: 1.45;
+  line-height: 1.5;
 }
 
 .seller-review figcaption {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--shop-text-muted, #6b7280);
 }
 
 .seller-faq {
-  margin-top: 8px;
+  margin-top: 12px;
 }
 
 .seller-faq-heading {
-  margin: 0 0 12px;
-  font-size: 0.95rem;
+  margin: 0 0 14px;
+  font-size: 1.05rem;
   font-weight: 700;
   color: var(--shop-heading, #000);
 }
 
 .seller-faq-item {
   background: var(--shop-bg, #f4f4f8);
-  border-radius: 14px;
-  padding: 12px 14px;
-  margin-bottom: 10px;
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
   border: 1px solid var(--shop-border, #e5e7eb);
 }
 
@@ -271,14 +271,14 @@
 
 .seller-faq-item b {
   display: block;
-  font-size: 0.85rem;
-  margin-bottom: 4px;
+  font-size: 0.95rem;
+  margin-bottom: 6px;
   color: #222;
 }
 
 .seller-faq-item p {
   margin: 0;
-  font-size: 0.82rem;
+  font-size: 0.9rem;
   color: var(--shop-text-muted, #4b5563);
-  line-height: 1.4;
+  line-height: 1.45;
 }
