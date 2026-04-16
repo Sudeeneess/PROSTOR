@@ -26,7 +26,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -134,12 +136,33 @@ public class OrderService {
         order.setOrderDate(LocalDateTime.now());
         order.setTotalAmount(0);
 
+        Map<Integer, Product> productsById = new HashMap<>();
+        for (OrderItemRequest itemReq : request.getItems()) {
+            productsById.computeIfAbsent(itemReq.getProductId(), productId ->
+                    productRepository.findById(productId)
+                            .orElseThrow(() -> new EntityNotFoundException("Продукт не найден с идентификатором: " + productId)));
+        }
+
+        Map<Integer, Long> requestedByProduct = request.getItems().stream()
+                .collect(Collectors.groupingBy(OrderItemRequest::getProductId, Collectors.counting()));
+
+        for (Map.Entry<Integer, Long> requestedEntry : requestedByProduct.entrySet()) {
+            Integer productId = requestedEntry.getKey();
+            long requested = requestedEntry.getValue();
+            int totalAvailable = warehouseStockService.getTotalAvailableQuantity(productId);
+            Product product = productsById.get(productId);
+
+            if (totalAvailable < requested) {
+                throw new IllegalStateException("Недостаточно товара '" + product.getName() +
+                        "' на складе. Запрошено: " + requested + ", доступно: " + totalAvailable);
+            }
+        }
+
         Order savedOrder = orderRepository.save(order);
 
         double total = 0;
         for (OrderItemRequest itemReq : request.getItems()) {
-            Product product = productRepository.findById(itemReq.getProductId())
-                    .orElseThrow(() -> new EntityNotFoundException("Продукт не найден с идентификатором: " + itemReq.getProductId()));
+            Product product = productsById.get(itemReq.getProductId());
 
             OrderItem item = toItemEntity(itemReq, savedOrder, product);
             orderItemRepository.save(item);
@@ -166,25 +189,43 @@ public class OrderService {
 
         List<OrderItem> items = orderItemRepository.findByOrderId(orderId);
 
-        for (OrderItem item : items) {
-            int totalAvailable = warehouseStockService.getTotalAvailableQuantity(item.getProduct().getId());
+        Map<Integer, Long> requestedByProduct = items.stream()
+                .collect(Collectors.groupingBy(item -> item.getProduct().getId(), Collectors.counting()));
+        Map<Integer, String> productNamesById = items.stream()
+                .collect(Collectors.toMap(
+                        item -> item.getProduct().getId(),
+                        item -> item.getProduct().getName(),
+                        (first, ignored) -> first
+                ));
 
-            log.debug("Product: {}, available: {}, requested: 1",
-                    item.getProduct().getName(), totalAvailable);
+        for (Map.Entry<Integer, Long> requestedEntry : requestedByProduct.entrySet()) {
+            Integer productId = requestedEntry.getKey();
+            long requested = requestedEntry.getValue();
+            int totalAvailable = warehouseStockService.getTotalAvailableQuantity(productId);
+            String productName = productNamesById.get(productId);
 
-            if (totalAvailable <= 0) {
-                throw new IllegalStateException("Товар '" + item.getProduct().getName() +
-                        "' отсутствует на складе. Доступно: " + totalAvailable);
+            log.debug("Product: {}, available: {}, requested: {}",
+                    productName, totalAvailable, requested);
+
+            if (totalAvailable < requested) {
+                throw new IllegalStateException("Товар '" + productName +
+                        "' отсутствует в достаточном количестве. Запрошено: " + requested +
+                        ", доступно: " + totalAvailable);
             }
+        }
 
-            boolean reserved = warehouseStockService.reserveProduct(item.getProduct().getId(), 1);
+        for (OrderItem item : items) {
+            Integer productId = item.getProduct().getId();
+            String productName = item.getProduct().getName();
+
+            boolean reserved = warehouseStockService.reserveProduct(productId, 1);
 
             if (!reserved) {
                 throw new IllegalStateException("Не удалось зарезервировать товар '" +
-                        item.getProduct().getName() + "'. Возможно, он уже был зарезервирован другим заказом.");
+                        productName + "'. Возможно, он уже был зарезервирован другим заказом.");
             }
 
-            log.debug("Successfully reserved product: {}", item.getProduct().getName());
+            log.debug("Successfully reserved product: {}", productName);
         }
 
         for (OrderItem item : items) {
