@@ -4,10 +4,12 @@ import HeaderSeller from './HeaderSeller';
 import styles from './ProductSeller.module.css';
 import {
   api,
+  type BrandRow,
   type Category,
   type ProductRequest,
   type SellerProduct,
   type SellerProductCreateRequest,
+  type SizeDto,
 } from '../../services/api';
 
 export interface SellerProductRow {
@@ -16,10 +18,12 @@ export interface SellerProductRow {
   description: string;
   type: string;
   brand: string;
+  brandId: number | null;
   size: string;
+  sizeId: number | null;
   price: string;
   quantity: number;
-  /** id категории с сервера (GET /api/categories) */
+  /* GET /api/categories */
   categoryId: number;
   sellerId: number;
   imageUrl: string;
@@ -34,7 +38,9 @@ function productToRow(p: SellerProduct): SellerProductRow {
     description: '',
     type: '',
     brand: '',
+    brandId: null,
     size: '',
+    sizeId: null,
     price: String(p.price),
     quantity: p.availableQuantity ?? 0,
     categoryId: p.categoryId,
@@ -52,7 +58,9 @@ function createEmptyDraft(defaultCategoryId: number, sellerId: number): SellerPr
     description: '',
     type: '',
     brand: '',
+    brandId: null,
     size: '',
+    sizeId: null,
     price: '0',
     quantity: 0,
     categoryId: defaultCategoryId,
@@ -76,10 +84,18 @@ function toDeleteErrorMessage(raw?: string): string {
   return 'Ошибка удаления товара.';
 }
 
+function buildCardPhotoPayload(imageUrl: string): Array<Record<string, unknown>> {
+  const trimmed = imageUrl.trim();
+  if (!trimmed) return [];
+  return [{ url: trimmed }];
+}
+
 const ProductSeller: React.FC = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState<SellerProductRow[]>([]);
   const [apiCategories, setApiCategories] = useState<Category[]>([]);
+  const [apiBrands, setApiBrands] = useState<BrandRow[]>([]);
+  const [apiSizes, setApiSizes] = useState<SizeDto[]>([]);
   const [listError, setListError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -100,10 +116,18 @@ const ProductSeller: React.FC = () => {
     setLoading(true);
     setListError(null);
 
-    const catRes = await api.getCategoriesListForUi();
-    const cats =
-      catRes.success && catRes.data?.content?.length ? catRes.data.content : [];
+    const [catRes, brandsRes, sizesRes] = await Promise.all([
+      api.getCategoriesListForUi(),
+      api.getBrands(0, 200),
+      api.getSizes(0, 200),
+    ]);
+
+    const cats = catRes.success && catRes.data?.content?.length ? catRes.data.content : [];
+    const brands = brandsRes.success && brandsRes.data?.content?.length ? brandsRes.data.content : [];
+    const sizes = sizesRes.success && sizesRes.data?.content?.length ? sizesRes.data.content : [];
     setApiCategories(cats);
+    setApiBrands(brands);
+    setApiSizes(sizes);
 
     const res = await api.getSellerProducts(0, 100);
     if (!res.success) {
@@ -132,7 +156,9 @@ const ProductSeller: React.FC = () => {
           description: primaryCard?.description ?? '',
           type: primaryCard?.type ?? '',
           brand: primaryCard?.brand?.name ?? '—',
+          brandId: primaryCard?.brand?.id ?? null,
           size: primaryCard?.size?.name ?? '—',
+          sizeId: primaryCard?.size?.id ?? null,
         };
       })
     );
@@ -263,6 +289,10 @@ const ProductSeller: React.FC = () => {
       window.alert('Сначала должны загрузиться категории с сервера. Проверьте бэкенд.');
       return;
     }
+    if (!apiBrands.length || !apiSizes.length) {
+      window.alert('Не удалось загрузить бренды или размеры. Проверьте справочники на сервере.');
+      return;
+    }
     setModalMode('add');
     setDraft(createEmptyDraft(defaultCategoryId, fallbackSellerId));
     setModalOpen(true);
@@ -328,6 +358,22 @@ const ProductSeller: React.FC = () => {
       window.alert('Укажите цену больше нуля');
       return;
     }
+    if (!draft.type.trim()) {
+      window.alert('Укажите подкатегорию');
+      return;
+    }
+    if (!draft.description.trim()) {
+      window.alert('Укажите описание товара');
+      return;
+    }
+    if (!draft.brandId) {
+      window.alert('Выберите бренд');
+      return;
+    }
+    if (!draft.sizeId) {
+      window.alert('Выберите размер');
+      return;
+    }
 
     setSaving(true);
     try {
@@ -345,6 +391,28 @@ const ProductSeller: React.FC = () => {
           window.alert(res.error ?? 'Не удалось создать товар');
           return;
         }
+
+        const createdProductId = res.data?.id;
+        if (!createdProductId) {
+          window.alert('Товар создан, но не удалось получить id для сохранения карточки.');
+          closeModal();
+          await loadProducts();
+          return;
+        }
+
+        const cardRes = await api.createProductCard(createdProductId, {
+          description: draft.description.trim(),
+          type: draft.type.trim(),
+          brandId: draft.brandId,
+          sizeId: draft.sizeId,
+          isActive: true,
+          photo: buildCardPhotoPayload(draft.imageUrl),
+        });
+        if (!cardRes.success) {
+          window.alert(
+            `Товар создан, но карточка (описание/подкатегория/бренд/размер) не сохранена: ${cardRes.error ?? 'неизвестная ошибка'}`
+          );
+        }
       } else {
         const body: ProductRequest = {
           name: draft.name.trim(),
@@ -356,6 +424,41 @@ const ProductSeller: React.FC = () => {
         if (!res.success) {
           window.alert(res.error ?? 'Не удалось сохранить товар');
           return;
+        }
+
+        const cardsRes = await api.getProductCards(draft.id);
+        const cards = cardsRes.success ? cardsRes.data ?? [] : [];
+        const activeCard = cards.find((c) => c.isActive !== false) ?? cards[0];
+
+        if (activeCard) {
+          const cardUpdateRes = await api.updateProductCard(draft.id, activeCard.id, {
+            productId: draft.id,
+            description: draft.description.trim(),
+            type: draft.type.trim(),
+            brandId: draft.brandId,
+            sizeId: draft.sizeId,
+            isActive: true,
+            photo: buildCardPhotoPayload(draft.imageUrl),
+          });
+          if (!cardUpdateRes.success) {
+            window.alert(
+              `Базовые данные товара сохранены, но карточка не обновлена: ${cardUpdateRes.error ?? 'неизвестная ошибка'}`
+            );
+          }
+        } else {
+          const cardCreateRes = await api.createProductCard(draft.id, {
+            description: draft.description.trim(),
+            type: draft.type.trim(),
+            brandId: draft.brandId,
+            sizeId: draft.sizeId,
+            isActive: true,
+            photo: buildCardPhotoPayload(draft.imageUrl),
+          });
+          if (!cardCreateRes.success) {
+            window.alert(
+              `Базовые данные товара сохранены, но карточка не создана: ${cardCreateRes.error ?? 'неизвестная ошибка'}`
+            );
+          }
         }
       }
       closeModal();
@@ -694,6 +797,56 @@ const ProductSeller: React.FC = () => {
                     {modalSubcategoryOptions.map((subcategory) => (
                       <option key={subcategory} value={subcategory}>
                         {subcategory}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className={styles['seller-prod-form-row']}>
+                <div className={styles['seller-prod-form-group']}>
+                  <label htmlFor="sp-brand">Бренд</label>
+                  <select
+                    id="sp-brand"
+                    value={draft.brandId ?? ''}
+                    onChange={(e) => {
+                      const selectedId = e.target.value === '' ? null : Number(e.target.value);
+                      const selectedBrand = apiBrands.find((b) => b.id === selectedId) ?? null;
+                      updateDraft({
+                        brandId: selectedId,
+                        brand: selectedBrand?.name ?? '—',
+                      });
+                    }}
+                    className={styles['seller-prod-edit-input']}
+                  >
+                    <option value="">Выберите бренд</option>
+                    {apiBrands.map((brand) => (
+                      <option key={brand.id} value={brand.id}>
+                        {brand.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className={styles['seller-prod-form-group']}>
+                  <label htmlFor="sp-size">Размер</label>
+                  <select
+                    id="sp-size"
+                    value={draft.sizeId ?? ''}
+                    onChange={(e) => {
+                      const selectedId = e.target.value === '' ? null : Number(e.target.value);
+                      const selectedSize = apiSizes.find((s) => s.id === selectedId) ?? null;
+                      updateDraft({
+                        sizeId: selectedId,
+                        size: selectedSize?.name ?? '—',
+                      });
+                    }}
+                    className={styles['seller-prod-edit-input']}
+                  >
+                    <option value="">Выберите размер</option>
+                    {apiSizes.map((size) => (
+                      <option key={size.id} value={size.id}>
+                        {size.name}
                       </option>
                     ))}
                   </select>

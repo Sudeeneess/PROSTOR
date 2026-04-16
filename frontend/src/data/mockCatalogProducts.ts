@@ -1,9 +1,7 @@
 import { CATALOG_CATEGORIES } from './categories';
 
-/**
- * Товар в каталоге (как придёт с бэка: products + product_card + brand + size).
- * imageUrl — первое фото из JSONB product_card.photo.
- */
+
+ /* Товар в каталоге */
 export type CatalogGridProduct = {
   id: number;
   name: string;
@@ -18,11 +16,11 @@ export type CatalogGridProduct = {
   imageUrl: string;
 };
 
-/** Состояние фильтров. Подкатегории — только на странице /catalog/:категория (без /подкатегория). */
+/** Состояние фильтров. Подкатегории — только на странице /catalog/:категория (без /подкатегория) */
 export type CatalogFilterState = {
   brands: string[];
   sizes: string[];
-  /** slug подкатегорий (кроссовки, туфли …) — фильтр «тип товара» на странице категории */
+  /* фильтр «тип товара» на странице категории */
   subcategorySlugs: string[];
   priceMin: string;
   priceMax: string;
@@ -40,7 +38,7 @@ export function emptyCatalogFilter(): CatalogFilterState {
 
 const byId = new Map<number, CatalogGridProduct>();
 
-// Значения как у справочников brand / size и поля type в product_card
+//brand / size и поля type в product_card
 const BRANDS = ['PROSTOR', 'NORTH', 'URBAN', 'BASE', 'LINE'] as const;
 const SIZES = ['S', 'M', 'L', 'XL', '42', '43', '44'] as const;
 const TYPES = ['одежда', 'обувь', 'аксессуар', 'спорт'] as const;
