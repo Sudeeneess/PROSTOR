@@ -21,6 +21,8 @@ public interface WarehouseStockRepository extends JpaRepository<WarehouseStock, 
 
     List<WarehouseStock> findByQuantityLessThan(Integer threshold);
 
+    void deleteByProductId(Integer productId);
+
     @Query("SELECT SUM(ws.quantity) FROM WarehouseStock ws WHERE ws.product.id = :productId")
     Integer getTotalQuantityByProductId(@Param("productId") Integer productId);
 

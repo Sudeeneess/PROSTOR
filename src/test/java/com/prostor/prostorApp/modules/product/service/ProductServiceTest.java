@@ -5,9 +5,13 @@ import com.prostor.prostorApp.modules.product.dto.ProductResponse;
 import com.prostor.prostorApp.modules.product.model.Category;
 import com.prostor.prostorApp.modules.product.model.Product;
 import com.prostor.prostorApp.modules.product.repository.CategoryRepository;
+import com.prostor.prostorApp.modules.product.repository.ProductCardRepository;
 import com.prostor.prostorApp.modules.product.repository.ProductRepository;
+import com.prostor.prostorApp.modules.order.repository.OrderItemRepository;
 import com.prostor.prostorApp.modules.user.model.Seller;
 import com.prostor.prostorApp.modules.user.repository.SellerRepository;
+import com.prostor.prostorApp.modules.warehouse.repository.WarehouseStockRepository;
+import com.prostor.prostorApp.modules.warehouse.service.WarehouseStockService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -41,6 +45,18 @@ class ProductServiceTest {
 
     @Mock
     private CategoryRepository categoryRepository;
+
+    @Mock
+    private WarehouseStockService warehouseStockService;
+
+    @Mock
+    private ProductCardRepository productCardRepository;
+
+    @Mock
+    private WarehouseStockRepository warehouseStockRepository;
+
+    @Mock
+    private OrderItemRepository orderItemRepository;
 
     @InjectMocks
     private ProductService productService;
@@ -217,10 +233,14 @@ class ProductServiceTest {
     @DisplayName("Should delete product successfully when product exists")
     void delete_WhenProductExists_ShouldDeleteProduct() {
         when(productRepository.existsById(1)).thenReturn(true);
+        when(orderItemRepository.existsByProductId(1)).thenReturn(false);
 
         assertDoesNotThrow(() -> productService.delete(1));
 
         verify(productRepository, times(1)).existsById(1);
+        verify(orderItemRepository, times(1)).existsByProductId(1);
+        verify(productCardRepository, times(1)).deleteByProductId(1);
+        verify(warehouseStockRepository, times(1)).deleteByProductId(1);
         verify(productRepository, times(1)).deleteById(1);
     }
 
@@ -236,6 +256,28 @@ class ProductServiceTest {
 
         assertEquals("Product not found with id: 999", exception.getMessage());
         verify(productRepository, times(1)).existsById(999);
+        verify(orderItemRepository, never()).existsByProductId(anyInt());
+        verify(productCardRepository, never()).deleteByProductId(anyInt());
+        verify(warehouseStockRepository, never()).deleteByProductId(anyInt());
+        verify(productRepository, never()).deleteById(anyInt());
+    }
+
+    @Test
+    @DisplayName("Should throw IllegalStateException when product participates in orders")
+    void delete_WhenProductInOrders_ShouldThrowIllegalStateException() {
+        when(productRepository.existsById(1)).thenReturn(true);
+        when(orderItemRepository.existsByProductId(1)).thenReturn(true);
+
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> productService.delete(1)
+        );
+
+        assertEquals("Товар участвует в заказах и не может быть удален", exception.getMessage());
+        verify(productRepository, times(1)).existsById(1);
+        verify(orderItemRepository, times(1)).existsByProductId(1);
+        verify(productCardRepository, never()).deleteByProductId(anyInt());
+        verify(warehouseStockRepository, never()).deleteByProductId(anyInt());
         verify(productRepository, never()).deleteById(anyInt());
     }
 
