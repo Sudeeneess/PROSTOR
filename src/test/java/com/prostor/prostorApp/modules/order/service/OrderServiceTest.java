@@ -180,6 +180,7 @@ class OrderServiceTest {
             return o;
         });
         when(productRepository.findById(10)).thenReturn(Optional.of(product));
+        when(warehouseStockService.getTotalAvailableQuantity(10)).thenReturn(5);
         when(orderItemRepository.save(any(OrderItem.class))).thenAnswer(inv -> inv.getArgument(0));
         when(orderItemRepository.findByOrderId(200)).thenReturn(Collections.emptyList());
 
@@ -223,14 +224,30 @@ class OrderServiceTest {
         req.setItems(List.of(itemRequest(999, 1.0)));
         when(customerRepository.findById(1)).thenReturn(Optional.of(customer));
         when(ordersStatusRepository.findByName("PENDING")).thenReturn(Optional.of(pending));
-        when(orderRepository.save(any(Order.class))).thenAnswer(inv -> {
-            Order o = inv.getArgument(0);
-            o.setId(200);
-            return o;
-        });
         when(productRepository.findById(999)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> orderService.createOrder(req));
+    }
+
+    @Test
+    @DisplayName("Should throw when stock insufficient for repeated product on create")
+    void createOrder_WhenInsufficientStockForRepeatedProduct_ShouldThrow() {
+        OrderRequest req = new OrderRequest();
+        req.setCustomerId(1);
+        req.setItems(List.of(
+                itemRequest(10, 100.0),
+                itemRequest(10, 100.0),
+                itemRequest(10, 100.0)
+        ));
+
+        when(customerRepository.findById(1)).thenReturn(Optional.of(customer));
+        when(ordersStatusRepository.findByName("PENDING")).thenReturn(Optional.of(pending));
+        when(productRepository.findById(10)).thenReturn(Optional.of(product));
+        when(warehouseStockService.getTotalAvailableQuantity(10)).thenReturn(2);
+
+        assertThrows(IllegalStateException.class, () -> orderService.createOrder(req));
+        verify(orderRepository, never()).save(any(Order.class));
+        verify(orderItemRepository, never()).save(any(OrderItem.class));
     }
 
     @Test
@@ -280,6 +297,29 @@ class OrderServiceTest {
         when(orderRepository.findById(100)).thenReturn(Optional.of(order));
         when(orderItemRepository.findByOrderId(100)).thenReturn(List.of(item));
         when(warehouseStockService.getTotalAvailableQuantity(10)).thenReturn(0);
+
+        assertThrows(IllegalStateException.class, () -> orderService.confirmOrder(100));
+        verify(warehouseStockService, never()).reserveProduct(anyInt(), anyInt());
+    }
+
+    @Test
+    @DisplayName("Should throw when stock insufficient for repeated product items on confirm")
+    void confirmOrder_WhenRequestedCountExceedsStock_ShouldThrow() {
+        order.setOrdersStatus(pending);
+
+        OrderItem first = new OrderItem();
+        first.setProduct(product);
+        first.setIsOrdered(false);
+        first.setIsFinalized(false);
+
+        OrderItem second = new OrderItem();
+        second.setProduct(product);
+        second.setIsOrdered(false);
+        second.setIsFinalized(false);
+
+        when(orderRepository.findById(100)).thenReturn(Optional.of(order));
+        when(orderItemRepository.findByOrderId(100)).thenReturn(List.of(first, second));
+        when(warehouseStockService.getTotalAvailableQuantity(10)).thenReturn(1);
 
         assertThrows(IllegalStateException.class, () -> orderService.confirmOrder(100));
         verify(warehouseStockService, never()).reserveProduct(anyInt(), anyInt());
