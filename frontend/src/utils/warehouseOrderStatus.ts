@@ -32,32 +32,32 @@ export function buyerOrderStatusLabelRu(statusName: string | undefined): string 
   }
 }
 
-/** Подпись для выпадающего списка на складе (сборка) */
+/** Подпись для выпадающего списка на складе (сборка), только русский текст */
 export function assemblyStatusOptionLabel(code: string): string {
   switch (code.toUpperCase()) {
     case 'PENDING':
-      return 'PENDING — на рассмотрении';
+      return 'На рассмотрении';
     case 'CONFIRMED':
-      return 'CONFIRMED — собирается на складе';
+      return 'Собирается на складе';
     case 'SHIPPED':
-      return 'SHIPPED — отправлено на отгрузку';
+      return 'Отправлено на отгрузку';
     default:
-      return code;
+      return code.trim() ? code : 'Статус уточняется';
   }
 }
 
-/** Подпись для выпадающего списка на складе (отгрузка) */
+/** Подпись для выпадающего списка на складе (отгрузка), только русский текст */
 export function shipmentStatusOptionLabel(code: string): string {
   switch (code.toUpperCase()) {
     case 'SHIPPED':
-      return 'SHIPPED — отправлено на отгрузку';
+      return 'Отправлено на отгрузку';
     case 'IN_TRANSIT':
-      return 'IN_TRANSIT — в пути';
+      return 'В пути';
     case 'DELIVERED':
-      return 'DELIVERED — готов к выдаче';
+      return 'Готов к выдаче';
     case 'ISSUED':
-      return 'ISSUED — выдано покупателю';
+      return 'Выдано покупателю';
     default:
-      return code;
+      return code.trim() ? code : 'Статус уточняется';
   }
 }

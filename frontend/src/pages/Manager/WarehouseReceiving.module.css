@@ -7,23 +7,160 @@
 }
 
 .warehouse-receiving-content {
-  max-width: 1200px;
+  max-width: min(1680px, 100%);
   margin: 0 auto;
   padding: 20px;
 }
 
 .warehouse-receiving-container {
-  background-color: white;
+  background-color: #ffffff;
   border-radius: 20px;
   padding: 28px;
   box-shadow: 0 10px 24px rgba(68, 122, 221, 0.1);
+  border: 1px solid #f3f4f6;
 }
 
 .warehouse-receiving-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 24px;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.warehouse-receiving-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.warehouse-receiving-refresh-button {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #374151;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.warehouse-receiving-refresh-button:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.warehouse-receiving-refresh-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.warehouse-receiving-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  align-items: flex-end;
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.warehouse-receiving-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.warehouse-receiving-filter-grow {
+  flex: 1;
+  min-width: 180px;
+}
+
+.warehouse-receiving-filter-control {
+  min-height: 38px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  color: #111827;
+  background: #fff;
+}
+
+.warehouse-receiving-error {
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  color: #9a3412;
+  font-size: 14px;
+}
+
+.warehouse-receiving-table-empty {
+  text-align: center;
+  padding: 28px 16px !important;
+  color: #6b7280;
+}
+
+.warehouse-receiving-seller-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.warehouse-receiving-seller-title {
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+}
+
+.warehouse-receiving-seller-sub {
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.warehouse-receiving-qty-main {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #111827;
+}
+
+.warehouse-receiving-qty-sub {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.warehouse-receiving-col-action {
+  width: 110px;
+  text-align: right;
+}
+
+.warehouse-receiving-open-button {
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background: var(--shop-primary);
+  color: var(--shop-on-primary);
+  transition: background 0.2s;
+}
+
+.warehouse-receiving-open-button:hover {
+  background: var(--shop-primary-hover);
 }
 
 .warehouse-receiving-back-button {
@@ -36,7 +173,6 @@
   padding: 8px 12px;
   border-radius: 12px;
   transition: all 0.2s;
-  order: 2;
 }
 
 .warehouse-receiving-back-button:hover {
@@ -49,45 +185,77 @@
   font-weight: 700;
   color: #333;
   margin: 0;
-  order: 1;
   letter-spacing: -0.2px;
 }
 
 .warehouse-receiving-table-container {
   overflow-x: auto;
   margin-bottom: 24px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
 }
 
 .warehouse-receiving-table {
   width: 100%;
+  min-width: 960px;
+  table-layout: fixed;
   border-collapse: collapse;
   background-color: white;
 }
 
+.warehouse-receiving-table th:first-child,
+.warehouse-receiving-table td:first-child {
+  width: 46%;
+  min-width: 28rem;
+}
+
+.warehouse-receiving-table th:nth-child(2),
+.warehouse-receiving-table td:nth-child(2) {
+  width: 9%;
+  white-space: nowrap;
+}
+
+.warehouse-receiving-table th:nth-child(3),
+.warehouse-receiving-table td:nth-child(3) {
+  width: 11%;
+  white-space: nowrap;
+}
+
+.warehouse-receiving-table th:nth-child(4),
+.warehouse-receiving-table td:nth-child(4) {
+  width: 18%;
+}
+
 .warehouse-receiving-table thead {
-  background-color: #ddd;
-  border-bottom: 2px solid #ddd;
+  background-color: #f5f8ff;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .warehouse-receiving-table th {
-  padding: 15px 18px;
+  padding: 14px 16px;
   text-align: left;
-  font-weight: 700;
-  color: #2c3e50;
-  font-size: 16px;
-  letter-spacing: 0.3px;
+  font-weight: 600;
+  color: #4b5563;
+  font-size: 14px;
+  letter-spacing: 0.02em;
 }
 
 .warehouse-receiving-table td {
-  padding: 15px 18px;
-  border-bottom: 1px solid #ddd;
-  color: #2c3e50;
-  font-size: 16px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  color: #1f2937;
+  font-size: 15px;
   font-weight: 500;
+  vertical-align: middle;
 }
 
 .warehouse-receiving-table tbody tr:hover {
-  background-color: #ddd;
+  background-color: #f9fafb;
+}
+
+.warehouse-receiving-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 /* Стили для колонки с чекбоксами */
@@ -106,7 +274,8 @@
 
 .warehouse-receiving-product-id {
   font-weight: 600;
-  color: #2c3e50;
+  color: #111827;
+  font-variant-numeric: tabular-nums;
 }
 
 .warehouse-receiving-status-badge {
@@ -118,18 +287,18 @@
 }
 
 .warehouse-receiving-status-pending {
-  background-color: #ddd;
-  color: #000000;
+  background-color: #fef3c7;
+  color: #92400e;
 }
 
 .warehouse-receiving-status-partial {
-  background-color: #ddd;
-  color: #000000;
+  background-color: #e0e7ff;
+  color: #3730a3;
 }
 
 .warehouse-receiving-status-accepted {
-  background-color: #ddd;
-  color: #000000;
+  background-color: #d1fae5;
+  color: #065f46;
 }
 
 .warehouse-receiving-action-buttons-container {
@@ -138,7 +307,7 @@
   justify-content: flex-start;
   margin-top: 24px;
   padding-top: 20px;
-  border-top: 1px solid #ffffff;
+  border-top: 1px solid #e5e7eb;
 }
 
 .warehouse-receiving-action-button {
@@ -185,6 +354,15 @@
 
 /* Responsive design */
 @media (max-width: 768px) {
+  .warehouse-receiving-table th:first-child,
+  .warehouse-receiving-table td:first-child {
+    min-width: 18rem;
+  }
+
+  .warehouse-receiving-seller-title {
+    white-space: normal;
+  }
+
   .warehouse-receiving-content {
     padding: 12px;
   }

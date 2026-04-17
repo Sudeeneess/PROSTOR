@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import HeaderSeller from "./HeaderSeller";
 import SellerFioInput from "../../components/SellerFioInput";
 import { formatFioDisplay } from "../../utils/fioInput";
+import { RECEPTION_LAST_SELLER_ID, syncSellerSnapshotFromLk } from "../../utils/warehouseReception";
 import styles from './PersonalSeller.module.css';
 
 interface SellerProfile {
@@ -30,7 +31,7 @@ const PersonalSeller: React.FC = () => {
   }, []);
 
   const handleAddProduct = () => {
-    navigate("/seller/add-products");
+    navigate("/seller/products");
   };
 
   const handleMyProducts = () => {
@@ -67,6 +68,11 @@ const PersonalSeller: React.FC = () => {
     setSeller(next);
     setFormData(next);
     localStorage.setItem("sellerProfile", JSON.stringify(next));
+    const sidRaw = localStorage.getItem(RECEPTION_LAST_SELLER_ID);
+    const sid = sidRaw ? Number(sidRaw) : NaN;
+    if (Number.isFinite(sid)) {
+      syncSellerSnapshotFromLk(sid);
+    }
     setIsModalOpen(false);
   };
 

@@ -143,6 +143,9 @@
 }
 
 .number {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: #111827;
 }
 
 .executor {
@@ -189,24 +192,30 @@
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 10px 24px rgba(68, 122, 221, 0.1);
+  border: 1px solid #f3f4f6;
+  min-height: 120px;
 }
 
 .table-header {
   display: grid;
   grid-template-columns: 100px 2.2fr 1.6fr 1.3fr 1fr;
+  align-items: center;
   background: #f5f8ff;
-  padding: 18px 30px;
+  padding: 16px 30px;
+  min-height: 48px;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 14px;
   color: #4b5563;
-  border-bottom: 1px solid #d1d5db;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .table-row {
   display: grid;
   grid-template-columns: 100px 2.2fr 1.6fr 1.3fr 1fr;
-  padding: 20px 30px;
-  font-size: 16px;
+  align-items: center;
+  padding: 18px 30px;
+  min-height: 52px;
+  font-size: 15px;
   border-bottom: 1px solid #f3f4f6;
   color: #1f2937;
 }

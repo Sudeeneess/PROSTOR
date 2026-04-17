@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HeaderSeller from './HeaderSeller';
 import styles from './ProductSeller.module.css';
@@ -11,6 +11,15 @@ import {
   type SellerProductCreateRequest,
   type SizeDto,
 } from '../../services/api';
+import { RECEPTION_LAST_SELLER_ID, syncSellerSnapshotFromLk } from '../../utils/warehouseReception';
+import { CATALOG_CATEGORIES } from '../../data/categories';
+
+/** Имена подкатегорий для поля `type` по названию категории из API (совпадает с `data/categories.ts`). */
+function catalogTypeNamesForCategoryName(categoryName: string | undefined): string[] {
+  if (!categoryName) return [];
+  const def = CATALOG_CATEGORIES.find((c) => c.name === categoryName);
+  return def ? def.subcategories.map((s) => s.name) : [];
+}
 
 export interface SellerProductRow {
   id: number;
@@ -163,6 +172,11 @@ const ProductSeller: React.FC = () => {
       })
     );
     setProducts(enrichedRows);
+    const sid = enrichedRows[0]?.sellerId;
+    if (sid != null) {
+      localStorage.setItem(RECEPTION_LAST_SELLER_ID, String(sid));
+      syncSellerSnapshotFromLk(sid);
+    }
     setLoading(false);
   }, [navigate]);
 
@@ -202,22 +216,37 @@ const ProductSeller: React.FC = () => {
   const subcategoryOptions = useMemo(() => {
     const unique = new Set<string>();
     products.forEach((p) => {
+      if (filterCategoryId !== '' && p.categoryId !== filterCategoryId) return;
       const value = p.type.trim();
       if (value && value !== '—') {
         unique.add(value);
       }
     });
-    return Array.from(unique).sort((a, b) => a.localeCompare(b, 'ru'));
-  }, [products]);
-
-  const modalSubcategoryOptions = useMemo(() => {
-    const unique = new Set(subcategoryOptions);
-    const draftType = draft?.type.trim();
-    if (draftType && draftType !== '—') {
-      unique.add(draftType);
+    if (filterCategoryId !== '') {
+      const cat = apiCategories.find((c) => c.id === filterCategoryId);
+      catalogTypeNamesForCategoryName(cat?.categoryName).forEach((n) => unique.add(n));
+    } else {
+      CATALOG_CATEGORIES.forEach((c) =>
+        c.subcategories.forEach((s) => unique.add(s.name))
+      );
     }
     return Array.from(unique).sort((a, b) => a.localeCompare(b, 'ru'));
-  }, [subcategoryOptions, draft?.type]);
+  }, [products, filterCategoryId, apiCategories]);
+
+  const modalSubcategoryOptions = useMemo(() => {
+    if (!draft) return [];
+    const cat = apiCategories.find((c) => c.id === draft.categoryId);
+    const fromCatalog = catalogTypeNamesForCategoryName(cat?.categoryName);
+    const unique = new Set<string>(fromCatalog);
+    products.forEach((p) => {
+      if (p.categoryId !== draft.categoryId) return;
+      const value = p.type.trim();
+      if (value && value !== '—') unique.add(value);
+    });
+    const draftType = draft.type.trim();
+    if (draftType && draftType !== '—') unique.add(draftType);
+    return Array.from(unique).sort((a, b) => a.localeCompare(b, 'ru'));
+  }, [draft, products, apiCategories]);
 
   const filteredProducts = useMemo(() => {
     const nameQ = filterName.trim().toLowerCase();

@@ -7,6 +7,7 @@ import WarehouseAssembling from './WarehouseAssembling';
 import WarehouseShipment from './WarehouseShipment';
 import { api } from '../../services/api';
 import type { OrderResponseDto, OrderStatusDto } from '../../services/api';
+import { warehouseOrderNumber } from '../../utils/warehouseOrderNumber';
 
 interface Activity {
   id: string;
@@ -125,7 +126,7 @@ const Dashboard: React.FC = () => {
             })
           : '--:--',
         action: mapped.action,
-        number: `#S-${order.id}`,
+        number: warehouseOrderNumber(order.id),
         executor,
         status: mapped.status,
       };
@@ -152,7 +153,7 @@ const Dashboard: React.FC = () => {
       case 'CANCELLED':
         return { action: 'Заказ отменён', status: 'warning' };
       default:
-        return { action: `Статус ${statusName}`, status: 'pending' };
+        return { action: 'Статус заказа уточняется', status: 'pending' };
     }
   };
 
@@ -230,15 +231,15 @@ const Dashboard: React.FC = () => {
 
             <section className={styles['stats-cards']}>
               <div className={styles['card']}>
-                <div className={styles['card-title']}>Ожидают сборки (PENDING)</div>
+                <div className={styles['card-title']}>Ожидают сборки</div>
                 <div className={styles['card-value']}>{stats.pendingCount}</div>
               </div>
               <div className={styles['card']}>
-                <div className={styles['card-title']}>Собираются (CONFIRMED)</div>
+                <div className={styles['card-title']}>Собираются на складе</div>
                 <div className={styles['card-value']}>{stats.confirmedCount}</div>
               </div>
               <div className={styles['card']}>
-                <div className={styles['card-title']}>На отгрузке (SHIPPED)</div>
+                <div className={styles['card-title']}>На отгрузке</div>
                 <div className={styles['card-value']}>{stats.shippedCount}</div>
               </div>
             </section>
@@ -277,7 +278,7 @@ const Dashboard: React.FC = () => {
                 <div className={styles['table-header']}>
                   <div className={`${styles['col']} ${styles['time']}`}>Время</div>
                   <div className={`${styles['col']} ${styles['action']}`}>Событие</div>
-                  <div className={`${styles['col']} ${styles['number']}`}>Заказ</div>
+                  <div className={`${styles['col']} ${styles['number']}`}>Номер заказа</div>
                   <div className={`${styles['col']} ${styles['executor']}`}>Менеджер</div>
                   <div className={`${styles['col']} ${styles['status']}`}>Этап</div>
                 </div>

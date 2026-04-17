@@ -32,7 +32,6 @@ import Warehouse from './pages/Manager/WarehousePage';
 import Authorizationseller from './pages/Seller/AuthSeller';
 import SellerEntrance from './pages/Seller/RegistrSeller'; 
 import PersonalSeller from './pages/Seller/PersonalSeller';
-import AddingProducts from './pages/Seller/AddProducts';
 import ProductSeller from './pages/Seller/ProductSeller';
 import OrdersSeller from './pages/Seller/OrdersSeller';
 import MainSeller from './pages/Seller/MainSeller';
@@ -322,16 +321,6 @@ const AppContent: React.FC = () => {
           element={
             <PrivateSellerRoute>
               <ProductSeller />
-            </PrivateSellerRoute>
-          } 
-        />
-        
-        {/* Добавление товаров */}
-        <Route 
-          path="add-products" 
-          element={
-            <PrivateSellerRoute>
-              <AddingProducts />
             </PrivateSellerRoute>
           } 
         />

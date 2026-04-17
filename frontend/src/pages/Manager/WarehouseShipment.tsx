@@ -4,6 +4,7 @@ import styles from './WarehouseShipment.module.css';
 import { api } from '../../services/api';
 import type { OrderResponseDto } from '../../services/api';
 import { orderStatusIdsByName, shipmentStatusOptionLabel } from '../../utils/warehouseOrderStatus';
+import { warehouseOrderNumber } from '../../utils/warehouseOrderNumber';
 
 interface WarehouseShipmentProps {
   onBack: () => void;
@@ -110,7 +111,7 @@ const WarehouseShipment: React.FC<WarehouseShipmentProps> = ({ onBack }) => {
 
     const nextId = statusByName.get(next);
     if (nextId == null) {
-      setRowError(`Статус ${next} не найден в справочнике`);
+      setRowError('Выбранный статус не найден в справочнике');
       return;
     }
 
@@ -130,9 +131,12 @@ const WarehouseShipment: React.FC<WarehouseShipmentProps> = ({ onBack }) => {
     }
   };
 
-  const filtered = orders.filter((o) =>
-    `#S-${o.id}`.toLowerCase().includes(searchTerm.trim().toLowerCase())
-  );
+  const filtered = orders.filter((o) => {
+    const q = searchTerm.trim().toLowerCase().replace(/^№\s*/, '');
+    if (!q) return true;
+    const idStr = warehouseOrderNumber(o.id).toLowerCase();
+    return idStr.includes(q);
+  });
 
   const totalCost = filtered.reduce((s, o) => s + (o.totalAmount ?? 0), 0);
 
@@ -172,21 +176,17 @@ const WarehouseShipment: React.FC<WarehouseShipmentProps> = ({ onBack }) => {
           <input
             type="search"
             className={styles['warehouse-shipment-search-input']}
-            placeholder="Поиск по номеру (#S-12)"
+            placeholder="Поиск по номеру заказа"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>
 
-      {error && (
-        <div className={styles['warehouse-shipment-table-container']} role="alert">
-          {error}
-        </div>
-      )}
-      {rowError && (
-        <div className={styles['warehouse-shipment-table-container']} role="alert">
-          {rowError}
+      {(error || rowError) && (
+        <div className={styles['warehouse-shipment-alert']} role="alert">
+          {error && <div>{error}</div>}
+          {rowError && <div>{rowError}</div>}
         </div>
       )}
 
@@ -194,16 +194,20 @@ const WarehouseShipment: React.FC<WarehouseShipmentProps> = ({ onBack }) => {
         <table className={styles['warehouse-shipment-table']}>
           <thead>
             <tr>
-              <th className={styles['warehouse-shipment-col-order']}>Заказ</th>
-              <th className={styles['warehouse-shipment-col-items']}>Товары</th>
+              <th className={styles['warehouse-shipment-col-order']}>Номер заказа</th>
+              <th className={styles['warehouse-shipment-col-items']}>Состав</th>
               <th className={styles['warehouse-shipment-col-time']}>Дата</th>
-              <th>Статус</th>
+              <th className={styles['warehouse-shipment-col-status']}>Статус</th>
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={4}>Нет заказов в статусах SHIPPED, IN_TRANSIT или DELIVERED</td>
+                <td colSpan={4} className={styles['warehouse-shipment-empty-row']}>
+                  {orders.length > 0 && searchTerm.trim()
+                    ? 'Нет заказов по этому номеру'
+                    : 'Нет заказов на отгрузке, в пути или готовых к выдаче'}
+                </td>
               </tr>
             ) : (
               filtered.map((order) => {
@@ -212,18 +216,20 @@ const WarehouseShipment: React.FC<WarehouseShipmentProps> = ({ onBack }) => {
                 const busy = updatingOrderId === order.id;
                 return (
                   <tr key={order.id}>
-                    <td className={styles['warehouse-shipment-col-order']}>#S-{order.id}</td>
+                    <td className={styles['warehouse-shipment-col-order']}>
+                      {warehouseOrderNumber(order.id)}
+                    </td>
                     <td className={styles['warehouse-shipment-col-items']}>
                       {itemsLabel(order.items.length)}
                     </td>
                     <td className={styles['warehouse-shipment-col-time']}>{formatDate(order.orderDate)}</td>
-                    <td>
+                    <td className={styles['warehouse-shipment-col-status']}>
                       <select
                         className={styles['warehouse-shipment-status-select']}
                         value={current}
                         disabled={busy}
                         onChange={(e) => void handleStatusChange(order, e.target.value)}
-                        aria-label={`Статус отгрузки #S-${order.id}`}
+                        aria-label={`Статус отгрузки заказа ${warehouseOrderNumber(order.id)}`}
                       >
                         {codes.map((code) => (
                           <option key={code} value={code} disabled={optionDisabled(current, code)}>

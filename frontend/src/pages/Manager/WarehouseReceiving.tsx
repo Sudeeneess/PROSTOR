@@ -1,245 +1,303 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import HeaderManager from './HeaderManager';
-import WindWarehouseReceiving from './WindWarehouseReceiving';
+import WindWarehouseReceiving, { type ReceptionLine } from './WindWarehouseReceiving';
 import styles from './WarehouseReceiving.module.css';
-
-interface ProductItem {
-  id: string;
-  seller: string;
-  products: string;
-  date: string;
-  status: string;
-  selected: boolean;
-}
+import { api } from '../../services/api';
+import type { Product, WarehouseStockResponse } from '../../services/api';
+import {
+  buildReceptionBatches,
+  formatDateKeyRu,
+  getReceptionBatchStatus,
+  getSellerDisplayForReception,
+  sellerLoginStorageKey,
+  setReceptionBatchAccepted,
+} from '../../utils/warehouseReception';
 
 interface WarehouseReceivingProps {
   onBack: () => void;
 }
 
-// Данные для всех поставок
-const receptionData: Record<string, { sellerName: string; products: any[] }> = {
-  '#S-45': {
-    sellerName: 'ООО "Поставщик"',
-    products: [
-      { id: '1', name: 'Куртка', expected: 50, accepted: 45, cell: 'A-15-B' },
-      { id: '2', name: 'Штаны', expected: 40, accepted: 30, cell: 'Б-08-Г' },
-      { id: '3', name: 'Футболка', expected: 100, accepted: 95, cell: 'B-12-P' }
-    ]
-  },
-  '#S-46': {
-    sellerName: 'ИП Петров',
-    products: [
-      { id: '1', name: 'Кроссовки', expected: 30, accepted: 28, cell: 'C-05-D' },
-      { id: '2', name: 'Свитер', expected: 25, accepted: 25, cell: 'D-12-E' },
-      { id: '3', name: 'Джинсы', expected: 40, accepted: 38, cell: 'E-08-F' }
-    ]
-  },
-  '#S-47': {
-    sellerName: 'ООО "Снабжение"',
-    products: [
-      { id: '1', name: 'Пальто', expected: 20, accepted: 15, cell: 'F-10-G' },
-      { id: '2', name: 'Рубашка', expected: 60, accepted: 55, cell: 'G-03-H' },
-      { id: '3', name: 'Брюки', expected: 35, accepted: 30, cell: 'H-07-I' }
-    ]
+type StatusFilter = 'all' | 'pending' | 'accepted';
+
+async function fetchAllProducts(): Promise<Product[]> {
+  const all: Product[] = [];
+  let page = 0;
+  const size = 100;
+  let totalPages = 1;
+  while (page < totalPages) {
+    const res = await api.getProducts({ page, size });
+    if (!res.success || !res.data) break;
+    const data = res.data;
+    all.push(...(data.content ?? []));
+    totalPages = data.totalPages ?? 1;
+    page += 1;
   }
-};
+  return all;
+}
 
 const WarehouseReceiving: React.FC<WarehouseReceivingProps> = ({ onBack }) => {
   const navigate = useNavigate();
-  const [products, setProducts] = useState<ProductItem[]>([
-    {
-      id: '#S-45',
-      seller: 'ООО "Поставщик"',
-      products: '3 позиции',
-      date: '25.10',
-      status: 'Ожидает',
-      selected: false
-    },
-    {
-      id: '#S-46',
-      seller: 'ИП Петров',
-      products: '3 позиции',
-      date: '26.10',
-      status: 'Ожидает',
-      selected: false
-    },
-    {
-      id: '#S-47',
-      seller: 'ООО "Снабжение"',
-      products: '3 позиции',
-      date: '24.10',
-      status: 'Частично',
-      selected: false
-    }
-  ]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [stocks, setStocks] = useState<WarehouseStockResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [statusVersion, setStatusVersion] = useState(0);
 
-  const [isWindowOpen, setIsWindowOpen] = useState(false);
-  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [filterStatus, setFilterStatus] = useState<StatusFilter>('all');
+  const [filterDate, setFilterDate] = useState('');
+  const [filterSeller, setFilterSeller] = useState('');
 
-  // Проверка авторизации
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalBatchKey, setModalBatchKey] = useState<string | null>(null);
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     const role = sessionStorage.getItem('userRole');
-    
     if (!token || role !== 'warehouse_manager') {
       navigate('/warehouse/auth', { replace: true });
-      return;
     }
   }, [navigate]);
 
-  const handleSelectProduct = (id: string) => {
-    setProducts(prevProducts =>
-      prevProducts.map(product =>
-        product.id === id
-          ? { ...product, selected: !product.selected }
-          : product
-      )
-    );
-  };
-
-  const handleBack = () => {
-    onBack();
-  };
-
-  const handleAcceptSelected = () => {
-    const selectedProducts = products.filter(product => product.selected);
-    if (selectedProducts.length > 0) {
-      setSelectedOrderId(selectedProducts[0].id);
-      setIsWindowOpen(true);
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [plist, sres] = await Promise.all([
+        fetchAllProducts(),
+        api.getWarehouseStocks(),
+      ]);
+      setProducts(plist);
+      if (sres.success && sres.data) {
+        setStocks(sres.data);
+      } else {
+        setStocks([]);
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Ошибка загрузки');
+    } finally {
+      setLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const qtyByProductId = useMemo(() => {
+    const m = new Map<number, number>();
+    for (const s of stocks) {
+      const pid = s.productId;
+      if (pid == null) continue;
+      m.set(pid, (m.get(pid) ?? 0) + (s.quantity ?? 0));
+    }
+    return m;
+  }, [stocks]);
+
+  const batches = useMemo(() => buildReceptionBatches(products), [products]);
+
+  const rows = useMemo(() => {
+    const qSeller = filterSeller.trim().toLowerCase();
+    const qDate = filterDate.trim();
+
+    return batches
+      .map((b) => {
+        const snap = getSellerDisplayForReception(b.sellerId);
+        const status = getReceptionBatchStatus(b.sellerId, b.dateKey);
+        const skuCount = b.products.length;
+        const storedLogin = localStorage.getItem(sellerLoginStorageKey(b.sellerId)) ?? '';
+        const searchBlob =
+          `${snap.title} ${snap.subtitle ?? ''} ${storedLogin} ${b.sellerId}`.toLowerCase();
+        return {
+          ...b,
+          snap,
+          status,
+          skuCount,
+          dateLabel: formatDateKeyRu(b.dateKey),
+          searchBlob,
+        };
+      })
+      .filter((r) => {
+        if (filterStatus === 'pending' && r.status !== 'pending') return false;
+        if (filterStatus === 'accepted' && r.status !== 'accepted') return false;
+        if (qDate && r.dateKey !== qDate) return false;
+        if (qSeller && !r.searchBlob.includes(qSeller)) return false;
+        return true;
+      });
+  }, [batches, filterStatus, filterDate, filterSeller, statusVersion]);
+
+  const openModal = (key: string) => {
+    setModalBatchKey(key);
+    setModalOpen(true);
   };
 
-  const handleCloseWindow = () => {
-    setIsWindowOpen(false);
-    setSelectedOrderId(null);
+  const closeModal = () => {
+    setModalOpen(false);
+    setModalBatchKey(null);
   };
+
+  const modalBatch = useMemo(() => {
+    if (!modalBatchKey) return null;
+    return batches.find((b) => b.key === modalBatchKey) ?? null;
+  }, [batches, modalBatchKey]);
+
+  const modalLines: ReceptionLine[] = useMemo(() => {
+    if (!modalBatch) return [];
+    return modalBatch.products.map((p) => ({
+      productName: p.name,
+      quantity: qtyByProductId.get(p.id) ?? 0,
+    }));
+  }, [modalBatch, qtyByProductId]);
 
   const handleCompleteReception = () => {
-    if (selectedOrderId) {
-      setProducts(prevProducts =>
-        prevProducts.map(product =>
-          product.id === selectedOrderId
-            ? { ...product, status: 'Принято', selected: false }
-            : product
-        )
-      );
-    }
+    if (!modalBatch) return;
+    if (getReceptionBatchStatus(modalBatch.sellerId, modalBatch.dateKey) === 'accepted') return;
+    setReceptionBatchAccepted(modalBatch.sellerId, modalBatch.dateKey);
+    setStatusVersion((v) => v + 1);
   };
 
-  const handleDownloadInvoices = () => {
-    console.log('Скачать накладные');
-  };
-
-  const handleExportToExcel = () => {
-    console.log('Экспорт в Excel');
-  };
-
-  const hasSelectedItems = products.some(product => product.selected);
-
-  const getWindowData = () => {
-    if (selectedOrderId && receptionData[selectedOrderId]) {
-      const orderData = receptionData[selectedOrderId];
-      return {
-        sellerName: orderData.sellerName,
-        orderId: selectedOrderId,
-        products: orderData.products
-      };
-    }
-    return null;
-  };
-
-  const windowData = getWindowData();
+  const modalSnap = modalBatch ? getSellerDisplayForReception(modalBatch.sellerId) : null;
+  const modalDateLabel = modalBatch ? formatDateKeyRu(modalBatch.dateKey) : '';
+  const modalAlreadyAccepted =
+    modalBatch != null && getReceptionBatchStatus(modalBatch.sellerId, modalBatch.dateKey) === 'accepted';
 
   return (
     <div className={styles['warehouse-receiving-content']}>
       <div className={styles['warehouse-receiving-container']}>
         <div className={styles['warehouse-receiving-header']}>
-          <h1 className={styles['warehouse-receiving-title']}>Приемка товара</h1>
-          <button className={styles['warehouse-receiving-back-button']} onClick={handleBack}>
-            Назад
-          </button>
+          <h1 className={styles['warehouse-receiving-title']}>Приёмка товара</h1>
+          <div className={styles['warehouse-receiving-header-actions']}>
+            <button
+              type="button"
+              className={styles['warehouse-receiving-refresh-button']}
+              onClick={() => void load()}
+              disabled={loading}
+            >
+              Обновить
+            </button>
+            <button type="button" className={styles['warehouse-receiving-back-button']} onClick={onBack}>
+              Назад
+            </button>
+          </div>
         </div>
+
+        <div className={styles['warehouse-receiving-filters']}>
+          <label className={styles['warehouse-receiving-filter']}>
+            <span>Статус</span>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value as StatusFilter)}
+              className={styles['warehouse-receiving-filter-control']}
+            >
+              <option value="all">Все статусы</option>
+              <option value="pending">Ожидает приёмки</option>
+              <option value="accepted">Принято</option>
+            </select>
+          </label>
+          <label className={styles['warehouse-receiving-filter']}>
+            <span>Дата партии</span>
+            <input
+              type="date"
+              value={filterDate}
+              onChange={(e) => setFilterDate(e.target.value)}
+              className={styles['warehouse-receiving-filter-control']}
+            />
+          </label>
+          <label className={`${styles['warehouse-receiving-filter']} ${styles['warehouse-receiving-filter-grow']}`}>
+            <span>Организация или логин</span>
+            <input
+              type="search"
+              placeholder="Название организации, логин или id продавца"
+              value={filterSeller}
+              onChange={(e) => setFilterSeller(e.target.value)}
+              className={styles['warehouse-receiving-filter-control']}
+            />
+          </label>
+        </div>
+
+        {error && (
+          <div className={styles['warehouse-receiving-error']} role="alert">
+            {error}
+          </div>
+        )}
 
         <div className={styles['warehouse-receiving-table-container']}>
           <table className={styles['warehouse-receiving-table']}>
             <thead>
               <tr>
-                <th className={styles['warehouse-receiving-checkbox-column']}></th>
-                <th>ID</th>
-                <th>Продавец</th>
-                <th>Товары</th>
+                <th>Организация</th>
+                <th>Позиций</th>
                 <th>Дата</th>
                 <th>Статус</th>
+                <th className={styles['warehouse-receiving-col-action']} />
               </tr>
             </thead>
             <tbody>
-              {products.map((product) => (
-                <tr key={product.id}>
-                  <td className={styles['warehouse-receiving-checkbox-column']}>
-                    <input
-                      type="checkbox"
-                      className={styles['warehouse-receiving-checkbox']}
-                      checked={product.selected}
-                      onChange={() => handleSelectProduct(product.id)}
-                      disabled={product.status === 'Принято'}
-                    />
-                  </td>
-                  <td className={styles['warehouse-receiving-product-id']}>{product.id}</td>
-                  <td>{product.seller}</td>
-                  <td>{product.products}</td>
-                  <td>{product.date}</td>
-                  <td>
-                    <span
-                      className={`${styles['warehouse-receiving-status-badge']} ${
-                        product.status === 'Ожидает'
-                          ? styles['warehouse-receiving-status-pending']
-                          : product.status === 'Частично'
-                            ? styles['warehouse-receiving-status-partial']
-                            : styles['warehouse-receiving-status-accepted']
-                      }`}
-                    >
-                      {product.status}
-                    </span>
+              {loading ? (
+                <tr>
+                  <td colSpan={5} className={styles['warehouse-receiving-table-empty']}>
+                    Загрузка…
                   </td>
                 </tr>
-              ))}
+              ) : rows.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className={styles['warehouse-receiving-table-empty']}>
+                    Нет записей по выбранным фильтрам
+                  </td>
+                </tr>
+              ) : (
+                rows.map((r) => (
+                  <tr key={r.key}>
+                    <td>
+                      <div className={styles['warehouse-receiving-seller-cell']}>
+                        <span className={styles['warehouse-receiving-seller-title']}>{r.snap.title}</span>
+                        {r.snap.subtitle ? (
+                          <span className={styles['warehouse-receiving-seller-sub']}>{r.snap.subtitle}</span>
+                        ) : null}
+                      </div>
+                    </td>
+                    <td>
+                      <span className={styles['warehouse-receiving-qty-main']}>{r.skuCount}</span>
+                      <span className={styles['warehouse-receiving-qty-sub']}> позиций</span>
+                    </td>
+                    <td>{r.dateLabel}</td>
+                    <td>
+                      <span
+                        className={`${styles['warehouse-receiving-status-badge']} ${
+                          r.status === 'pending'
+                            ? styles['warehouse-receiving-status-pending']
+                            : styles['warehouse-receiving-status-accepted']
+                        }`}
+                      >
+                        {r.status === 'pending' ? 'Ожидает приёмки' : 'Принято'}
+                      </span>
+                    </td>
+                    <td className={styles['warehouse-receiving-col-action']}>
+                      <button
+                        type="button"
+                        className={styles['warehouse-receiving-open-button']}
+                        onClick={() => openModal(r.key)}
+                      >
+                        Открыть
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
-
-        {hasSelectedItems && (
-          <div className={styles['warehouse-receiving-action-buttons-container']}>
-            <button 
-              className={`${styles['warehouse-receiving-action-button']} ${styles['warehouse-receiving-accept-button']}`}
-              onClick={handleAcceptSelected}
-            >
-              Принять выбранные ({products.filter(p => p.selected).length})
-            </button>
-            <button 
-              className={`${styles['warehouse-receiving-action-button']} ${styles['warehouse-receiving-download-button']}`}
-              onClick={handleDownloadInvoices}
-            >
-              Скачать накладные
-            </button>
-            <button 
-              className={`${styles['warehouse-receiving-action-button']} ${styles['warehouse-receiving-export-button']}`}
-              onClick={handleExportToExcel}
-            >
-              Экспорт в Excel
-            </button>
-          </div>
-        )}
       </div>
 
-      {windowData && (
+      {modalOpen && modalSnap && modalBatch && (
         <WindWarehouseReceiving
-          isOpen={isWindowOpen}
-          onClose={handleCloseWindow}
+          isOpen={modalOpen}
+          onClose={closeModal}
           onComplete={handleCompleteReception}
-          sellerName={windowData.sellerName}
-          orderId={windowData.orderId}
-          products={windowData.products}
+          sellerTitle={modalSnap.title}
+          sellerSubtitle={modalSnap.subtitle}
+          batchDateLabel={modalDateLabel}
+          lines={modalLines}
+          completeDisabled={modalAlreadyAccepted}
         />
       )}
     </div>
@@ -247,4 +305,3 @@ const WarehouseReceiving: React.FC<WarehouseReceivingProps> = ({ onBack }) => {
 };
 
 export default WarehouseReceiving;
-export { HeaderManager };

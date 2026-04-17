@@ -7,6 +7,7 @@ import {
   assemblyStatusOptionLabel,
   orderStatusIdsByName,
 } from '../../utils/warehouseOrderStatus';
+import { warehouseOrderNumber } from '../../utils/warehouseOrderNumber';
 
 interface WarehouseAssemblingProps {
   onBack: () => void;
@@ -36,7 +37,7 @@ const WarehouseAssembling: React.FC<WarehouseAssemblingProps> = ({ onBack }) => 
     const pendingId = idMap.get('PENDING');
     const confirmedId = idMap.get('CONFIRMED');
     if (pendingId == null || confirmedId == null) {
-      setError('В справочнике нет статусов PENDING или CONFIRMED');
+      setError('В справочнике нет статусов «на рассмотрении» или «собирается на складе»');
       return;
     }
 
@@ -54,11 +55,11 @@ const WarehouseAssembling: React.FC<WarehouseAssemblingProps> = ({ onBack }) => 
     }
 
     if (!pendingRes.success || !pendingRes.data) {
-      setError(pendingRes.error || 'Не удалось загрузить заказы PENDING');
+      setError(pendingRes.error || 'Не удалось загрузить заказы на рассмотрении');
       return;
     }
     if (!confirmedRes.success || !confirmedRes.data) {
-      setError(confirmedRes.error || 'Не удалось загрузить заказы CONFIRMED');
+      setError(confirmedRes.error || 'Не удалось загрузить заказы в сборке');
       return;
     }
 
@@ -121,15 +122,15 @@ const WarehouseAssembling: React.FC<WarehouseAssemblingProps> = ({ onBack }) => 
       } else if (current === 'CONFIRMED' && next === 'SHIPPED') {
         const shippedId = statusByName.get('SHIPPED');
         if (shippedId == null) {
-          throw new Error('Статус SHIPPED не найден в справочнике');
+          throw new Error('Статус «отправлено на отгрузку» не найден в справочнике');
         }
         const res = await api.setOrderStatus(order.id, shippedId);
         if (!res.success) {
-          throw new Error(res.error || 'Не удалось перевести заказ в SHIPPED');
+          throw new Error(res.error || 'Не удалось отправить заказ на отгрузку');
         }
       } else {
         throw new Error(
-          'Недопустимый переход: из PENDING в CONFIRMED — кнопка подтверждения; из CONFIRMED в SHIPPED — отправка на отгрузку'
+          'Недопустимый переход статуса: допустимо подтвердить заказ из «на рассмотрении» или отправить на отгрузку из «собирается на складе»'
         );
       }
 
@@ -164,14 +165,10 @@ const WarehouseAssembling: React.FC<WarehouseAssemblingProps> = ({ onBack }) => 
         </button>
       </div>
 
-      {error && (
-        <div className={styles['warehouse-assembling-orders-table-container']} role="alert">
-          {error}
-        </div>
-      )}
-      {rowError && (
-        <div className={styles['warehouse-assembling-orders-table-container']} role="alert">
-          {rowError}
+      {(error || rowError) && (
+        <div className={styles['warehouse-assembling-alert']} role="alert">
+          {error && <div>{error}</div>}
+          {rowError && <div>{rowError}</div>}
         </div>
       )}
 
@@ -179,16 +176,18 @@ const WarehouseAssembling: React.FC<WarehouseAssemblingProps> = ({ onBack }) => 
         <table className={styles['warehouse-assembling-orders-table']}>
           <thead>
             <tr>
-              <th>Заказ</th>
-              <th>Товары</th>
-              <th>Дата</th>
-              <th>Статус</th>
+              <th className={styles['warehouse-assembling-col-order']}>Номер заказа</th>
+              <th className={styles['warehouse-assembling-col-items']}>Состав</th>
+              <th className={styles['warehouse-assembling-col-date']}>Дата</th>
+              <th className={styles['warehouse-assembling-col-status']}>Статус</th>
             </tr>
           </thead>
           <tbody>
             {orders.length === 0 ? (
               <tr>
-                <td colSpan={4}>Нет заказов в статусах PENDING и CONFIRMED</td>
+                <td colSpan={4} className={styles['warehouse-assembling-empty-row']}>
+                  Нет заказов на рассмотрении и в сборке
+                </td>
               </tr>
             ) : (
               orders.map((order) => {
@@ -196,16 +195,20 @@ const WarehouseAssembling: React.FC<WarehouseAssemblingProps> = ({ onBack }) => 
                 const busy = updatingOrderId === order.id;
                 return (
                   <tr key={order.id}>
-                    <td>#S-{order.id}</td>
-                    <td>{itemsLabel(order.items.length)}</td>
-                    <td>{formatDate(order.orderDate)}</td>
-                    <td>
+                    <td className={styles['warehouse-assembling-col-order']}>
+                      {warehouseOrderNumber(order.id)}
+                    </td>
+                    <td className={styles['warehouse-assembling-col-items']}>
+                      {itemsLabel(order.items.length)}
+                    </td>
+                    <td className={styles['warehouse-assembling-col-date']}>{formatDate(order.orderDate)}</td>
+                    <td className={styles['warehouse-assembling-col-status']}>
                       <select
                         className={styles['warehouse-assembling-status-select']}
                         value={current}
                         disabled={busy}
                         onChange={(e) => void handleStatusChange(order, e.target.value)}
-                        aria-label={`Статус заказа #S-${order.id}`}
+                        aria-label={`Статус заказа ${warehouseOrderNumber(order.id)}`}
                       >
                         {ASSEMBLY_STATUS_NAMES.map((code) => {
                           const disabled =
