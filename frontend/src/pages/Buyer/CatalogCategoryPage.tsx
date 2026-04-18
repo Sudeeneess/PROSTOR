@@ -3,16 +3,14 @@ import { Link, useParams } from 'react-router-dom';
 import ProductGrid from '../../components/ProductGrid';
 import CatalogFilters from '../../components/CatalogFilters';
 import {
-  findCategoryBySlug,
-  findSubcategoryBySlug,
-} from '../../data/categories';
-import {
   emptyCatalogFilter,
   filterCatalogProducts,
-  getProductsForCategory,
   type CatalogFilterState,
+  type CatalogGridProduct,
 } from '../../data/mockCatalogProducts';
 import styles from './CatalogCategoryPage.module.css';
+import { api } from '../../services/api';
+import { enrichProductListForGrid } from '../../utils/catalogFromApi';
 
 function goodsWord(n: number): string {
   const m = n % 10;
@@ -23,48 +21,92 @@ function goodsWord(n: number): string {
   return 'товаров';
 }
 
-/** Страница категории или подкатегории: сетка + фильтры по полям БД. */
+/** GET /api/categories/:id + /api/products?categoryId= */
 const CatalogCategoryPage: React.FC = () => {
-  const { categorySlug = '', subSlug } = useParams<{
-    categorySlug: string;
-    subSlug?: string;
+  const { categoryId: categoryIdParam = '' } = useParams<{
+    categoryId: string;
   }>();
+  const categoryId = parseInt(categoryIdParam, 10);
 
   const homePath = useMemo(() => {
     const token = localStorage.getItem('token');
-    const role = sessionStorage.getItem('userRole');
-    return token && role === 'customer' ? '/buyer' : '/';
+    const role = api.getStoredUserRole();
+    return token && role === 'customer' ? '/customer' : '/';
   }, []);
 
   const [filter, setFilter] = useState<CatalogFilterState>(() =>
     emptyCatalogFilter()
   );
+  const [categoryTitle, setCategoryTitle] = useState<string>('');
+  const [baseProducts, setBaseProducts] = useState<CatalogGridProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const category = findCategoryBySlug(categorySlug);
-  const sub = subSlug
-    ? findSubcategoryBySlug(categorySlug, subSlug)
-    : undefined;
-
-  // Смена раздела — сбрасываем фильтры (иначе старые чекбоксы «обнулят» выдачу)
   useEffect(() => {
     setFilter(emptyCatalogFilter());
-  }, [categorySlug, subSlug]);
+  }, [categoryIdParam]);
 
-  const baseProducts = useMemo(
-    () => getProductsForCategory(categorySlug, subSlug),
-    [categorySlug, subSlug]
-  );
+  useEffect(() => {
+    if (!Number.isFinite(categoryId) || categoryId < 1) {
+      setLoading(false);
+      setError('Некорректный раздел каталога');
+      setBaseProducts([]);
+      setCategoryTitle('');
+      return;
+    }
+
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      setError(null);
+      const catRes = await api.getCategoryById(categoryId);
+      if (cancelled) return;
+      if (!catRes.success || !catRes.data) {
+        setError(catRes.error ?? 'Раздел не найден');
+        setCategoryTitle('');
+        setBaseProducts([]);
+        setLoading(false);
+        return;
+      }
+      setCategoryTitle(catRes.data.categoryName);
+
+      const prodRes = await api.getProducts({
+        categoryId,
+        page: 0,
+        size: 100,
+      });
+      if (cancelled) return;
+      if (!prodRes.success || !prodRes.data?.content) {
+        setError(prodRes.error ?? 'Не удалось загрузить товары');
+        setBaseProducts([]);
+        setLoading(false);
+        return;
+      }
+      const enriched = await enrichProductListForGrid(prodRes.data.content, {
+        categoryKey: `s-${categoryId}`,
+        subKey: 'all',
+      });
+      if (!cancelled) {
+        setBaseProducts(enriched);
+        setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [categoryId, categoryIdParam]);
 
   const filteredProducts = useMemo(
     () => filterCatalogProducts(baseProducts, filter),
     [baseProducts, filter]
   );
 
-  if (!category) {
+  if (!Number.isFinite(categoryId) || categoryId < 1) {
     return (
       <div className={styles['page']}>
         <div className={styles['inner']}>
-          <p className={styles['notFound']}>Категория не найдена.</p>
+          <p className={styles['notFound']}>Раздел не найден.</p>
           <Link to="/catalog" className={styles['link']}>
             В каталог
           </Link>
@@ -73,13 +115,15 @@ const CatalogCategoryPage: React.FC = () => {
     );
   }
 
-  if (subSlug && !sub) {
+  if (!loading && error && baseProducts.length === 0) {
     return (
       <div className={styles['page']}>
         <div className={styles['inner']}>
-          <p className={styles['notFound']}>Подкатегория не найдена.</p>
-          <Link to={`/catalog/${categorySlug}`} className={styles['link']}>
-            Все товары раздела «{category.name}»
+          <p className={styles['notFound']} role="alert">
+            {error}
+          </p>
+          <Link to="/catalog" className={styles['link']}>
+            В каталог
           </Link>
         </div>
       </div>
@@ -102,43 +146,37 @@ const CatalogCategoryPage: React.FC = () => {
           <span className={styles['crumbSep']} aria-hidden>
             /
           </span>
-          <Link to={`/catalog/${category.slug}`} className={styles['crumb']}>
-            {category.name}
-          </Link>
-          {sub && (
-            <>
-              <span className={styles['crumbSep']} aria-hidden>
-                /
-              </span>
-              <span className={styles['crumbCurrent']}>{sub.name}</span>
-            </>
-          )}
+          <span className={styles['crumbCurrent']}>
+            {loading ? '…' : categoryTitle || 'Раздел'}
+          </span>
         </nav>
 
         <h1 className={styles['title']}>
-          {sub ? `${category.name} — ${sub.name}` : category.name}
+          {loading ? 'Загрузка…' : categoryTitle}
         </h1>
-        <p className={styles['meta']}>
-          Показано {filteredProducts.length} из {baseProducts.length}{' '}
-          {goodsWord(baseProducts.length)}
-        </p>
+        {!loading && (
+          <p className={styles['meta']}>
+            Показано {filteredProducts.length} из {baseProducts.length}{' '}
+            {goodsWord(baseProducts.length)}
+          </p>
+        )}
 
         <div className={styles['body']}>
           <CatalogFilters
             products={baseProducts}
             value={filter}
             onChange={setFilter}
-            subcategoryOptions={
-              sub ? undefined : category.subcategories
-            }
           />
           <div className={styles['gridWrap']}>
-            {filteredProducts.length === 0 ? (
+            {loading && <p className={styles['empty']}>Загрузка товаров…</p>}
+            {!loading && filteredProducts.length === 0 && (
               <p className={styles['empty']}>
-                Нет товаров по выбранным фильтрам. Сбросьте фильтры или
-                измените условия.
+                {baseProducts.length === 0
+                  ? 'В этом разделе пока нет товаров.'
+                  : 'Нет товаров по выбранным фильтрам. Сбросьте фильтры.'}
               </p>
-            ) : (
+            )}
+            {!loading && filteredProducts.length > 0 && (
               <ProductGrid products={filteredProducts} />
             )}
           </div>

@@ -23,9 +23,10 @@
   /* Единый шрифт интерфейса (+ запасные системные) */
   --shop-font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   /* Полупрозрачная заливка акцента: ховеры списков, подсветка */
-  --shop-primary-soft: rgba(104, 109, 242, 0.1);
+  /* Полупрозрачный акцент под текущий --shop-primary (#447add → rgb 68,122,221) */
+  --shop-primary-soft: rgba(68, 122, 221, 0.12);
   /* Чуть плотнее soft — усиленный ховер/подсветка */
-  --shop-primary-soft-hover: rgba(104, 109, 242, 0.18);
+  --shop-primary-soft-hover: rgba(68, 122, 221, 0.22);
   /* Фон верхней шапки сайта */
   --shop-header-bg: #447add;
 }

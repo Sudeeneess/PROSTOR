@@ -1,0 +1,8 @@
+$kind: http-request
+url: "{{baseUrl}}/api/products?categoryId={{categoryId}}&page=0&size=20"
+method: GET
+queryParams:
+  categoryId: "{{categoryId}}"
+  page: "0"
+  size: "20"
+order: 4000

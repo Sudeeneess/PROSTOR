@@ -7,13 +7,13 @@
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     show-sql: true
-    open-in-view: false  # Добавьте эту строку (хорошая практика)
+    open-in-view: false
 
   flyway:
     enabled: true
@@ -27,10 +27,12 @@ app:
     expiration: 86400000
   security:
     cors:
-      allowed-origins: "http://localhost:3001,http://localhost:3000"
+      allowed-origins: "http://localhost:3001,http://localhost:3000,http://localhost:3002"
+  commission:
+    rate: 0.10  #комиссия
 
 server:
-  port: 8080
+  port: 8083
 
 logging:
   level:

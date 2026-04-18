@@ -7,7 +7,6 @@ import {
 } from '../data/mockCatalogProducts';
 
 type ProductGridProps = {
-  /** Если не передан — показываем подборку для главной */
   products?: CatalogGridProduct[];
 };
 

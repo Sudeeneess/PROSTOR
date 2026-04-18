@@ -2,33 +2,54 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import HeaderAdmin from "./HeaderAdmin";
 import styles from './AuthAdmin.module.css';
+import { api, resolveAfterLogin } from "../../services/api";
 
 const AuthorizationAdmin: React.FC = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    login: "",
+    username: "",
     password: "",
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    if (error) setError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
+
+    if (!formData.username || !formData.password) {
+      setError("Пожалуйста, заполните все поля");
+      setIsLoading(false);
+      return;
+    }
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await api.login({
+        username: formData.username,
+        password: formData.password,
+      });
 
-      localStorage.setItem("token", "admin-token-" + Date.now());
-      sessionStorage.setItem("userRole", "admin");
+      if (!response.success || !response.data) {
+        setError(response.error || "Неверное имя пользователя или пароль");
+        return;
+      }
 
-      navigate("/admin");
+      if (response.data.role !== "admin") {
+        api.logout();
+        setError("Вход доступен только для роли администратора");
+        return;
+      }
+
+      navigate(resolveAfterLogin(response.data), { replace: true });
 
     } finally {
       setIsLoading(false);
@@ -43,16 +64,24 @@ const AuthorizationAdmin: React.FC = () => {
         <form className={styles['admin-auth-form']} onSubmit={handleSubmit}>
           <div className={styles['admin-auth-form-header']}>Авторизация администратора</div>
 
+          {error && (
+            <div className={styles['admin-auth-error-message']}>
+              {error}
+            </div>
+          )}
+
           <div className={styles['admin-auth-form-container']}>
             <div className={styles['admin-auth-form-field']}>
-              <label>Логин</label>
+              <label>Username</label>
               <input
                 type="text"
-                name="login"
-                value={formData.login}
+                name="username"
+                value={formData.username}
                 onChange={handleInputChange}
                 className={styles['admin-auth-input-field']}
+                placeholder="Username"
                 required
+                disabled={isLoading}
               />
             </div>
 
@@ -64,11 +93,13 @@ const AuthorizationAdmin: React.FC = () => {
                 value={formData.password}
                 onChange={handleInputChange}
                 className={styles['admin-auth-input-field']}
+                placeholder="Введите пароль"
                 required
+                disabled={isLoading}
               />
             </div>
 
-            <button className={styles['admin-auth-save-button']} disabled={isLoading}>
+            <button className={`${styles['admin-auth-save-button']} ${isLoading ? styles['admin-auth-loading'] : ''}`} disabled={isLoading}>
               {isLoading ? "Вход..." : "Войти"}
             </button>
           </div>

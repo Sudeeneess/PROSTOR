@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{baseUrl}}/api/seller/products/{{sellerProductId}}"
+method: GET
+headers:
+  Authorization: Bearer {{sellerToken}}
+order: 3000

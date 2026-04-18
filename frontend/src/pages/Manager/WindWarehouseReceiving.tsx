@@ -1,30 +1,31 @@
 import React from 'react';
 import styles from './WindWarehouseReceiving.module.css';
 
-interface ProductItem {
-  id: string;
-  name: string;
-  expected: number;
-  accepted: number;
-  cell: string;
+export interface ReceptionLine {
+  productName: string;
+  quantity: number;
 }
 
 interface WindWarehouseReceivingProps {
   isOpen: boolean;
   onClose: () => void;
   onComplete: () => void;
-  sellerName: string;
-  orderId: string;
-  products: ProductItem[];
+  sellerTitle: string;
+  sellerSubtitle?: string;
+  batchDateLabel: string;
+  lines: ReceptionLine[];
+  completeDisabled?: boolean;
 }
 
 const WindWarehouseReceiving: React.FC<WindWarehouseReceivingProps> = ({
   isOpen,
   onClose,
   onComplete,
-  sellerName,
-  orderId,
-  products
+  sellerTitle,
+  sellerSubtitle,
+  batchDateLabel,
+  lines,
+  completeDisabled = false,
 }) => {
   if (!isOpen) return null;
 
@@ -35,6 +36,7 @@ const WindWarehouseReceiving: React.FC<WindWarehouseReceivingProps> = ({
   };
 
   const handleCompleteReception = () => {
+    if (completeDisabled) return;
     onComplete();
     onClose();
   };
@@ -43,10 +45,15 @@ const WindWarehouseReceiving: React.FC<WindWarehouseReceivingProps> = ({
     <div className={styles['wind-warehouse-receiving-overlay']} onClick={handleOverlayClick}>
       <div className={styles['wind-warehouse-receiving-modal']}>
         <div className={styles['wind-warehouse-receiving-header']}>
-          <h2 className={styles['wind-warehouse-receiving-title']}>
-            Поставка {orderId} от {sellerName}
-          </h2>
-          <button className={styles['wind-warehouse-receiving-close']} onClick={onClose}>
+          <div>
+            <h2 className={styles['wind-warehouse-receiving-title']}>Приёмка новых товаров</h2>
+            <p className={styles['wind-warehouse-receiving-subtitle']}>
+              {sellerTitle}
+              {sellerSubtitle ? ` · ${sellerSubtitle}` : ''}
+            </p>
+            <p className={styles['wind-warehouse-receiving-meta']}>Дата занесения: {batchDateLabel}</p>
+          </div>
+          <button type="button" className={styles['wind-warehouse-receiving-close']} onClick={onClose}>
             ×
           </button>
         </div>
@@ -57,37 +64,37 @@ const WindWarehouseReceiving: React.FC<WindWarehouseReceivingProps> = ({
               <thead>
                 <tr>
                   <th>Товар</th>
-                  <th>Ожидается</th>
-                  <th>Принято</th>
-                  <th>Ячейка</th>
+                  <th>Количество</th>
                 </tr>
               </thead>
               <tbody>
-                {products.map((product, index) => (
-                  <tr key={index}>
-                    <td className={styles['wind-warehouse-receiving-product-name']}>{product.name}</td>
-                    <td>{product.expected}</td>
-                    <td>{product.accepted}</td>
-                    <td>{product.cell}</td>
+                {lines.length === 0 ? (
+                  <tr>
+                    <td colSpan={2} className={styles['wind-warehouse-receiving-empty']}>
+                      Нет позиций
+                    </td>
                   </tr>
-                ))}
+                ) : (
+                  lines.map((line, index) => (
+                    <tr key={`${line.productName}-${index}`}>
+                      <td className={styles['wind-warehouse-receiving-product-name']}>{line.productName}</td>
+                      <td>{line.quantity}</td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
         </div>
 
         <div className={styles['wind-warehouse-receiving-footer']}>
-          <button 
+          <button
+            type="button"
             className={`${styles['wind-warehouse-receiving-button']} ${styles['wind-warehouse-receiving-complete-button']}`}
             onClick={handleCompleteReception}
+            disabled={completeDisabled}
           >
-            Завершить приемку
-          </button>
-          <button 
-            className={`${styles['wind-warehouse-receiving-button']} ${styles['wind-warehouse-receiving-draft-button']}`}
-            onClick={onClose}
-          >
-            Сохранить черновик
+            {completeDisabled ? 'Уже принято' : 'Завершить приёмку'}
           </button>
         </div>
       </div>

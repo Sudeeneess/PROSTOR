@@ -1,0 +1,27 @@
+$kind: http-request
+description: sellerId в теле перезаписывается сервером по JWT; categoryId при
+  необходимости замените.
+url: "{{baseUrl}}/api/seller/products"
+method: POST
+headers:
+  Authorization: Bearer {{sellerToken}}
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Товар из Postman",
+      "price": 1999.99,
+      "sellerId": 1,
+      "categoryId": {{categoryId}}
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      if (pm.response.code === 201) {
+        const j = pm.response.json();
+        if (j.id != null) pm.environment.set('sellerProductId', String(j.id));
+      }
+      pm.test('Ответ получен', () => pm.response.code !== 0);
+    language: text/javascript
+order: 4000

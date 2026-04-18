@@ -1,0 +1,9 @@
+$kind: http-request
+url: "{{baseUrl}}/api/orders-statuses?page=0&size=20"
+method: GET
+headers:
+  Authorization: Bearer {{managerToken}}
+queryParams:
+  page: "0"
+  size: "20"
+order: 3000

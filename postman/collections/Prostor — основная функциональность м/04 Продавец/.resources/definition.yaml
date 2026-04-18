@@ -1,0 +1,4 @@
+$kind: collection
+description: "Удаление товара намеренно не включено (разрушительная операция).
+  При необходимости: DELETE /api/seller/products/{id}"
+order: 4000

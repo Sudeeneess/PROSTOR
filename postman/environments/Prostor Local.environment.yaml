@@ -1,0 +1,89 @@
+name: Prostor Local
+values:
+  - key: baseUrl
+    value: 'http://localhost:8083'
+    enabled: true
+  - key: token
+    value: ''
+    enabled: true
+  - key: adminToken
+    value: ''
+    enabled: true
+  - key: warehouseUsername
+    value: warehouse_mgr
+    enabled: true
+  - key: warehousePassword
+    value: ware123
+    enabled: true
+  - key: adminUsername
+    value: admin_user
+    enabled: true
+  - key: adminPassword
+    value: admin123
+    enabled: true
+  - key: warehouseId
+    value: '1'
+    enabled: true
+  - key: productId
+    value: '1'
+    enabled: true
+  - key: orderId
+    value: ''
+    enabled: true
+  - key: orderItemId
+    value: ''
+    enabled: true
+  - key: statusId
+    value: ''
+    enabled: true
+  - key: targetOrderStatusId
+    value: '2'
+    enabled: true
+  - key: stockId
+    value: ''
+    enabled: true
+  - key: movementId
+    value: ''
+    enabled: true
+  - key: movementStatusName
+    value: PENDING
+    enabled: true
+  - key: customerUsername
+    value: john_doe
+    enabled: true
+  - key: customerPassword
+    value: cust123
+    enabled: true
+  - key: sellerUsername
+    value: seller_pro
+    enabled: true
+  - key: sellerPassword
+    value: seller123
+    enabled: true
+  - key: customerToken
+    value: ''
+    enabled: true
+  - key: sellerToken
+    value: ''
+    enabled: true
+  - key: managerToken
+    value: ''
+    enabled: true
+  - key: customerId
+    value: '1'
+    enabled: true
+  - key: categoryId
+    value: '1'
+    enabled: true
+  - key: paymentId
+    value: ''
+    enabled: true
+  - key: sellerProductId
+    value: ''
+    enabled: true
+  - key: regCustomerName
+    value: ''
+    enabled: true
+  - key: regSellerName
+    value: ''
+    enabled: true

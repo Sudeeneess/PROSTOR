@@ -1,17 +1,42 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import HeaderSeller from "./HeaderSeller"; // поправь путь если нужно
+import HeaderSeller from "./HeaderSeller";
 import styles from './OrdersSeller.module.css';
+import { api } from "../../services/api";
 
 const OrdersSeller: React.FC = () => {
   const navigate = useNavigate();
-
-  const orders = {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [orders, setOrders] = useState({
     new: 0,
     assembling: 0,
     sold: 0,
     onTheWay: 0,
-  };
+  });
+
+  useEffect(() => {
+    const loadDashboard = async () => {
+      setLoading(true);
+      setError(null);
+      const res = await api.getSellerOrdersDashboard();
+      if (!res.success || !res.data) {
+        setError(res.error ?? "Не удалось загрузить статистику");
+        setLoading(false);
+        return;
+      }
+
+      setOrders({
+        new: res.data.newProducts ?? 0,
+        assembling: res.data.assembling ?? 0,
+        sold: res.data.sold ?? 0,
+        onTheWay: res.data.onTheWay ?? 0,
+      });
+      setLoading(false);
+    };
+
+    void loadDashboard();
+  }, []);
 
   const handleBack = () => {
     if (window.history.length > 1) {
@@ -22,7 +47,7 @@ const OrdersSeller: React.FC = () => {
   };
 
   return (
-    <div className={styles['seller-orders-page']}>
+    <div className={`seller-app-shell ${styles['seller-orders-page']}`}>
       <HeaderSeller />
 
       <div className={styles['seller-orders-container']}>
@@ -33,6 +58,11 @@ const OrdersSeller: React.FC = () => {
             ← Назад
           </button>
         </div>
+
+        {loading && <p className={styles['seller-orders-status']}>Загрузка...</p>}
+        {error && !loading && (
+          <p className={styles['seller-orders-status']} role="alert">{error}</p>
+        )}
 
         <div className={styles['seller-orders-grid']}>
           <div className={styles['seller-orders-card']}>

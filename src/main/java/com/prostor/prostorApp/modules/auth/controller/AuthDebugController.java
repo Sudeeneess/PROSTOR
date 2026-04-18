@@ -20,12 +20,12 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-//@RestController
+@RestController
 @RequestMapping("/api/debug")
 @RequiredArgsConstructor
 public class AuthDebugController {
 
-    private final UserService userService;              // Вместо UserRepository
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;

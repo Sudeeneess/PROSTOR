@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { FiLogOut, FiPackage, FiCreditCard, FiChevronRight, FiPlus, FiTrash2 } from 'react-icons/fi';
 import { FaUserCircle } from 'react-icons/fa';
 import { IoCardOutline } from "react-icons/io5";
-import InputMask from 'react-input-mask';
 import HeaderMain from '../../components/HeaderMain';
+import { formatRuPhoneFromDigits, formatRuPhoneInput } from '../../utils/phoneFormat';
 import styles from './ProfileBuyer.module.css';
 
 interface UserProfile {
@@ -35,12 +35,9 @@ const AccountPage: React.FC = () => {
     phone: '+7'
   });
   
-  // Состояние для попапа способа оплаты
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  // Состояние для попапа редактирования профиля
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   
-  // Состояние для карт
   const [savedCards, setSavedCards] = useState<SavedCard[]>([
     { id: '1', last4: '4532', brand: 'visa', expiryDate: '12/26', cardholderName: 'ALEXEY IVANOV' },
     { id: '2', last4: '8765', brand: 'mastercard', expiryDate: '08/25', cardholderName: 'ALEXEY IVANOV' },
@@ -54,42 +51,53 @@ const AccountPage: React.FC = () => {
     cardholderName: ''
   });
 
-  // Загрузка данных пользователя при монтировании
   useEffect(() => {
     loadUserData();
   }, []);
+
+  const phoneFromStorage = (savedPhone: string | null): string => {
+    if (!savedPhone) return '+7';
+    const digits = savedPhone.replace(/\D/g, '');
+    if (digits.length === 11 && digits.startsWith('7')) {
+      return formatRuPhoneFromDigits(digits);
+    }
+    if (savedPhone.trim().startsWith('+')) {
+      return savedPhone;
+    }
+    return '+7';
+  };
 
   const loadUserData = () => {
     try {
       const userName = localStorage.getItem('userName');
       const savedPhone = localStorage.getItem('userPhone');
-      
+      const phoneMasked = phoneFromStorage(savedPhone);
+
       if (userName) {
         const nameParts = userName.split(' ');
         setProfile({
           firstName: nameParts[0] || '',
           lastName: nameParts.slice(1).join(' ') || '',
-          phone: savedPhone || '+7'
+          phone: phoneMasked,
         });
         setEditProfile({
           firstName: nameParts[0] || '',
           lastName: nameParts.slice(1).join(' ') || '',
-          phone: savedPhone || '+7'
+          phone: phoneMasked,
         });
       } else {
-        // Загрузка из user объекта
         const userStr = localStorage.getItem('user');
         if (userStr) {
           const userData = JSON.parse(userStr);
           setProfile({
             firstName: userData.name || userData.username || '',
             lastName: '',
-            phone: savedPhone || '+7'
+            phone: phoneMasked,
           });
           setEditProfile({
             firstName: userData.name || userData.username || '',
             lastName: '',
-            phone: savedPhone || '+7'
+            phone: phoneMasked,
           });
         }
       }
@@ -104,10 +112,8 @@ const AccountPage: React.FC = () => {
   };
 
   const handleSaveProfile = () => {
-    // Сохраняем данные
     setProfile({ ...editProfile });
     
-    // Сохраняем в localStorage
     const fullName = editProfile.lastName 
       ? `${editProfile.firstName} ${editProfile.lastName}`
       : editProfile.firstName;
@@ -120,7 +126,6 @@ const AccountPage: React.FC = () => {
       }
     }
     
-    // Обновляем данные в объекте user
     const userStr = localStorage.getItem('user');
     if (userStr) {
       const userData = JSON.parse(userStr);
@@ -132,12 +137,7 @@ const AccountPage: React.FC = () => {
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = e.target.value;
-    if (rawValue === '' || rawValue === '+') {
-      setEditProfile({ ...editProfile, phone: '+7' });
-      return;
-    }
-    setEditProfile({ ...editProfile, phone: rawValue });
+    setEditProfile({ ...editProfile, phone: formatRuPhoneInput(e.target.value) });
   };
 
   const handlePhoneBlur = () => {
@@ -160,14 +160,13 @@ const AccountPage: React.FC = () => {
     navigate('/');
   };
 
-  // Функции для работы с картами
   const handleAddCard = () => {
     if (newCard.cardNumber && newCard.expiryDate && newCard.cvc && newCard.cardholderName) {
       const last4 = newCard.cardNumber.slice(-4);
       const newCardObj: SavedCard = {
         id: Date.now().toString(),
         last4: last4,
-        brand: 'visa', // Можно определить по первым цифрам
+        brand: 'visa',
         expiryDate: newCard.expiryDate,
         cardholderName: newCard.cardholderName.toUpperCase()
       };
@@ -181,7 +180,6 @@ const AccountPage: React.FC = () => {
     setSavedCards(savedCards.filter(card => card.id !== cardId));
   };
 
-  // Функция для получения иконки карты (параметр brand не используется, но оставлен для возможного расширения)
   const getCardIcon = (_brand: string) => {
     return <IoCardOutline size={28} color="#111111" />;
   };
@@ -215,9 +213,7 @@ const AccountPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Блок с опциями */}
           <div className={styles['buyer-account-options']}>
-            {/* Карточка "Заказы" */}
             <div 
               className={styles['buyer-account-option-card']}
               onClick={handleOrdersClick}
@@ -234,7 +230,6 @@ const AccountPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Карточка "Способ оплаты" */}
             <div 
               className={styles['buyer-account-option-card']}
               onClick={() => setIsPaymentModalOpen(true)}
@@ -253,7 +248,6 @@ const AccountPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Кнопка "Выйти" */}
             <button 
               className={styles['buyer-account-logout-btn']}
               onClick={handleLogout}
@@ -264,7 +258,6 @@ const AccountPage: React.FC = () => {
         </div>
       </main>
 
-      {/* Модальное окно "Редактирование профиля" */}
       {isProfileModalOpen && (
         <div className={styles['buyer-account-modal-overlay']} onClick={() => setIsProfileModalOpen(false)}>
           <div className={styles['buyer-account-modal-content']} onClick={(e) => e.stopPropagation()}>
@@ -298,17 +291,17 @@ const AccountPage: React.FC = () => {
                 
                 <div className={styles['profile-edit-field']}>
                   <label>Номер телефона</label>
-                  <InputMask
-                    mask="+7 (999) 999-99-99"
-                    maskChar="_"
+                  <input
+                    type="tel"
                     value={editProfile.phone}
                     onChange={handlePhoneChange}
                     onBlur={handlePhoneBlur}
+                    inputMode="tel"
+                    autoComplete="tel"
+                    maxLength={18}
                     className={styles['profile-edit-input']}
                     placeholder="+7 (___) ___-__-__"
-                  >
-                    {(inputProps: any) => <input {...inputProps} type="tel" />}
-                  </InputMask>
+                  />
                 </div>
                 
                 <div className={styles['profile-edit-actions']}>
@@ -325,7 +318,6 @@ const AccountPage: React.FC = () => {
         </div>
       )}
 
-      {/* Модальное окно "Способы оплаты" */}
       {isPaymentModalOpen && (
         <div className={styles['buyer-account-modal-overlay']} onClick={() => setIsPaymentModalOpen(false)}>
           <div className={`${styles['buyer-account-modal-content']} ${styles['payment-modal-content']}`} onClick={(e) => e.stopPropagation()}>
@@ -335,7 +327,6 @@ const AccountPage: React.FC = () => {
             </div>
             <div className={styles['buyer-account-modal-body']}>
               <div className={styles['payment-methods-container']}>
-                {/* Существующие карты */}
                 {savedCards.map((card) => (
                   <div key={card.id} className={styles['payment-card-item']}>
                     <div className={styles['payment-card-info']}>
@@ -363,7 +354,6 @@ const AccountPage: React.FC = () => {
                   </div>
                 ))}
 
-                {/* Форма добавления новой карты */}
                 {!isAddingCard ? (
                   <button 
                     className={styles['add-card-button']}

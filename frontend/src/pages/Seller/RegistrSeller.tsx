@@ -2,12 +2,18 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import HeaderSeller from "./HeaderSeller";
 import styles from './RegistrSeller.module.css';
+import { api } from "../../services/api";
+import SellerFioInput from "../../components/SellerFioInput";
+import { formatFioDisplay } from "../../utils/fioInput";
 
 const SellerEntrance: React.FC = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    country: "",
+    username: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
     orgForm: "",
     inn: "",
     fullname: "",
@@ -27,6 +33,11 @@ const SellerEntrance: React.FC = () => {
         ...formData,
         inn: value.replace(/\D/g, "").slice(0, 12),
       });
+    } else if (name === "phone") {
+      setFormData({
+        ...formData,
+        phone: value.replace(/\D/g, "").slice(0, 11),
+      });
     } else {
       setFormData({ ...formData, [name]: value });
     }
@@ -38,34 +49,57 @@ const SellerEntrance: React.FC = () => {
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    if (formData.inn.length !== 12) {
-      setErrorMessage("ИНН должен содержать 12 цифр");
+    if (!formData.username || !formData.phone || !formData.password || !formData.confirmPassword) {
+      setErrorMessage("Заполните username, телефон и пароль");
+      setLoading(false);
+      return;
+    }
+
+    if (formData.inn.length < 10 || formData.inn.length > 12) {
+      setErrorMessage("ИНН должен содержать 10-12 цифр");
+      setLoading(false);
+      return;
+    }
+
+    const fioNorm = formatFioDisplay(formData.fullname);
+    const fioParts = fioNorm.split(/\s+/).filter(Boolean);
+    if (fioParts.length !== 3) {
+      setErrorMessage("ФИО должно содержать 3 слова: фамилия, имя, отчество");
       setLoading(false);
       return;
     }
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const response = await api.register({
+        username: formData.username.trim(),
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+        phone: formData.phone,
+        role: "SELLER",
+        inn: formData.inn,
+        companyName: fioNorm,
+      });
+
+      if (!response.success) {
+        setErrorMessage(response.error || "Ошибка регистрации");
+        return;
+      }
 
       const sellerProfile = {
-        country: formData.country,
+        username: formData.username.trim(),
+        phone: formData.phone.replace(/\D/g, ''),
         orgForm: formData.orgForm,
         inn: formData.inn,
-        fio: formData.fullname,
+        fio: fioNorm,
       };
 
-      // ✅ сохраняем профиль
+      // сохраняем профиль
       localStorage.setItem("sellerProfile", JSON.stringify(sellerProfile));
-
-      // ✅ создаём авторизацию
-      localStorage.setItem("token", "seller-token-" + Date.now());
-      sessionStorage.setItem("userRole", "seller");
 
       setSuccessMessage("Регистрация успешна!");
 
-      // ✅ сразу в личный кабинет
       setTimeout(() => {
-        navigate("/seller/dashboard");
+        navigate("/seller/auth");
       }, 1000);
 
     } catch {
@@ -76,7 +110,7 @@ const SellerEntrance: React.FC = () => {
   };
 
   return (
-    <div className={styles['seller-reg-app']}>
+    <div className={`seller-app-shell ${styles['seller-reg-app']}`}>
       <HeaderSeller />
 
       <main className={styles['seller-reg-content-section']}>
@@ -84,17 +118,45 @@ const SellerEntrance: React.FC = () => {
           <div className={styles['seller-reg-auth-form-header']}>Регистрация продавца</div>
 
           <div className={styles['seller-reg-form-container']}>
-            <select
-              name="country"
-              value={formData.country}
+            <input
+              type="text"
+              name="username"
+              placeholder="Username"
+              value={formData.username}
               onChange={handleChange}
+              className={styles['seller-reg-input-field']}
               required
-              className={styles['seller-reg-input-select']}
-            >
-              <option value="">Страна</option>
-              <option value="RU">Россия</option>
-              <option value="KZ">Казахстан</option>
-            </select>
+            />
+
+            <input
+              type="tel"
+              name="phone"
+              placeholder="Телефон (11 цифр)"
+              value={formData.phone}
+              onChange={handleChange}
+              className={styles['seller-reg-input-field']}
+              required
+            />
+
+            <input
+              type="password"
+              name="password"
+              placeholder="Пароль"
+              value={formData.password}
+              onChange={handleChange}
+              className={styles['seller-reg-input-field']}
+              required
+            />
+
+            <input
+              type="password"
+              name="confirmPassword"
+              placeholder="Повторите пароль"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              className={styles['seller-reg-input-field']}
+              required
+            />
 
             <select
               name="orgForm"
@@ -119,13 +181,12 @@ const SellerEntrance: React.FC = () => {
               required
             />
 
-            <input
-              type="text"
+            <SellerFioInput
               name="fullname"
-              placeholder="ФИО"
               value={formData.fullname}
-              onChange={handleChange}
+              onChange={(value) => setFormData({ ...formData, fullname: value })}
               className={styles['seller-reg-input-field']}
+              placeholder="Фамилия Имя Отчество"
               required
             />
 

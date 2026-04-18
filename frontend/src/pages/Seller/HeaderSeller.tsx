@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from './HeaderSeller.module.css';
+import { api } from "../../services/api";
 
 const HeaderSeller: React.FC = () => {
   const navigate = useNavigate();
@@ -10,7 +11,12 @@ const HeaderSeller: React.FC = () => {
   };
 
   const handlePersonalClick = () => {
-    navigate("/seller/dashboard"); // ИСПРАВЛЕНО: правильный путь к личному кабинету
+    navigate("/seller/dashboard");
+  };
+
+  const handleGuestHomeClick = () => {
+    api.logout();
+    window.location.replace("/");
   };
 
   return (
@@ -27,6 +33,9 @@ const HeaderSeller: React.FC = () => {
         <Link to="/seller/orders" className={styles['seller-header-navigation-link']}>Заказы</Link>
         <button onClick={handlePersonalClick} className={styles['seller-header-navigation-button']}>
           Личный кабинет
+        </button>
+        <button onClick={handleGuestHomeClick} className={styles['seller-header-navigation-button']}>
+          Выйти к гостю
         </button>
       </nav>
     </header>

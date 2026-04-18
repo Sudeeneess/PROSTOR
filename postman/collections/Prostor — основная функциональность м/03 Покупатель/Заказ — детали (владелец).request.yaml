@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{baseUrl}}/api/orders/{{orderId}}"
+method: GET
+headers:
+  Authorization: Bearer {{customerToken}}
+scripts:
+  - type: afterResponse
+    code: |-
+      // 403 если orderId не ваш заказ
+      pm.test('Ответ получен', () => pm.response.code !== 0);
+    language: text/javascript
+order: 5000

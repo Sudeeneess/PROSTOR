@@ -4,33 +4,71 @@ import { LuMenu } from 'react-icons/lu';
 import { IoPersonCircleOutline } from 'react-icons/io5';
 import { FaBasketShopping } from 'react-icons/fa6';
 import { Link, useNavigate } from 'react-router-dom';
-import { CATALOG_CATEGORIES } from '../data/categories';
 import {
   searchHeaderCatalog,
   getHeaderSearchNavigatePath,
   getFirstHeaderSearchHit,
   type HeaderSearchHit,
+  type CatalogSearchOptions,
 } from '../utils/catalogSearch';
+import { api } from '../services/api';
 
 export type HeaderMainVariant = 'landing' | 'buyer';
 
 interface HeaderMainProps {
   variant?: HeaderMainVariant;
-  // onCartClick больше не нужен, убираем его
 }
 
 const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
-  const [activeCategorySlug, setActiveCategorySlug] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [catalogMenu, setCatalogMenu] = useState<
+    { id: number; categoryName: string }[]
+  >([]);
+  const [brandNames, setBrandNames] = useState<string[]>([]);
+  const [menuLoaded, setMenuLoaded] = useState(false);
   const [searchPanelOpen, setSearchPanelOpen] = useState(false);
   const searchWrapRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const catRes = await api.getCategoriesListForUi();
+      const brRes = await api.getBrands(0, 120);
+      if (cancelled) return;
+      if (catRes.success && catRes.data?.content?.length) {
+        setCatalogMenu(
+          catRes.data.content.map((c) => ({
+            id: c.id,
+            categoryName: c.categoryName,
+          }))
+        );
+      }
+      if (brRes.success && brRes.data?.content?.length) {
+        setBrandNames(brRes.data.content.map((b) => b.name));
+      }
+      setMenuLoaded(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const catalogSearchOpts: CatalogSearchOptions = useMemo(() => {
+    if (!menuLoaded) {
+      return { apiCategories: [], brandNames };
+    }
+    return {
+      apiCategories: catalogMenu,
+      brandNames,
+    };
+  }, [menuLoaded, catalogMenu, brandNames]);
+
   const searchResults = useMemo(
-    () => searchHeaderCatalog(searchQuery),
-    [searchQuery]
+    () => searchHeaderCatalog(searchQuery, catalogSearchOpts),
+    [searchQuery, catalogSearchOpts]
   );
 
   const hasSearchQuery = searchQuery.trim().length > 0;
@@ -70,12 +108,10 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
 
   const handleCatalogMouseLeave = () => {
     setIsCatalogOpen(false);
-    setActiveCategorySlug(null);
   };
 
   const closeCatalog = () => {
     setIsCatalogOpen(false);
-    setActiveCategorySlug(null);
   };
 
   const handleRoleClick = (role: string) => {
@@ -87,7 +123,7 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
           navigate('/auth');
           break;
         case 'seller':
-          navigate('/seller/auth');
+          navigate('/seller/main');
           break;
         case 'warehouse':
           navigate('/warehouse/auth');
@@ -102,8 +138,12 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
     }
 
     switch (role) {
+      case 'guest':
+        api.logout();
+        window.location.replace('/');
+        break;
       case 'seller':
-        navigate('/seller/auth');
+        navigate('/seller/main');
         break;
       case 'warehouse':
         navigate('/warehouse/auth');
@@ -122,16 +162,13 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
     }
   };
 
-  // Новая функция для обработки клика по корзине
   const handleCartClick = () => {
     const token = localStorage.getItem('token');
-    const userRole = sessionStorage.getItem('userRole');
-    
-    // Если пользователь авторизован как покупатель
+    const userRole = api.getStoredUserRole();
+
     if (token && userRole === 'customer') {
       navigate('/basket');
     } 
-    // Если не авторизован
     else {
       navigate('/auth');
     }
@@ -139,7 +176,7 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
 
   const logo = (
     <Link
-      to={variant === 'landing' ? '/' : '/buyer'}
+      to={variant === 'landing' ? '/' : '/customer'}
       className={styles['hm-logo']}
       title="На главную"
     >
@@ -157,7 +194,6 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
           onMouseEnter={handleCatalogMouseEnter}
           onMouseLeave={handleCatalogMouseLeave}
         >
-          {/* Клик по иконке — сразу в корень каталога */}
           <button
             type="button"
             className={styles['hm-menu-button']}
@@ -175,7 +211,6 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
               <div className={styles['hm-catalog-dropdown']}>
                 <div
                   className={`${styles['hm-catalog-item']} ${styles['hm-catalog-all']}`}
-                  onMouseEnter={() => setActiveCategorySlug(null)}
                   onClick={() => {
                     navigate('/catalog');
                     closeCatalog();
@@ -192,13 +227,12 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
                 >
                   Все разделы
                 </div>
-                {CATALOG_CATEGORIES.map((category) => (
+                {catalogMenu.map((category) => (
                   <div
-                    key={category.slug}
-                    className={`${styles['hm-catalog-item']} ${activeCategorySlug === category.slug ? styles['active'] : ''}`}
-                    onMouseEnter={() => setActiveCategorySlug(category.slug)}
+                    key={category.id}
+                    className={styles['hm-catalog-item']}
                     onClick={() => {
-                      navigate(`/catalog/${category.slug}`);
+                      navigate(`/catalog/section/${category.id}`);
                       closeCatalog();
                     }}
                     role="button"
@@ -206,58 +240,15 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
-                        navigate(`/catalog/${category.slug}`);
+                        navigate(`/catalog/section/${category.id}`);
                         closeCatalog();
                       }
                     }}
                   >
-                    {category.name}
+                    {category.categoryName}
                   </div>
                 ))}
               </div>
-
-              {activeCategorySlug && (
-                <div
-                  className={styles['hm-subcategory-dropdown']}
-                  onMouseEnter={() => setActiveCategorySlug(activeCategorySlug)}
-                  onMouseLeave={() => setActiveCategorySlug(null)}
-                >
-                  <div className={styles['hm-subcategory-header']}>
-                    <h3>
-                      {CATALOG_CATEGORIES.find((c) => c.slug === activeCategorySlug)
-                        ?.name ?? ''}
-                    </h3>
-                  </div>
-                  <div className={styles['hm-subcategory-list']}>
-                    {CATALOG_CATEGORIES.find((c) => c.slug === activeCategorySlug)
-                      ?.subcategories.map((sub) => (
-                        <div
-                          key={sub.slug}
-                          className={styles['hm-subcategory-item']}
-                          onClick={() => {
-                            navigate(
-                              `/catalog/${activeCategorySlug}/${sub.slug}`
-                            );
-                            closeCatalog();
-                          }}
-                          role="button"
-                          tabIndex={0}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              navigate(
-                                `/catalog/${activeCategorySlug}/${sub.slug}`
-                              );
-                              closeCatalog();
-                            }
-                          }}
-                        >
-                          {sub.name}
-                        </div>
-                      ))}
-                  </div>
-                </div>
-              )}
             </div>
           )}
         </div>
@@ -291,7 +282,10 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
                 }
                 if (e.key === 'Enter') {
                   e.preventDefault();
-                  const hit = getFirstHeaderSearchHit(searchQuery);
+                  const hit = getFirstHeaderSearchHit(
+                    searchQuery,
+                    catalogSearchOpts
+                  );
                   if (hit) applySearchHit(hit);
                 }
               }}
@@ -318,7 +312,11 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
                       </div>
                       {searchResults.categories.map((hit) => (
                         <button
-                          key={`c-${hit.slug}`}
+                          key={
+                            hit.sectionId != null
+                              ? `c-${hit.sectionId}`
+                              : `c-${hit.slug}`
+                          }
                           type="button"
                           role="option"
                           className={styles['hm-search-item']}
@@ -428,6 +426,15 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
                 >
                   Войти как администратор
                 </div>
+                {variant === 'buyer' && (
+                  <div
+                    className={styles['hm-role-item']}
+                    role="menuitem"
+                    onClick={() => handleRoleClick('guest')}
+                  >
+                    Выйти к гостю
+                  </div>
+                )}
               </div>
             )}
           </div>

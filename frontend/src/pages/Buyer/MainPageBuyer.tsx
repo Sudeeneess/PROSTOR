@@ -1,6 +1,6 @@
 import React from 'react';
 import HeaderMain from '../../components/HeaderMain';
-import ProductGrid from '../../components/ProductGrid';
+import ApiProductGrid from '../../components/ApiProductGrid';
 import styles from './MainPageBuyer.module.css'; 
 
 const MainPageBuyer: React.FC = () => {
@@ -8,7 +8,7 @@ const MainPageBuyer: React.FC = () => {
     <div className={styles['buyer-page']}>
       <HeaderMain variant="buyer" />
       <main className={styles['buyer-main-content']}>
-        <ProductGrid />
+        <ApiProductGrid limit={16} />
       </main>
     </div>
   );

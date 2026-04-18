@@ -8,6 +8,7 @@ import {
   readCart,
   writeCart,
 } from '../utils/cartStorage';
+import { api } from '../services/api';
 import styles from './ProductCard.module.css';
 
 export type ProductCardProps = {
@@ -16,7 +17,6 @@ export type ProductCardProps = {
   name: string;
   rating: string;
   reviews: string;
-  /** Первое фото из product_card.photo (URL); без него — плейсхолдер */
   imageUrl?: string | null;
 };
 
@@ -34,7 +34,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   const isBuyer = (() => {
     const token = localStorage.getItem('token');
-    const userRole = sessionStorage.getItem('userRole');
+    const userRole = api.getStoredUserRole();
     return Boolean(token && userRole === 'customer');
   })();
 
@@ -74,7 +74,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   const handleAddToCart = () => {
     const token = localStorage.getItem('token');
-    const userRole = sessionStorage.getItem('userRole');
+    const userRole = api.getStoredUserRole();
 
     if (!token || userRole !== 'customer') {
       navigate('/auth');
@@ -103,7 +103,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const handleDecrement = (e: React.MouseEvent) => {
     e.stopPropagation();
     const token = localStorage.getItem('token');
-    const userRole = sessionStorage.getItem('userRole');
+    const userRole = api.getStoredUserRole();
     if (!token || userRole !== 'customer') return;
 
     const cart = readCart();
@@ -124,7 +124,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const handleIncrement = (e: React.MouseEvent) => {
     e.stopPropagation();
     const token = localStorage.getItem('token');
-    const userRole = sessionStorage.getItem('userRole');
+    const userRole = api.getStoredUserRole();
     if (!token || userRole !== 'customer') return;
 
     const cart = readCart();
@@ -142,7 +142,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
     writeCart(cart);
     setQuantity(getQuantityForProduct(cart, id));
-    // Тост только при первом добавлении через «Добавить в корзину», не при «+»
   };
 
   const showCounter = isBuyer && quantity > 0;

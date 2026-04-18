@@ -1,12 +1,10 @@
-/* Основной контейнер страницы авторизации менеджера */
 .manager-auth-page {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #f5f5f5;
+  background-color: var(--shop-bg);
 }
 
-/* Контейнер для формы авторизации */
 .manager-auth-container {
   flex: 1;
   display: flex;
@@ -15,13 +13,9 @@
   padding: 2rem;
 }
 
-/* Карточка формы */
 .manager-auth-card {
   background: white;
-  padding-bottom: 1.2rem;
-  padding-top: 1.2rem;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  padding: 1.2rem 1.5rem;
   border-radius: 30px;
   width: 100%;
   max-width: 400px;
@@ -42,11 +36,10 @@
   }
 }
 
-/* Заголовок формы */
 .manager-auth-title {
   text-align: start;
   margin-bottom: 2rem;
-  color: #0a0a0a;
+  color: var(--shop-heading);
   font-size: 1.5rem;
   font-weight: 600;
   display: flex;
@@ -60,37 +53,34 @@
   vertical-align: middle;
 }
 
-/* Группа полей ввода */
 .manager-auth-form-group {
   margin-bottom: 1.5rem;
   width: 100%;
 }
 
-/* Поля ввода */
 .manager-auth-form-group input {
   width: 100%;
-  max-width: 100%;
-  padding: 12px;
-  padding-left: 15px;
-  border: 1px solid #C0C0C0;
+  padding: 12px 12px 12px 15px;
+  border: 1px solid var(--shop-border);
   border-radius: 20px;
   font-size: 14px;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
   box-sizing: border-box;
+  color: var(--shop-text);
+  background: var(--shop-surface);
 }
 
 .manager-auth-form-group input:focus {
-  border-color: #8d8d8d;
-  box-shadow: 0 0 0 2px rgba(192, 192, 192, 0.2);
+  border-color: var(--shop-primary);
+  box-shadow: 0 0 0 2px var(--shop-primary-soft);
 }
 
-/* Кнопка отправки */
 .manager-auth-submit-button {
   width: 100%;
   padding: 13px;
-  background-color: #e0e0e0;
-  color: #000000;
+  background-color: var(--shop-primary);
+  color: var(--shop-on-primary);
   border: none;
   border-radius: 20px;
   font-size: 1rem;
@@ -100,38 +90,9 @@
 }
 
 .manager-auth-submit-button:hover {
-  background-color: #acacac;
+  background-color: var(--shop-primary-hover);
 }
 
-/* Футер формы (если нужен) */
-.manager-auth-footer {
-  text-align: center;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid #eee;
-}
-
-.manager-auth-footer p {
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.manager-auth-link-button {
-  background: none;
-  border: none;
-  color: #1f54c7;
-  cursor: pointer;
-  font-size: 0.9rem;
-  text-decoration: underline;
-  padding: 0;
-  margin-left: 0.3rem;
-}
-
-.manager-auth-link-button:hover {
-  color: #003772;
-}
-
-/* Адаптивность для мобильных устройств */
 @media (max-width: 480px) {
   .manager-auth-container {
     padding: 1rem;
@@ -158,7 +119,6 @@
   }
 }
 
-/* Стили для сообщения об ошибке */
 .manager-auth-error-message {
   background-color: #ffebee;
   color: #c62828;
@@ -174,44 +134,28 @@
   box-shadow: 0 2px 8px rgba(198, 40, 40, 0.1);
 }
 
-/* Анимация для ошибки (встряхивание) */
 @keyframes manager-auth-shake {
   0%, 100% { transform: translateX(0); }
   10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
   20%, 40%, 60%, 80% { transform: translateX(5px); }
 }
 
-/* Стили для disabled состояния кнопки */
 .manager-auth-submit-button:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
   cursor: not-allowed;
-  background-color: #e0e0e0;
+  background-color: var(--shop-primary);
 }
 
 .manager-auth-submit-button:disabled:hover {
-  background-color: #e0e0e0;
+  background-color: var(--shop-primary);
 }
 
-/* Стили для disabled состояния ссылок */
-.manager-auth-link-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  color: #999;
-  text-decoration: none;
-}
-
-.manager-auth-link-button:disabled:hover {
-  color: #999;
-}
-
-/* Стили для disabled состояния инпутов */
 .manager-auth-form-group input:disabled {
   background-color: #f5f5f5;
   cursor: not-allowed;
   opacity: 0.7;
 }
 
-/* Стили для инпута с ошибкой (красная обводка) */
 .manager-auth-form-group input.manager-auth-error {
   border-color: #c62828;
   background-color: #ffebee;
@@ -222,7 +166,6 @@
   box-shadow: 0 0 0 2px rgba(198, 40, 40, 0.2);
 }
 
-/* Стили для индикатора загрузки на кнопке */
 .manager-auth-submit-button.manager-auth-loading {
   position: relative;
   color: transparent;

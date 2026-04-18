@@ -107,6 +107,11 @@
   scroll-snap-align: start;
 }
 
+.buyer-orders-empty {
+  margin: 0;
+  color: #555;
+}
+
 .buyer-orders-scroll::-webkit-scrollbar {
   height: 8px;
 }

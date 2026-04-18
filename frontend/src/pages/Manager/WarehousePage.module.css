@@ -1,6 +1,6 @@
 .dashboard-wrapper {
   min-height: 100vh;
-  background: linear-gradient(to bottom, #f0f1f5 0%, #e8eaf0 100%);
+  background: var(--shop-bg);
 }
 
 .main-content {
@@ -38,16 +38,16 @@
 .logout-button {
   padding: 6px 12px;
   font-size: 14px;
-  background-color: #C0C0C0;
-  color: white;
+  background-color: var(--shop-primary);
+  color: var(--shop-on-primary);
   border: none;
-  border-radius: 6px;
+  border-radius: 20px;
   cursor: pointer;
   transition: background-color 0.2s;
 }
 
 .logout-button:hover {
-  background-color: #C0C0C0;
+  background-color: var(--shop-primary-hover);
 }
 
 /* Карточки статистики */
@@ -99,10 +99,10 @@
 .action-btn {
   flex: 1;
   height: 72px;
-  background: #6b7280;
-  color: white;
+  background: var(--shop-primary);
+  color: var(--shop-on-primary);
   border: none;
-  border-radius: 14px;
+  border-radius: 20px;
   font-size: 17px;
   font-weight: 600;
   cursor: pointer;
@@ -110,12 +110,12 @@
   align-items: center;
   justify-content: center;
   padding: 0 32px;
-  box-shadow: 0 5px 15px rgba(107, 114, 128, 0.35);
+  box-shadow: 0 5px 15px rgba(68, 122, 221, 0.35);
   transition: background-color 0.2s;
 }
 
 .action-btn:hover:not(:disabled) {
-  background: #4b5563;
+  background: var(--shop-primary-hover);
 }
 
 .action-btn:disabled {
@@ -143,6 +143,9 @@
 }
 
 .number {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: #111827;
 }
 
 .executor {
@@ -153,9 +156,9 @@
 
 .status-badge {
   display: inline-block;
-  padding: 4px 10px;
+  padding: 6px 12px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
 }
 
@@ -186,27 +189,33 @@
 
 .activity-table {
   background: white;
-  border-radius: 16px;
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 24px rgba(68, 122, 221, 0.1);
+  border: 1px solid #f3f4f6;
+  min-height: 120px;
 }
 
 .table-header {
   display: grid;
   grid-template-columns: 100px 2.2fr 1.6fr 1.3fr 1fr;
-  background: #e5e7eb;
-  padding: 16px 28px;
+  align-items: center;
+  background: #f5f8ff;
+  padding: 16px 30px;
+  min-height: 48px;
   font-weight: 600;
   font-size: 14px;
   color: #4b5563;
-  border-bottom: 1px solid #d1d5db;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .table-row {
   display: grid;
   grid-template-columns: 100px 2.2fr 1.6fr 1.3fr 1fr;
-  padding: 18px 28px;
-  font-size: 14.5px;
+  align-items: center;
+  padding: 18px 30px;
+  min-height: 52px;
+  font-size: 15px;
   border-bottom: 1px solid #f3f4f6;
   color: #1f2937;
 }

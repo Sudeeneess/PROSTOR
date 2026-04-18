@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{baseUrl}}/api/products?page=0&size=20"
+method: GET
+queryParams:
+  page: "0"
+  size: "20"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('200', () => pm.response.to.have.status(200));
+      try {
+        const j = pm.response.json();
+        if (j.content && j.content[0] && j.content[0].id != null)
+          pm.environment.set('productId', String(j.content[0].id));
+      } catch (e) {}
+    language: text/javascript
+order: 3000

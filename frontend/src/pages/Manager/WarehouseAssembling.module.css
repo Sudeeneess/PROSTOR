@@ -1,6 +1,6 @@
 .warehouse-assembling-wrapper {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: var(--shop-bg);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -37,7 +37,7 @@
   font-size: 14px;
   font-weight: 500;
   padding: 8px 12px;
-  border-radius: 4px;
+  border-radius: 12px;
   transition: all 0.2s;
   order: 2;
 }
@@ -47,40 +47,82 @@
   color: #333;
 }
 
+.warehouse-assembling-alert {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  color: #9a3412;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.warehouse-assembling-alert > div + div {
+  margin-top: 8px;
+}
+
 .warehouse-assembling-orders-table-container {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  box-shadow: 0 10px 24px rgba(68, 122, 221, 0.1);
   overflow: hidden;
   margin-bottom: 32px;
 }
 
 .warehouse-assembling-orders-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
 }
 
+.warehouse-assembling-col-order {
+  width: 11rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.warehouse-assembling-col-items {
+  width: 10rem;
+}
+
+.warehouse-assembling-col-date {
+  width: 11rem;
+}
+
+.warehouse-assembling-col-status {
+  width: auto;
+  min-width: 0;
+}
+
+.warehouse-assembling-empty-row {
+  text-align: center;
+  padding: 28px 20px !important;
+  color: #6b7280;
+  font-weight: 500;
+}
+
 .warehouse-assembling-orders-table thead {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
+  background-color: #f5f8ff;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .warehouse-assembling-orders-table th {
   text-align: left;
   padding: 16px 20px;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 14px;
-  color: #495057;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
+  color: #4b5563;
+  letter-spacing: 0.02em;
 }
 
 .warehouse-assembling-orders-table td {
   padding: 16px 20px;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
-  color: #2c3e50;
-  border-bottom: 1px solid #e9ecef;
+  color: #1f2937;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: middle;
 }
 
 .warehouse-assembling-orders-table tbody tr:last-child td {
@@ -97,21 +139,34 @@
 }
 
 .warehouse-assembling-start-assembly-button {
-  background-color: #666;
-  color: white;
+  background-color: var(--shop-primary);
+  color: var(--shop-on-primary);
   border: none;
   padding: 12px 32px;
   font-size: 16px;
   font-weight: 600;
-  border-radius: 8px;
+  border-radius: 20px;
   cursor: pointer;
   transition: background-color 0.2s;
 }
 
 .warehouse-assembling-start-assembly-button:hover {
-  background-color: #666;
+  background-color: var(--shop-primary-hover);
 }
 
 .warehouse-assembling-start-assembly-button:active {
   transform: scale(0.98);
+}
+
+.warehouse-assembling-status-select {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #1f2937;
 }

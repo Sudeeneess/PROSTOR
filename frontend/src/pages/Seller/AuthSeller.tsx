@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import HeaderSeller from "./HeaderSeller";
 import styles from './AuthSeller.module.css';
+import { api, resolveAfterLogin } from "../../services/api";
 
 const Authorizationseller: React.FC = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    inn: "",
-    fio: "",
+    username: "",
+    password: "",
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -16,15 +17,7 @@ const Authorizationseller: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-
-    if (name === "inn") {
-      setFormData({
-        ...formData,
-        inn: value.replace(/\D/g, "").slice(0, 12),
-      });
-    } else {
-      setFormData({ ...formData, fio: value });
-    }
+    setFormData({ ...formData, [name]: value });
     
     // Очищаем ошибку при вводе
     if (error) setError(null);
@@ -36,36 +29,30 @@ const Authorizationseller: React.FC = () => {
     setError(null);
 
     // Валидация
-    if (!formData.inn || !formData.fio) {
+    if (!formData.username || !formData.password) {
       setError("Пожалуйста, заполните все поля");
       setIsLoading(false);
       return;
     }
 
-    if (formData.inn.length < 10) {
-      setError("ИНН должен содержать 10 или 12 цифр");
-      setIsLoading(false);
-      return;
-    }
-
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const response = await api.login({
+        username: formData.username,
+        password: formData.password,
+      });
 
-      const sellerProfile = {
-        inn: formData.inn,
-        fio: formData.fio,
-      };
+      if (!response.success || !response.data) {
+        setError(response.error || "Неверное имя пользователя или пароль");
+        return;
+      }
 
-      // ✅ сохраняем профиль
-      localStorage.setItem("sellerProfile", JSON.stringify(sellerProfile));
+      if (response.data.role !== "seller") {
+        api.logout();
+        setError("Вход доступен только для роли продавца");
+        return;
+      }
 
-      // ✅ авторизация
-      localStorage.setItem("token", "seller-token-" + Date.now());
-      sessionStorage.setItem("userRole", "seller");
-
-      // Перенаправление
-      navigate("/seller/dashboard");
-
+      navigate(resolveAfterLogin(response.data), { replace: true });
     } catch {
       setError("Произошла ошибка при входе");
       console.error("Ошибка авторизации");
@@ -75,7 +62,7 @@ const Authorizationseller: React.FC = () => {
   };
 
   return (
-    <div className={styles['seller-auth-page']}>
+    <div className={`seller-app-shell ${styles['seller-auth-page']}`}>
       <HeaderSeller />
 
       <main className={styles['seller-auth-content-section']}>
@@ -92,28 +79,28 @@ const Authorizationseller: React.FC = () => {
 
           <div className={styles['seller-auth-form-container']}>
             <div className={styles['seller-auth-form-field']}>
-              <label className={styles['seller-auth-label-text']}>ИНН</label>
+              <label className={styles['seller-auth-label-text']}>Имя пользователя</label>
               <input
                 type="text"
-                name="inn"
-                value={formData.inn}
+                name="username"
+                value={formData.username}
                 onChange={handleInputChange}
-                className={`${styles['seller-auth-input-field']} ${error && !formData.inn ? styles['seller-auth-error'] : ''}`}
-                placeholder="Введите 10 или 12 цифр"
+                className={`${styles['seller-auth-input-field']} ${error && !formData.username ? styles['seller-auth-error'] : ''}`}
+                placeholder="Введите username"
                 required
                 disabled={isLoading}
               />
             </div>
 
             <div className={styles['seller-auth-form-field']}>
-              <label className={styles['seller-auth-label-text']}>ФИО</label>
+              <label className={styles['seller-auth-label-text']}>Пароль</label>
               <input
-                type="text"
-                name="fio"
-                value={formData.fio}
+                type="password"
+                name="password"
+                value={formData.password}
                 onChange={handleInputChange}
-                className={`${styles['seller-auth-input-field']} ${error && !formData.fio ? styles['seller-auth-error'] : ''}`}
-                placeholder="Иванов Иван Иванович"
+                className={`${styles['seller-auth-input-field']} ${error && !formData.password ? styles['seller-auth-error'] : ''}`}
+                placeholder="Введите пароль"
                 required
                 disabled={isLoading}
               />

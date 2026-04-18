@@ -1,0 +1,9 @@
+$kind: http-request
+url: "{{baseUrl}}/api/sizes?page=0&size=20"
+method: GET
+headers:
+  Authorization: Bearer {{customerToken}}
+queryParams:
+  page: "0"
+  size: "20"
+order: 3000

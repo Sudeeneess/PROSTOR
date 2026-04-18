@@ -1,11 +1,11 @@
-/* Единый стиль с Header / HeaderBuyer */
+/* Шапка продавца в тон шапке покупателя (акцент, светлый текст). */
 .seller-header-section {
-  background: #c0c0c0;
+  background: var(--shop-header-bg);
   padding: 0.5rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 14px rgba(68, 122, 221, 0.28);
   gap: 20px;
   width: 100%;
   box-sizing: border-box;
@@ -19,64 +19,64 @@
 
 .seller-header-logo-prostor {
   font-size: 36px;
-  font-weight: 700;
-  color: #000000;
+  font-weight: 800;
+  color: #ffffff;
   text-transform: uppercase;
   white-space: nowrap;
+  letter-spacing: 0.02em;
 }
 
 .seller-header-logo-seller {
-  font-size: 26px;           /* Увеличено */
+  font-size: 26px;
   font-weight: 700;
-  color: #ffffff;            /* Белый цвет */
+  color: rgba(255, 255, 255, 0.92);
   text-transform: none;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.03em;
 }
 
 .seller-header-navigation-bar {
   display: flex;
   align-items: center;
-  gap: 12px;                 /* Увеличен gap между пунктами */
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 .seller-header-navigation-link {
-  color: #111;
+  color: #ffffff;
   text-decoration: none;
-  font-size: 16px;           
-  font-weight: 400;          
-  padding: 10px 20px;        
-  border-radius: 40px;       
-  transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-  position: relative;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 10px 18px;
+  border-radius: 999px;
+  transition:
+    background 0.2s ease,
+    transform 0.15s ease;
 }
 
 .seller-header-navigation-link:hover {
-  background-color: rgba(0, 0, 0, 0.08);
-  transform: translateY(-1px); 
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .seller-header-navigation-button {
-  background: none;
+  background: transparent;
   border: none;
-  color: #111;
-  font-size: 16px;          
-  font-weight: 400;        
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 500;
   cursor: pointer;
-  padding: 10px 20px;       
-  border-radius: 40px;      
+  padding: 10px 18px;
+  border-radius: 999px;
   font-family: inherit;
-  transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+  transition:
+    background 0.2s ease,
+    transform 0.15s ease;
 }
 
 .seller-header-navigation-button:hover {
-  background-color: rgba(0, 0, 0, 0.08);
-  transform: translateY(-1px);  
+  background: rgba(255, 255, 255, 0.18);
 }
 
-/* Активное состояние для кнопок/ссылок */
 .seller-header-navigation-link:active,
 .seller-header-navigation-button:active {
-  transform: translateY(1px);
-  transition-duration: 0.1s;
+  transform: scale(0.98);
 }

@@ -1,6 +1,6 @@
 .warehouse-shipment-wrapper {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: var(--shop-bg);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -36,7 +36,7 @@
   font-size: 14px;
   font-weight: 500;
   padding: 8px 12px;
-  border-radius: 4px;
+  border-radius: 12px;
   transition: all 0.2s;
   order: 2;
 }
@@ -47,17 +47,21 @@
 }
 
 .warehouse-shipment-stats-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr minmax(220px, 1.15fr);
+  align-items: stretch;
+  margin-bottom: 24px;
+  gap: 16px;
 }
 
 .warehouse-shipment-ready-info,
 .warehouse-shipment-cost-info {
-  flex: 1;
   text-align: center;
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px 12px;
+  box-shadow: 0 4px 14px rgba(68, 122, 221, 0.08);
+  border: 1px solid #f3f4f6;
 }
 
 .warehouse-shipment-ready-label,
@@ -81,17 +85,18 @@
 }
 
 .warehouse-shipment-search-wrapper {
-  flex: 1;
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: stretch;
+  min-width: 0;
 }
 
 .warehouse-shipment-search-input {
   width: 100%;
-  max-width: 300px;
+  max-width: none;
   padding: 10px 16px;
   border: 1px solid #ddd;
-  border-radius: 6px;
+  border-radius: 20px;
   font-size: 14px;
   font-weight: 400;
   outline: none;
@@ -102,37 +107,54 @@
   border-color: #2c3e50;
 }
 
+.warehouse-shipment-alert {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  color: #9a3412;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.warehouse-shipment-alert > div + div {
+  margin-top: 8px;
+}
+
 .warehouse-shipment-table-container {
   background-color: white;
-  border-radius: 8px;
+  border-radius: 20px;
   overflow-x: auto;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 24px rgba(68, 122, 221, 0.1);
 }
 
 .warehouse-shipment-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
 }
 
 .warehouse-shipment-table th,
 .warehouse-shipment-table td {
-  padding: 16px;
+  padding: 16px 18px;
   text-align: left;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: middle;
 }
 
 .warehouse-shipment-table th {
-  background-color: #fafafa;
-  font-weight: 700;
-  color: #495057;
+  background-color: #f5f8ff;
+  font-weight: 600;
+  color: #4b5563;
   font-size: 14px;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.02em;
 }
 
 .warehouse-shipment-table td {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
-  color: #2c3e50;
+  color: #1f2937;
 }
 
 .warehouse-shipment-col-select {
@@ -141,11 +163,13 @@
 }
 
 .warehouse-shipment-col-order {
-  width: 120px;
+  width: 11rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
 }
 
 .warehouse-shipment-col-items {
-  width: 120px;
+  width: 10rem;
 }
 
 .warehouse-shipment-col-collector {
@@ -153,12 +177,24 @@
 }
 
 .warehouse-shipment-col-time {
-  width: 120px;
+  width: 11rem;
+}
+
+.warehouse-shipment-col-status {
+  width: auto;
+  min-width: 0;
+}
+
+.warehouse-shipment-empty-row {
+  text-align: center;
+  padding: 28px 20px !important;
+  color: #6b7280;
+  font-weight: 500;
 }
 
 .warehouse-shipment-checkbox {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   cursor: pointer;
   accent-color: #808080;
 }
@@ -175,10 +211,10 @@
 
 .warehouse-shipment-ship-button {
   padding: 10px 24px;
-  background-color: #666;
-  color: white;
+  background-color: var(--shop-primary);
+  color: var(--shop-on-primary);
   border: none;
-  border-radius: 6px;
+  border-radius: 20px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -186,7 +222,20 @@
 }
 
 .warehouse-shipment-ship-button:hover {
-  background-color: #666;
+  background-color: var(--shop-primary-hover);
+}
+
+.warehouse-shipment-status-select {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #1f2937;
 }
 
 @media (max-width: 768px) {
@@ -195,8 +244,7 @@
   }
   
   .warehouse-shipment-stats-row {
-    flex-direction: column;
-    align-items: flex-start;
+    grid-template-columns: 1fr;
   }
   
   .warehouse-shipment-search-wrapper {

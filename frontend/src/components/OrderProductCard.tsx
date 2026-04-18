@@ -4,15 +4,10 @@ import styles from './OrderProductCard.module.css';
 export type OrderProductCardProps = {
   price: string;
   name: string;
-  /** Подпись статуса внизу карточки (жирным) */
   statusLabel: string;
   imageUrl?: string;
 };
 
-/**
- * Карточка товара для списков заказов. Вёрстка по шаблону ProductGrid:
- * плейсхолдер изображения, цена, название; вместо рейтинга — статус.
- */
 const OrderProductCard: React.FC<OrderProductCardProps> = ({
   price,
   name,

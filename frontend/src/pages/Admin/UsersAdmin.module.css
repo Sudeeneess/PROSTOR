@@ -6,7 +6,7 @@
 
 .admin-users-container body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
-  background-color: #f5f5f5;
+  background-color: var(--shop-bg);
   color: #1a1a1a;
   line-height: 1.5;
 }
@@ -15,9 +15,9 @@
   max-width: 1200px;
   margin: 2rem auto;
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 24px rgba(68, 122, 221, 0.1);
+  padding: 2rem;
 }
 
 .admin-users-container .admin-users-header {
@@ -30,7 +30,7 @@
 }
 
 .admin-users-container .admin-users-header h1 {
-  font-size: 1.75rem;
+  font-size: 2rem;
   font-weight: 600;
   color: #1a1a1a;
   letter-spacing: -0.01em;
@@ -43,7 +43,7 @@
   color: #676767;
   cursor: pointer;
   padding: 0.5rem 1rem;
-  border-radius: 4px;
+  border-radius: 12px;
   transition: background 0.2s;
   font-weight: 500;
 }
@@ -91,21 +91,21 @@
 .admin-users-container .admin-users-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 .admin-users-container .admin-users-table th,
 .admin-users-container .admin-users-table td {
-  padding: 1rem 0.75rem;
+  padding: 1.15rem 0.9rem;
   text-align: left;
   border-bottom: 1px solid #e8e8e8;
 }
 
 .admin-users-container .admin-users-table th {
-  background-color: #fafafa;
+  background-color: #f5f8ff;
   font-weight: 600;
   color: #333;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border-bottom: 2px solid #e0e0e0;
@@ -126,14 +126,14 @@
 }
 
 .admin-users-container .admin-users-checkbox-cell {
-  width: 40px;
+  width: 52px;
   text-align: center;
 }
 
 /* Серые чекбоксы - полностью кастомные */
 .admin-users-container .admin-users-checkbox-cell input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   cursor: pointer;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -186,12 +186,12 @@
 
 .admin-users-container .admin-users-edit-button,
 .admin-users-container .admin-users-invite-button {
-  background-color: #676767;
-  color: white;
+  background-color: var(--shop-primary);
+  color: var(--shop-on-primary);
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  font-size: 0.9rem;
+  padding: 0.9rem 1.6rem;
+  border-radius: 20px;
+  font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -199,7 +199,7 @@
 
 .admin-users-container .admin-users-edit-button:hover,
 .admin-users-container .admin-users-invite-button:hover {
-  background-color: #4a4a4a;
+  background-color: var(--shop-primary-hover);
   transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -354,11 +354,11 @@
 }
 
 .admin-users-container .admin-users-submit-button {
-  background-color: #676767;
-  color: white;
+  background-color: var(--shop-primary);
+  color: var(--shop-on-primary);
   border: none;
   padding: 12px 24px;
-  border-radius: 6px;
+  border-radius: 20px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -368,7 +368,7 @@
 }
 
 .admin-users-container .admin-users-submit-button:hover {
-  background-color: #4a4a4a;
+  background-color: var(--shop-primary-hover);
   transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }

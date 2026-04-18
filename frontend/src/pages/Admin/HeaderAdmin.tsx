@@ -1,6 +1,7 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './HeaderAdmin.module.css';
+import { api } from '../../services/api';
 
 interface HeaderAdminProps {
   onMenuItemChange?: (menuItem: string) => void;
@@ -8,6 +9,7 @@ interface HeaderAdminProps {
 
 const HeaderAdmin: React.FC<HeaderAdminProps> = ({ onMenuItemChange }) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleMenuClick = (menuItem: string) => {
     switch (menuItem) {
@@ -38,6 +40,12 @@ const HeaderAdmin: React.FC<HeaderAdminProps> = ({ onMenuItemChange }) => {
           onMenuItemChange('admin');
         }
         break;
+      case 'guest':
+        api.logout();
+        sessionStorage.removeItem('userName');
+        localStorage.removeItem('adminProfile');
+        window.location.replace('/');
+        break;
 
       default:
         break;
@@ -53,24 +61,30 @@ const HeaderAdmin: React.FC<HeaderAdminProps> = ({ onMenuItemChange }) => {
 
       <div className={styles['admin-header-menu']}>
         <button
-          className={styles['admin-header-menu-item']}
+          className={`${styles['admin-header-menu-item']} ${location.pathname === '/admin' ? styles['active'] : ''}`}
           onClick={() => handleMenuClick('main')}
         >
           Главная
         </button>
 
         <button
-          className={styles['admin-header-menu-item']}
+          className={`${styles['admin-header-menu-item']} ${location.pathname.startsWith('/admin/users') ? styles['active'] : ''}`}
           onClick={() => handleMenuClick('users')}
         >
           Пользователи
         </button>
 
         <button
-          className={styles['admin-header-menu-item']}
+          className={`${styles['admin-header-menu-item']} ${location.pathname.startsWith('/admin/products') ? styles['active'] : ''}`}
           onClick={() => handleMenuClick('products')}
         >
           Товары
+        </button>
+        <button
+          className={styles['admin-header-menu-item']}
+          onClick={() => handleMenuClick('guest')}
+        >
+          Выйти к гостю
         </button>
       </div>
     </header>

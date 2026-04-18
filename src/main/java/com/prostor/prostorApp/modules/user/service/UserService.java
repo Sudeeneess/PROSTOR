@@ -1,13 +1,14 @@
 package com.prostor.prostorApp.modules.user.service;
 
+import com.prostor.prostorApp.modules.admin.model.Administrator;
+import com.prostor.prostorApp.modules.admin.repository.AdministratorRepository;
 import com.prostor.prostorApp.modules.user.dto.RoleDto;
 import com.prostor.prostorApp.modules.user.dto.UserCreateRequest;
 import com.prostor.prostorApp.modules.user.dto.UserResponse;
-import com.prostor.prostorApp.modules.user.model.Role;
-import com.prostor.prostorApp.modules.user.model.User;
-import com.prostor.prostorApp.modules.user.repository.RoleRepository;
-import com.prostor.prostorApp.modules.user.repository.UserRepository;
+import com.prostor.prostorApp.modules.user.model.*;
+import com.prostor.prostorApp.modules.user.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -26,6 +28,10 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CustomerRepository customerRepository;
+    private final SellerRepository sellerRepository;
+    private final AdministratorRepository administratorRepository;
+    private final WarehouseManagerRepository warehouseManagerRepository;
 
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll().stream()
@@ -60,12 +66,16 @@ public class UserService {
 
         User user = new User();
         user.setUserName(request.getUserName());
-        user.setPasswordHash(passwordEncoder.encode(request.getPassword())); // Хэшируем пароль!
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         user.setContactPhone(request.getContactPhone());
         user.setRole(role);
         user.setCreatedAt(LocalDateTime.now());
 
         User savedUser = userRepository.save(user);
+        log.info("Created user: {} with role: {}", savedUser.getUserName(), role.getName());
+
+        createRoleSpecificRecord(savedUser);
+
         return convertToUserResponse(savedUser);
     }
 
@@ -84,7 +94,7 @@ public class UserService {
             user.setUserName(request.getUserName());
         }
 
-        if (request.getPassword() != null) {
+        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
             user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         }
 
@@ -92,13 +102,16 @@ public class UserService {
             user.setContactPhone(request.getContactPhone());
         }
 
-        if (request.getRoleId() > 0) {
+        if (request.getRoleId() > 0 && (user.getRole() == null || user.getRole().getId() != request.getRoleId())) {
             Role role = roleRepository.findById(request.getRoleId())
                     .orElseThrow(() -> new RuntimeException("Role not found with id: " + request.getRoleId()));
+            deleteRoleSpecificRecord(user);
             user.setRole(role);
+            createRoleSpecificRecord(user);
         }
 
         User updatedUser = userRepository.save(user);
+        log.info("Updated user with id: {}", id);
         return convertToUserResponse(updatedUser);
     }
 
@@ -107,7 +120,12 @@ public class UserService {
         if (!userRepository.existsById(id)) {
             throw new RuntimeException("User not found with id: " + id);
         }
+
+        User user = userRepository.findById(id).get();
+        deleteRoleSpecificRecord(user);
+
         userRepository.deleteById(id);
+        log.info("Deleted user with id: {}", id);
     }
 
     public List<UserResponse> getUsersByRole(int roleId) {
@@ -143,5 +161,78 @@ public class UserService {
                     return map;
                 })
                 .toList();
+    }
+
+    private void createRoleSpecificRecord(User user) {
+        String roleName = user.getRole().getName().toUpperCase();
+
+        switch (roleName) {
+            case "CUSTOMER":
+                if (!customerRepository.existsByUserId(user.getId())) {
+                    Customer customer = new Customer();
+                    customer.setUser(user);
+                    customerRepository.save(customer);
+                    log.debug("Created Customer record for user: {}", user.getUserName());
+                }
+                break;
+
+            case "SELLER":
+                if (!sellerRepository.findByUserId(user.getId()).isPresent()) {
+                    Seller seller = new Seller();
+                    seller.setUser(user);
+                    seller.setInn("000000000000"); // Временный ИНН, нужно будет обновить
+                    seller.setCompanyName("Company");
+                    sellerRepository.save(seller);
+                    log.debug("Created Seller record for user: {}", user.getUserName());
+                }
+                break;
+
+            case "ADMIN":
+                if (!administratorRepository.existsByUserId(user.getId())) {
+                    Administrator admin = new Administrator();
+                    admin.setUser(user);
+                    administratorRepository.save(admin);
+                    log.debug("Created Administrator record for user: {}", user.getUserName());
+                }
+                break;
+
+            case "WAREHOUSE_MANAGER":
+                if (!warehouseManagerRepository.existsByUserId(user.getId())) {
+                    WarehouseManager wm = new WarehouseManager();
+                    wm.setUser(user);
+                    warehouseManagerRepository.save(wm);
+                    log.debug("Created WarehouseManager record for user: {}", user.getUserName());
+                }
+                break;
+
+            default:
+                log.warn("Unknown role: {}, skipping specific record creation", roleName);
+        }
+    }
+
+    private void deleteRoleSpecificRecord(User user) {
+        String roleName = user.getRole().getName().toUpperCase();
+
+        switch (roleName) {
+            case "CUSTOMER":
+                customerRepository.findByUserId(user.getId())
+                        .ifPresent(customerRepository::delete);
+                break;
+
+            case "SELLER":
+                sellerRepository.findByUserId(user.getId())
+                        .ifPresent(sellerRepository::delete);
+                break;
+
+            case "ADMIN":
+                administratorRepository.findByUserId(user.getId())
+                        .ifPresent(administratorRepository::delete);
+                break;
+
+            case "WAREHOUSE_MANAGER":
+                warehouseManagerRepository.findByUserId(user.getId())
+                        .ifPresent(warehouseManagerRepository::delete);
+                break;
+        }
     }
 }

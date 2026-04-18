@@ -1,0 +1,13 @@
+$kind: http-request
+description: "Если 403: в @PreAuthorize сравнивается customerId с
+  authentication.principal.id — у стандартного User из Spring Security поля id
+  нет."
+url: "{{baseUrl}}/api/orders/customer/{{customerId}}"
+method: GET
+headers:
+  Authorization: Bearer {{customerToken}}
+scripts:
+  - type: afterResponse
+    code: pm.test('Ответ получен', () => pm.response.code !== 0);
+    language: text/javascript
+order: 6000

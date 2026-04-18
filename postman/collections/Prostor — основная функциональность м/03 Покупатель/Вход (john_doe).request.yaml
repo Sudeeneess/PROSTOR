@@ -1,0 +1,19 @@
+$kind: http-request
+url: "{{baseUrl}}/api/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "{{customerUsername}}",
+      "password": "{{customerPassword}}"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Login OK', () => pm.response.to.have.status(200));
+      pm.environment.set('customerToken', pm.response.json().token);
+    language: text/javascript
+order: 1000
