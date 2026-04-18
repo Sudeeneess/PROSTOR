@@ -21,6 +21,10 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+<<<<<<< HEAD
+// import java.util.List;
+=======
+>>>>>>> 6b10ae4c76d01577fe1de08ab7bbfc0782916ffa
 
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)
@@ -117,7 +121,6 @@ public class SecurityConfig {
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
-
         return source;
     }
 }

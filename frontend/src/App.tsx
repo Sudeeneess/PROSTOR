@@ -1,4 +1,4 @@
-// Главная страница неавторизованных пользователей для всех ролей
+[18.04.2026 19:42] Пиздахлюйка: // Главная страница неавторизованных пользователей для всех ролей
 import React from 'react';
 import {
   BrowserRouter as Router,
@@ -51,7 +51,7 @@ const PrivateBuyerRoute: React.FC<{ children: React.ReactNode }> = ({ children }
   const token = localStorage.getItem('token');
   const userRole = api.getStoredUserRole();
 
-  if (!token || userRole !== 'customer') {
+  if (!token  userRole !== 'customer') {
     return <Navigate to="/auth" replace />;
   }
 
@@ -74,21 +74,20 @@ const PrivateProfileRoute: React.FC<{ children: React.ReactNode }> = ({ children
   const token = localStorage.getItem('token');
   const userRole = api.getStoredUserRole();
 
-  if (!token || userRole !== 'customer') {
+  if (!token  userRole !== 'customer') {
     return <Navigate to="/auth" replace />;
   }
 
   return <>{children}</>;
 };
 
-// ЗАЩИТА МАРШРУТОВ - ПРОДАВЕЦ 
-
-// Проверка авторизации продавца
+// ЗАЩИТА МАРШРУТОВ - ПРОДАВЕЦ
+[18.04.2026 19:42] Пиздахлюйка: // Проверка авторизации продавца
 const PrivateSellerRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const token = localStorage.getItem('token');
   const userRole = sessionStorage.getItem('userRole');
   
-  if (!token || userRole !== 'seller') {
+  if (!token  userRole !== 'seller') {
     return <Navigate to="/seller/auth" replace />;
   }
   
@@ -114,7 +113,7 @@ const PrivateWarehouseRoute: React.FC<{ children: React.ReactNode }> = ({ childr
   const token = localStorage.getItem('token');
   const userRole = sessionStorage.getItem('userRole');
   
-  if (!token || userRole !== 'warehouse_manager') {
+  if (!token  userRole !== 'warehouse_manager') {
     return <Navigate to="/warehouse/auth" replace />;
   }
   
@@ -199,8 +198,7 @@ const AppContent: React.FC = () => {
         (() => {
           const token = localStorage.getItem('token');
           const userRole = api.getStoredUserRole();
-
-          // Перенаправление по ролям
+[18.04.2026 19:42] Пиздахлюйка: // Перенаправление по ролям
           if (token && userRole === 'customer') {
             return <Navigate to="/customer" replace />;
           }
@@ -300,8 +298,7 @@ const AppContent: React.FC = () => {
             </RedirectSellerIfAuthenticated>
           } 
         />
-
-        {/* Лендинг продавца — доступен без авторизации */}
+[18.04.2026 19:42] Пиздахлюйка: {/* Лендинг продавца — доступен без авторизации */}
         <Route path="main" element={<MainSeller />} />
         
         {/* Личный кабинет / Дашборд продавца */}
