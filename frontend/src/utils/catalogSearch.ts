@@ -2,10 +2,8 @@ import { CATALOG_CATEGORIES } from '../data/categories';
 
 export type HeaderSearchCategoryHit = {
   kind: 'category';
-  /** Устаревший slug для статического каталога; если задан sectionId — не используется */
   slug: string;
   label: string;
-  /** Раздел каталога с сервера: /catalog/section/:id */
   sectionId?: number;
 };
 
@@ -28,9 +26,7 @@ export type HeaderSearchHit =
   | HeaderSearchBrandHit;
 
 export type CatalogSearchOptions = {
-  /** Категории с API: id + categoryName */
   apiCategories?: { id: number; categoryName: string }[];
-  /** Имена брендов (например из GET /api/brands) */
   brandNames?: string[];
 };
 
@@ -50,9 +46,6 @@ function matches(text: string, query: string): boolean {
 
 const MAX_EACH = 8;
 
-/**
- * Подсказки для строки поиска: категории (API и/или статические), подкатегории из макета, бренды.
- */
 export function searchHeaderCatalog(
   query: string,
   opts?: CatalogSearchOptions

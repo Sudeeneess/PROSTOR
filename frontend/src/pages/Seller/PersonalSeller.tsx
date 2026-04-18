@@ -46,7 +46,6 @@ const PersonalSeller: React.FC = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('tokenType');
     sessionStorage.removeItem('userRole');
-    // Полная перезагрузка гарантирует главную для гостя (лендинг с HeaderMain)
     window.location.assign('/');
   };
 
@@ -117,7 +116,6 @@ const PersonalSeller: React.FC = () => {
           </button>
         </div>
 
-        {/* Единый класс для всех кнопок действий */}
         <div className={styles['seller-personal-actions']}>
           <button 
             className={styles['seller-personal-action-btn']} 

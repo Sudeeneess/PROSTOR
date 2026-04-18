@@ -23,7 +23,6 @@ function goodsWord(n: number): string {
   return GOODS_WORDS[2];
 }
 
-/** Корень каталога: разделы с сервера и опционально сетка по ?brand= */
 const CatalogRootPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const brandParam = searchParams.get('brand')?.trim() ?? '';

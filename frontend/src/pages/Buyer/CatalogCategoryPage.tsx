@@ -21,7 +21,7 @@ function goodsWord(n: number): string {
   return 'товаров';
 }
 
-/** Список товаров раздела: GET /api/categories/:id + /api/products?categoryId= */
+/** GET /api/categories/:id + /api/products?categoryId= */
 const CatalogCategoryPage: React.FC = () => {
   const { categoryId: categoryIdParam = '' } = useParams<{
     categoryId: string;

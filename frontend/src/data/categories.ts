@@ -1,4 +1,3 @@
-/** Категории каталога — slug в URL только на английском (например /catalog/shoes/sneakers). */
 
 export type SubcategoryDef = {
   slug: string;

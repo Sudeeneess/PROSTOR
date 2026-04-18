@@ -1,4 +1,3 @@
-// src/pages/BasketBuyer/BasketBuyer.tsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HeaderMain from '../../components/HeaderMain';

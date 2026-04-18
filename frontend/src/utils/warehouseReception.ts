@@ -1,11 +1,9 @@
 import type { Product } from '../services/api';
 
-/** Ключ строки приёмки: `sellerId|YYYY-MM-DD` (локальная дата создания товара). */
 export type ReceptionBatchKey = string;
 
 export const RECEPTION_LAST_SELLER_ID = 'warehouse_reception_last_seller_id';
 const SELLER_SNAPSHOT_KEY = (sellerId: number) => `warehouse_reception_seller_snapshot_${sellerId}`;
-/** Логин продавца (username), сохраняется с клиента продавца — без бэкенда иначе не узнать. */
 export const sellerLoginStorageKey = (sellerId: number) => `warehouse_reception_seller_login_${sellerId}`;
 const STATUS_KEY = (sellerId: number, dateKey: string) =>
   `warehouse_reception_v1:status:${sellerId}:${dateKey}`;
@@ -35,7 +33,6 @@ export function formatDateKeyRu(dateKey: string): string {
   return dt.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
-/** Сохранить в localStorage данные из ЛК продавца (тот же браузер), чтобы склад их увидел. */
 export function syncSellerSnapshotFromLk(sellerId: number): void {
   try {
     const profRaw = localStorage.getItem('sellerProfile');
@@ -58,13 +55,9 @@ export function syncSellerSnapshotFromLk(sellerId: number): void {
     };
     localStorage.setItem(SELLER_SNAPSHOT_KEY(sellerId), JSON.stringify(payload));
   } catch {
-    /* ignore */
   }
 }
 
-/**
- * Отображение продавца: основная строка — из снимка ЛК; вторая — логин и ИНН.
- */
 export function getSellerDisplayForReception(sellerId: number): { title: string; subtitle?: string } {
   const storedLogin = localStorage.getItem(sellerLoginStorageKey(sellerId))?.trim();
   const raw = localStorage.getItem(SELLER_SNAPSHOT_KEY(sellerId));

@@ -10,7 +10,6 @@ interface WarehouseShipmentProps {
   onBack: () => void;
 }
 
-/** Заказы на вкладке «Отгрузка»: после отправки со сборки до выдачи */
 const SHIPMENT_PIPELINE = ['SHIPPED', 'IN_TRANSIT', 'DELIVERED'] as const;
 
 const WarehouseShipment: React.FC<WarehouseShipmentProps> = ({ onBack }) => {

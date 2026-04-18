@@ -1,9 +1,5 @@
 import { getCatalogProductById } from './mockCatalogProducts';
 
-/**
- * Поля в духе БД: products + product_card + brand + size.
- * Позже заменить ответом API GET /products/:id/detail
- */
 export type ProductDetail = {
   id: number;
   name: string;
@@ -37,7 +33,6 @@ export function getMockProductDetail(id: number): ProductDetail | undefined {
   if (id < 1 || id > 99999 || !Number.isFinite(id)) return undefined;
   const base = baseDetails(id);
   const c = getCatalogProductById(id);
-  // Галерея: первый кадр как в каталоге (product_card.photo), остальные — заглушки ракурсов
   const photos = c
     ? [
         c.imageUrl,

@@ -1,7 +1,6 @@
 import { CATALOG_CATEGORIES } from './categories';
 
 
- /* Товар в каталоге */
 export type CatalogGridProduct = {
   id: number;
   name: string;
@@ -16,11 +15,9 @@ export type CatalogGridProduct = {
   imageUrl: string;
 };
 
-/** Состояние фильтров. Подкатегории — только на странице /catalog/:категория (без /подкатегория) */
 export type CatalogFilterState = {
   brands: string[];
   sizes: string[];
-  /* фильтр «тип товара» на странице категории */
   subcategorySlugs: string[];
   priceMin: string;
   priceMax: string;
@@ -38,7 +35,6 @@ export function emptyCatalogFilter(): CatalogFilterState {
 
 const byId = new Map<number, CatalogGridProduct>();
 
-//brand / size и поля type в product_card
 const BRANDS = ['PROSTOR', 'NORTH', 'URBAN', 'BASE', 'LINE'] as const;
 const SIZES = ['S', 'M', 'L', 'XL', '42', '43', '44'] as const;
 const TYPES = ['одежда', 'обувь', 'аксессуар', 'спорт'] as const;
@@ -71,7 +67,6 @@ function buildAllProducts(): CatalogGridProduct[] {
           brandName: BRANDS[id % BRANDS.length],
           sizeName: SIZES[id % SIZES.length],
           type: TYPES[id % TYPES.length],
-          // Один главный кадр; в БД это был бы первый элемент photo[]
           imageUrl: `https://picsum.photos/seed/prostor-card-${id}/400/520`,
         };
         list.push(p);
@@ -109,12 +104,10 @@ export function getHomeGridProducts(): CatalogGridProduct[] {
   return ALL_PRODUCTS.slice(0, 16);
 }
 
-/** Уникальные бренды по всему каталогу (поиск в шапке, справочники). */
 export function getUniqueBrandNames(): string[] {
   return [...new Set(ALL_PRODUCTS.map((p) => p.brandName))].sort();
 }
 
-/** Бренды и размеры из текущей выборки товаров (для чекбоксов). */
 export function getFilterOptions(products: CatalogGridProduct[]) {
   const brands = [...new Set(products.map((p) => p.brandName))].sort();
   const sizes = [...new Set(products.map((p) => p.sizeName))].sort();
@@ -127,7 +120,6 @@ export function getFilterOptions(products: CatalogGridProduct[]) {
   };
 }
 
-/** Клиентская фильтрация (позже может уехать в query-параметры API). */
 export function filterCatalogProducts(
   items: CatalogGridProduct[],
   f: CatalogFilterState

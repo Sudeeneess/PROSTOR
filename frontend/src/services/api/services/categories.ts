@@ -24,10 +24,7 @@ function invalidateCategoriesListCache(): void {
 
 export function createCategoriesService(request: RequestFn) {
   const service = {
-    /**
-     * Единственный метод для загрузки списка категорий на витрине (меню, корень каталога и т.д.):
-     * фиксированный {@link CATEGORIES_LIST_PAGE_SIZE}, дедупликация параллельных запросов, кэш в памяти.
-     */
+   /*{@link CATEGORIES_LIST_PAGE_SIZE}*/
     async getCategoriesListForUi(): Promise<CategoriesListResult> {
       const now = Date.now();
       const hit = categoriesListCache;

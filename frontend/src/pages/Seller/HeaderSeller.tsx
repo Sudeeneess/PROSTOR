@@ -11,7 +11,7 @@ const HeaderSeller: React.FC = () => {
   };
 
   const handlePersonalClick = () => {
-    navigate("/seller/dashboard"); // ИСПРАВЛЕНО: правильный путь к личному кабинету
+    navigate("/seller/dashboard");
   };
 
   const handleGuestHomeClick = () => {

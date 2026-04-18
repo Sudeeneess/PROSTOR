@@ -44,7 +44,6 @@ export function apiProductToGrid(
   };
 }
 
-/** Для карточки сетки: берём первую активную карточку товара или первую в списке. */
 export function pickDisplayCard(
   cards: ProductCardResponse[] | undefined
 ): ProductCardResponse | undefined {

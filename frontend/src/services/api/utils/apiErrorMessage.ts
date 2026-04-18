@@ -1,7 +1,4 @@
-/**
- * Сообщение об ошибке из тела ответа: `message` / `error` или строки полей валидации.
- * Ответ логина/регистрации может быть плоским или вложенным в `data` (см. `unwrapAuthBody`).
- */
+
 export function extractApiErrorMessage(data: unknown): string {
   if (data == null) return '';
   if (typeof data === 'string') return data;

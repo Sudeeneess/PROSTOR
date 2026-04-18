@@ -4,7 +4,6 @@ export function createHttpError(status: number, message: string): Error & { stat
   return error;
 }
 
-/** Код ответа из `createHttpError` (если ошибка пришла из `request`). */
 export function getErrorStatus(error: unknown): number | undefined {
   if (error !== null && typeof error === 'object' && 'status' in error) {
     const s = (error as { status: unknown }).status;

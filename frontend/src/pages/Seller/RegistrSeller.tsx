@@ -93,12 +93,11 @@ const SellerEntrance: React.FC = () => {
         fio: fioNorm,
       };
 
-      // ✅ сохраняем профиль
+      // сохраняем профиль
       localStorage.setItem("sellerProfile", JSON.stringify(sellerProfile));
 
       setSuccessMessage("Регистрация успешна!");
 
-      // После регистрации сервер не выдаёт JWT, переводим на форму входа.
       setTimeout(() => {
         navigate("/seller/auth");
       }, 1000);

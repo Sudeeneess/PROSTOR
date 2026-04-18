@@ -60,7 +60,6 @@ function parseCustomerIdValue(value: unknown): number | null {
   return null;
 }
 
-/** Сначала id из логина (localStorage), иначе GET /api/customer/dashboard. */
 async function resolveCustomerId(): Promise<number | null> {
   const fromLogin = api.getStoredCustomerId();
   if (fromLogin != null) return fromLogin;
@@ -69,7 +68,6 @@ async function resolveCustomerId(): Promise<number | null> {
   return parseCustomerIdValue(dash.data.customerId);
 }
 
-// Функция для получения только цифр из номера
 const getRawPhoneDigits = (phone: string): string => {
   const digits = phone.replace(/\D/g, '');
   if (digits.length === 0) return '';

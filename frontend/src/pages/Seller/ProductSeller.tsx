@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+﻿import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HeaderSeller from './HeaderSeller';
 import styles from './ProductSeller.module.css';
@@ -14,7 +14,6 @@ import {
 import { RECEPTION_LAST_SELLER_ID, syncSellerSnapshotFromLk } from '../../utils/warehouseReception';
 import { CATALOG_CATEGORIES } from '../../data/categories';
 
-/** Имена подкатегорий для поля `type` по названию категории из API (совпадает с `data/categories.ts`). */
 function catalogTypeNamesForCategoryName(categoryName: string | undefined): string[] {
   if (!categoryName) return [];
   const def = CATALOG_CATEGORIES.find((c) => c.name === categoryName);
@@ -32,7 +31,6 @@ export interface SellerProductRow {
   sizeId: number | null;
   price: string;
   quantity: number;
-  /* GET /api/categories */
   categoryId: number;
   sellerId: number;
   imageUrl: string;

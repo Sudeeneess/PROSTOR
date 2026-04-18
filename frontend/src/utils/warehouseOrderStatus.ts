@@ -1,6 +1,6 @@
 import type { OrderStatusDto } from '../services/api';
 
-/** Справочник имя статуса → id из GET /api/orders-statuses */
+/*id из GET /api/orders-statuses */
 export function orderStatusIdsByName(statuses: OrderStatusDto[]): Map<string, number> {
   const map = new Map<string, number>();
   for (const s of statuses) {
@@ -9,7 +9,7 @@ export function orderStatusIdsByName(statuses: OrderStatusDto[]): Map<string, nu
   return map;
 }
 
-/** Подпись для покупателя в ЛК */
+/*подписи для покупателя в ЛК */
 export function buyerOrderStatusLabelRu(statusName: string | undefined): string {
   const n = (statusName ?? '').toUpperCase();
   switch (n) {
@@ -32,7 +32,6 @@ export function buyerOrderStatusLabelRu(statusName: string | undefined): string 
   }
 }
 
-/** Подпись для выпадающего списка на складе (сборка), только русский текст */
 export function assemblyStatusOptionLabel(code: string): string {
   switch (code.toUpperCase()) {
     case 'PENDING':
@@ -46,7 +45,6 @@ export function assemblyStatusOptionLabel(code: string): string {
   }
 }
 
-/** Подпись для выпадающего списка на складе (отгрузка), только русский текст */
 export function shipmentStatusOptionLabel(code: string): string {
   switch (code.toUpperCase()) {
     case 'SHIPPED':

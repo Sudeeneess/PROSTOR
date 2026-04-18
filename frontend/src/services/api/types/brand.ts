@@ -3,7 +3,7 @@ export interface BrandRow {
   name: string;
 }
 
-/** Тело POST/PUT /api/brands. */
+/* POST/PUT /api/brands */
 export interface BrandRequest {
   name: string;
 }

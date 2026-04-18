@@ -1,4 +1,3 @@
-/** Допустимые символы при вводе ФИО (кириллица, латиница, пробел, дефис). */
 const FIO_STRIP = /[^а-яёА-ЯЁa-zA-Z\s\-]/g;
 
 export function sanitizeFioInput(raw: string): string {
@@ -15,7 +14,6 @@ function capitalizeWord(w: string): string {
   return first.toLocaleUpperCase('ru-RU') + rest.toLocaleLowerCase('ru-RU');
 }
 
-/** Нормализация для отображения и сохранения: «Иванов Иван Иванович». */
 export function formatFioDisplay(raw: string): string {
   const s = sanitizeFioInput(raw.trim());
   if (!s) return '';

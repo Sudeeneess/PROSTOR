@@ -41,9 +41,6 @@ export function createOrderMovementsService(request: RequestFn) {
       }
     },
 
-    /**
-     * Новое движение: на бэкенде параметры в query (orderItemId, warehouseId, statusName).
-     */
     async createOrderMovement(
       orderItemId: number,
       warehouseId: number,

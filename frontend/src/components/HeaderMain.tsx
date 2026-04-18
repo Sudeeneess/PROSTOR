@@ -17,7 +17,6 @@ export type HeaderMainVariant = 'landing' | 'buyer';
 
 interface HeaderMainProps {
   variant?: HeaderMainVariant;
-  // onCartClick больше не нужен, убираем его
 }
 
 const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
@@ -163,7 +162,6 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
     }
   };
 
-  // Новая функция для обработки клика по корзине
   const handleCartClick = () => {
     const token = localStorage.getItem('token');
     const userRole = api.getStoredUserRole();
@@ -171,7 +169,6 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
     if (token && userRole === 'customer') {
       navigate('/basket');
     } 
-    // Если не авторизован
     else {
       navigate('/auth');
     }
@@ -197,7 +194,6 @@ const HeaderMain: React.FC<HeaderMainProps> = ({ variant = 'buyer' }) => {
           onMouseEnter={handleCatalogMouseEnter}
           onMouseLeave={handleCatalogMouseLeave}
         >
-          {/* Клик по иконке — сразу в корень каталога */}
           <button
             type="button"
             className={styles['hm-menu-button']}

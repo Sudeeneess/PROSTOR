@@ -14,7 +14,6 @@ interface WindWarehouseReceivingProps {
   sellerSubtitle?: string;
   batchDateLabel: string;
   lines: ReceptionLine[];
-  /** Если приёмка уже отмечена как принята — только просмотр. */
   completeDisabled?: boolean;
 }
 

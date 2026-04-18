@@ -1,4 +1,4 @@
-/** Ответ GET /api/customer/dashboard (тело Map из бэкенда). */
+/** Ответ GET /api/customer/dashboard */
 export interface CustomerDashboard {
   role: string;
   username: string;

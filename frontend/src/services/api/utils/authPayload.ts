@@ -1,7 +1,6 @@
 import type { LoginResponse } from '../types/auth';
 import { normalizeRole } from './roles';
 
-/** Выбор роли из списка authorities (не только [0] — порядок в Spring не гарантирован). */
 function pickRoleFromAuthorities(authorities: unknown): string {
   if (!Array.isArray(authorities)) return '';
   const normalized = authorities
@@ -24,13 +23,11 @@ function unwrapAuthBody(raw: unknown): Record<string, unknown> {
   const o = raw as Record<string, unknown>;
   const inner = o.data;
   if (inner && typeof inner === 'object' && !Array.isArray(inner)) {
-    /** Поля вроде customerId могут быть снаружи `data`, а токен — внутри; не теряем верхний уровень. */
     return { ...o, ...(inner as Record<string, unknown>) };
   }
   return o;
 }
 
-/** Положительный целочисленный id профиля из ответа логина (customerId и т.п.). */
 export function parsePositiveIntId(value: unknown): number | null {
   if (typeof value === 'number' && Number.isFinite(value) && Number.isInteger(value) && value > 0) {
     return value;

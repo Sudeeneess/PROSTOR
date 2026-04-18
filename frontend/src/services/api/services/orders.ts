@@ -11,7 +11,6 @@ import { getErrorStatus } from '../utils/httpError';
 
 export function createOrdersService(request: RequestFn) {
   return {
-    /** Дашборд продавца по товарам/заказам (SELLER). */
     async getSellerOrdersDashboard(): Promise<{
       success: boolean;
       data?: SellerOrdersDashboardResponse;
@@ -33,7 +32,6 @@ export function createOrdersService(request: RequestFn) {
       }
     },
 
-    /** Список всех заказов (роли ADMIN, WAREHOUSE_MANAGER). */
     async getOrders(
       page: number = 0,
       size: number = 20
@@ -57,7 +55,6 @@ export function createOrdersService(request: RequestFn) {
       }
     },
 
-    /** Один заказ (ADMIN или владелец-покупатель). */
     async getOrderById(
       id: number
     ): Promise<{ success: boolean; data?: OrderResponseDto; error?: string; status?: number }> {
@@ -73,7 +70,6 @@ export function createOrdersService(request: RequestFn) {
       }
     },
 
-    /** Заказы покупателя (ADMIN или сам покупатель). */
     async getOrdersForCustomer(
       customerId: number
     ): Promise<{
@@ -96,7 +92,6 @@ export function createOrdersService(request: RequestFn) {
       }
     },
 
-    /** Заказы по статусу (ADMIN, WAREHOUSE_MANAGER). */
     async getOrdersByStatus(
       statusId: number,
       page: number = 0,
@@ -139,7 +134,6 @@ export function createOrdersService(request: RequestFn) {
       }
     },
 
-    /** Подтвердить заказ (ADMIN, WAREHOUSE_MANAGER). */
     async confirmOrder(
       orderId: number
     ): Promise<{ success: boolean; data?: OrderResponseDto; error?: string; status?: number }> {
@@ -157,7 +151,6 @@ export function createOrdersService(request: RequestFn) {
       }
     },
 
-    /** Отменить заказ (ADMIN или владелец-покупатель). */
     async cancelOrder(
       orderId: number
     ): Promise<{ success: boolean; data?: OrderResponseDto; error?: string; status?: number }> {
@@ -175,7 +168,6 @@ export function createOrdersService(request: RequestFn) {
       }
     },
 
-    /** Сменить статус заказа (ADMIN, WAREHOUSE_MANAGER). */
     async setOrderStatus(
       orderId: number,
       statusId: number
@@ -195,7 +187,6 @@ export function createOrdersService(request: RequestFn) {
       }
     },
 
-    /** Удалить заказ (только ADMIN). */
     async deleteOrder(
       orderId: number
     ): Promise<{ success: boolean; error?: string; status?: number }> {

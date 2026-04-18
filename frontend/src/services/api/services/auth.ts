@@ -17,7 +17,6 @@ export function createAuthService(request: RequestFn) {
     return null;
   }
 
-  /** Единая запись сессии: localStorage + sessionStorage для существующих guards. */
   function persistAuth(response: LoginResponse): void {
     localStorage.setItem('token', response.token);
     const userPayload: {
@@ -148,7 +147,6 @@ export function createAuthService(request: RequestFn) {
       sessionStorage.removeItem('userName');
     },
 
-    /** Роль для guards: сначала `user` в localStorage, иначе sessionStorage (обратная совместимость). */
     getStoredUserRole(): string | null {
       try {
         const raw = localStorage.getItem('user');
@@ -156,13 +154,11 @@ export function createAuthService(request: RequestFn) {
           const u = JSON.parse(raw) as { role?: string };
           if (u?.role != null && String(u.role).trim() !== '') {
             const r = String(u.role).toLowerCase();
-            // На бэкенде при отсутствии роли в БД подставляется USER — для витрины это клиент
             if (r === 'user') return 'customer';
             return r;
           }
         }
       } catch {
-        /* ignore */
       }
       const s = sessionStorage.getItem('userRole');
       if (!s) return null;
@@ -172,7 +168,6 @@ export function createAuthService(request: RequestFn) {
 
     getCurrentUser,
 
-    /** customerId, сохранённый при входе (ответ логина). */
     getStoredCustomerId(): number | null {
       const u = getCurrentUser();
       if (!u) return null;

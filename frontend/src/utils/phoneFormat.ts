@@ -8,7 +8,7 @@ export function formatRuPhoneFromDigits(digits: string): string {
   return `+7 (${r.slice(0, 3)}) ${r.slice(3, 6)}-${r.slice(6, 8)}-${r.slice(8, 10)}`;
 }
 
-/** Форматирует пользовательский ввод в вид +7 (999) 999-99-99 c поддержкой частичного ввода. */
+/* пользовательский ввод в вид +7 (999) 999-99-99 c поддержкой частичного ввода */
 export function formatRuPhoneInput(value: string): string {
   const onlyDigits = value.replace(/\D/g, '');
 
