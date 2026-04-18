@@ -328,7 +328,15 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className={styles['dashboard-wrapper']}>
-      <HeaderManager onMenuItemChange={handleMenuItemChange} onManagementClick={handleManagementClick} />
+      <HeaderManager
+        onMenuItemChange={handleMenuItemChange}
+        onManagementClick={handleManagementClick}
+        activeWarehouseSection={
+          activeTab === 'receiving' || activeTab === 'shipment' || activeTab === 'assembling'
+            ? activeTab
+            : 'dashboard'
+        }
+      />
       <main className={styles['main-content']}>{renderContent()}</main>
     </div>
   );
