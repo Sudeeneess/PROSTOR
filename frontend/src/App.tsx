@@ -196,7 +196,7 @@ const AppContent: React.FC = () => {
         (() => {
           const token = localStorage.getItem('token');
           const userRole = api.getStoredUserRole();
-// Перенаправление по ролям
+ // Перенаправление по ролям
           if (token && userRole === 'customer') {
             return <Navigate to="/customer" replace />;
           }
@@ -296,7 +296,7 @@ const AppContent: React.FC = () => {
             </RedirectSellerIfAuthenticated>
           } 
         />
-[18.04.2026 19:42] Пиздахлюйка: {/* Лендинг продавца — доступен без авторизации */}
+{/* Лендинг продавца — доступен без авторизации */}
         <Route path="main" element={<MainSeller />} />
         
         {/* Личный кабинет / Дашборд продавца */}

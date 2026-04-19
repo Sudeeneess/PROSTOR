@@ -52,27 +52,26 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/api/public/**").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/products/**").permitAll()
-                        .requestMatchers("/api/categories/**").permitAll()
-                        .requestMatchers("/api/brands/**").permitAll()
-                        .requestMatchers("/images/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/").permitAll()
+                        .requestMatchers("/actuator/").permitAll()
+                        .requestMatchers("/api/public/").permitAll()
+                        .requestMatchers("/api/auth/").permitAll()
+                        .requestMatchers("/api/products/").permitAll()
+                        .requestMatchers("/api/categories/").permitAll()
+                        .requestMatchers("/api/brands/").permitAll()
+                        .requestMatchers("/images/").permitAll()
 
-                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/swagger-ui/").permitAll()
                         .requestMatchers("/swagger-ui.html").permitAll()
-                        .requestMatchers("/v3/api-docs/**").permitAll()
-                        .requestMatchers("/swagger-resources/**").permitAll()
-                        .requestMatchers("/webjars/**").permitAll()
+                        .requestMatchers("/v3/api-docs/").permitAll()
+                        .requestMatchers("/swagger-resources/").permitAll()
+                        .requestMatchers("/webjars/").permitAll()
+                        .requestMatchers("/api/debug/").hasRole("ADMIN")
 
-                        .requestMatchers("/api/debug/**").hasRole("ADMIN")
-
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
-                        .requestMatchers("/api/seller/**").hasRole("SELLER")
-                        .requestMatchers("/api/warehouse/**").hasRole("WAREHOUSE_MANAGER")
+                        .requestMatchers("/api/admin/").hasRole("ADMIN")
+                        .requestMatchers("/api/customer/").hasRole("CUSTOMER")
+                        .requestMatchers("/api/seller/").hasRole("SELLER")
+                        .requestMatchers("/api/warehouse/").hasRole("WAREHOUSE_MANAGER")
 
                         .anyRequest().authenticated()
                 )
@@ -116,7 +115,8 @@ public class SecurityConfig {
         ));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/", configuration);
+
         return source;
     }
 }
