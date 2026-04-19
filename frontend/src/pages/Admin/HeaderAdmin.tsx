@@ -21,16 +21,9 @@ const HeaderAdmin: React.FC<HeaderAdminProps> = ({ onMenuItemChange }) => {
         break;
 
       case 'users':
-        navigate('/admin/users'); // ✅ ДОБАВИЛИ
+        navigate('/admin/users');
         if (onMenuItemChange) {
           onMenuItemChange('users');
-        }
-        break;
-
-      case 'products':
-        navigate('/admin/products'); // уже есть ✅
-        if (onMenuItemChange) {
-          onMenuItemChange('products');
         }
         break;
 
@@ -72,13 +65,6 @@ const HeaderAdmin: React.FC<HeaderAdminProps> = ({ onMenuItemChange }) => {
           onClick={() => handleMenuClick('users')}
         >
           Пользователи
-        </button>
-
-        <button
-          className={`${styles['admin-header-menu-item']} ${location.pathname.startsWith('/admin/products') ? styles['active'] : ''}`}
-          onClick={() => handleMenuClick('products')}
-        >
-          Товары
         </button>
         <button
           className={styles['admin-header-menu-item']}

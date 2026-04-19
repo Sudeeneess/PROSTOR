@@ -1,4 +1,3 @@
-// src/components/BasketProductCard/BasketProductCard.tsx
 import React from 'react';
 import styles from './BasketProductCard.module.css';
 

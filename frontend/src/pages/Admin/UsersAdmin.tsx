@@ -1,310 +1,388 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './UsersAdmin.module.css';
 import HeaderAdmin from './HeaderAdmin';
-import WindEditAdmin from './WindEditAdmin';
-
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-  status: string;
-}
+import WindEditAdmin, { type WindEditSavePayload, type WindEditVariant } from './WindEditAdmin';
+import { appendAdminAction } from './adminActionLog';
+import { api } from '../../services/api';
+import type { AdminUserDto } from '../../services/api';
 
 interface UsersAdminProps {
   onBack?: () => void;
 }
 
-const initialUsers: User[] = [
-  { id: 15, name: 'Иванов И.', email: 'ivan@mail.ru', role: 'Покупатель', status: 'Активен' },
-  { id: 16, name: 'Петров П.', email: 'petr@mail.ru', role: 'Продавец', status: 'Активен' },
-  { id: 17, name: 'Сидоров С.', email: 'sidor@mail.ru', role: 'Менеджер', status: 'Активен' },
-  { id: 18, name: 'Кузнецов А.', email: 'kuzn@mail.ru', role: 'Покупатель', status: 'Активен' },
-];
-
-// Ключ для localStorage
-const USERS_STORAGE_KEY = 'app_users';
-
-// Функция загрузки пользователей из localStorage
-const loadUsersFromStorage = (): User[] => {
-  try {
-    const storedUsers = localStorage.getItem(USERS_STORAGE_KEY);
-    if (storedUsers) {
-      return JSON.parse(storedUsers);
-    }
-  } catch (error) {
-    console.error('Ошибка при загрузке пользователей:', error);
+function formatRoleName(roleName: string): string {
+  switch (roleName) {
+    case 'ADMIN':
+      return 'Администратор';
+    case 'CUSTOMER':
+      return 'Покупатель';
+    case 'SELLER':
+      return 'Продавец';
+    case 'WAREHOUSE_MANAGER':
+      return 'Менеджер склада';
+    default:
+      return roleName;
   }
-  return initialUsers;
-};
+}
 
-// Функция сохранения пользователей в localStorage
-const saveUsersToStorage = (users: User[]) => {
+function formatCreatedAt(iso?: string): string {
+  if (!iso) return '—';
   try {
-    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
-  } catch (error) {
-    console.error('Ошибка при сохранении пользователей:', error);
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return iso;
+    return d.toLocaleString('ru-RU', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  } catch {
+    return iso;
   }
-};
+}
+
+function getEditVariant(user: AdminUserDto): WindEditVariant {
+  const r = (user.role?.name ?? '').toUpperCase();
+  if (r === 'WAREHOUSE_MANAGER') return 'manager';
+  if (r === 'CUSTOMER' || r === 'SELLER') return 'customer_or_seller';
+  return 'admin_view';
+}
+
+/** Уникальный 11-значный телефон для API (поле скрыто в форме приглашения). */
+function generatePlaceholderPhone(): string {
+  const base = Date.now() % 10_000_000_000;
+  const pad = String(base).padStart(10, '0');
+  return `8${pad}`.slice(0, 11);
+}
 
 const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
   const navigate = useNavigate();
-
-  // Загружаем пользователей из localStorage при инициализации
-  const [users, setUsers] = useState<User[]>(() => loadUsersFromStorage());
+  const [users, setUsers] = useState<AdminUserDto[]>([]);
+  const [warehouseManagerRoleId, setWarehouseManagerRoleId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [rolesError, setRolesError] = useState<string | null>(null);
+  const [listError, setListError] = useState<string | null>(null);
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
-  const [showModal, setShowModal] = useState<boolean>(false);
-  const [showToast, setShowToast] = useState<boolean>(false);
-  const [toastMessage, setToastMessage] = useState<string>('');
-  const [showEditModal, setShowEditModal] = useState<boolean>(false);
-  const [selectedUserForEdit, setSelectedUserForEdit] = useState<User | null>(null);
-  const [activeTab, setActiveTab] = useState<'all' | 'active'>('all');
-  const [newUser, setNewUser] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    role: 'Менеджер склада',
-  });
+  const [showModal, setShowModal] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedUserForEdit, setSelectedUserForEdit] = useState<AdminUserDto | null>(null);
+  const [editVariant, setEditVariant] = useState<WindEditVariant>('admin_view');
+  const [inviteSubmitting, setInviteSubmitting] = useState(false);
+  const [inviteError, setInviteError] = useState<string | null>(null);
+  const [newUser, setNewUser] = useState({ userName: '', password: '' });
 
-  // Сохраняем пользователей в localStorage при каждом изменении
+  const loadRoles = useCallback(async () => {
+    setRolesError(null);
+    try {
+      const rows = await api.getDebugRoles();
+      const wm = rows.find((r) => r.role_name === 'WAREHOUSE_MANAGER');
+      setWarehouseManagerRoleId(wm?.role_id ?? null);
+    } catch (e) {
+      setRolesError(
+        e instanceof Error ? e.message : 'Не удалось загрузить список ролей (/api/debug/roles)'
+      );
+      setWarehouseManagerRoleId(null);
+    }
+  }, []);
+
+  const loadUsers = useCallback(async () => {
+    setListError(null);
+    try {
+      const list = await api.getAdminUsers();
+      setUsers(list);
+    } catch (e) {
+      setListError(e instanceof Error ? e.message : 'Не удалось загрузить пользователей');
+      setUsers([]);
+    }
+  }, []);
+
+  const refreshAll = useCallback(async () => {
+    setLoading(true);
+    await Promise.all([loadRoles(), loadUsers()]);
+    setLoading(false);
+  }, [loadRoles, loadUsers]);
+
   useEffect(() => {
-    saveUsersToStorage(users);
-  }, [users]);
-
-  // Фильтруем пользователей в зависимости от активной вкладки
-  const filteredUsers = activeTab === 'all' 
-    ? users 
-    : users.filter(user => user.status === 'Активен');
-
-  const handleSelectUser = (id: number) => {
-    setSelectedUsers(prev =>
-      prev.includes(id) ? prev.filter(userId => userId !== id) : [...prev, id]
-    );
-  };
-
-  const openModal = () => {
-    setShowModal(true);
-    setNewUser({ firstName: '', lastName: '', email: '', role: 'Менеджер склада' });
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-  };
+    void refreshAll();
+  }, [refreshAll]);
 
   const showNotification = (message: string) => {
     setToastMessage(message);
     setShowToast(true);
-    setTimeout(() => {
-      setShowToast(false);
-    }, 3000);
+    setTimeout(() => setShowToast(false), 3000);
   };
 
-  const handleInvite = () => {
-    if (newUser.firstName && newUser.lastName && newUser.email) {
-      const newUserId = Math.max(...users.map(u => u.id), 0) + 1;
-      const newUserObj: User = {
-        id: newUserId,
-        name: `${newUser.lastName} ${newUser.firstName.charAt(0)}.`,
-        email: newUser.email,
-        role: newUser.role,
-        status: 'Активен',
-      };
-      setUsers([...users, newUserObj]);
+  const handleSelectUser = (id: number) => {
+    setSelectedUsers((prev) =>
+      prev.includes(id) ? prev.filter((userId) => userId !== id) : [...prev, id]
+    );
+  };
+
+  const openModal = () => {
+    setInviteError(null);
+    setNewUser({ userName: '', password: '' });
+    if (warehouseManagerRoleId == null) {
+      setInviteError('Не найдена роль «Менеджер склада». Проверьте /api/debug/roles.');
+    }
+    setShowModal(true);
+  };
+
+  const closeModal = () => setShowModal(false);
+
+  const handleInvite = async () => {
+    setInviteError(null);
+    if (warehouseManagerRoleId == null) {
+      setInviteError('Роль менеджера не загружена');
+      return;
+    }
+    const { userName, password } = newUser;
+    if (!userName.trim() || !password.trim()) {
+      setInviteError('Заполните логин и пароль');
+      return;
+    }
+    setInviteSubmitting(true);
+    try {
+      let phone = generatePlaceholderPhone();
+      let created = false;
+      for (let i = 0; i < 8; i++) {
+        try {
+          await api.createAdminUser({
+            userName: userName.trim(),
+            password: password.trim(),
+            contactPhone: phone,
+            roleId: warehouseManagerRoleId,
+          });
+          created = true;
+          break;
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : '';
+          if (msg.includes('Phone number already exists') || msg.includes('телефон')) {
+            phone = generatePlaceholderPhone();
+            continue;
+          }
+          throw e;
+        }
+      }
+      if (!created) {
+        throw new Error('Не удалось создать пользователя: заняты служебные телефоны, попробуйте снова');
+      }
+      appendAdminAction({
+        action: 'Создан менеджер склада',
+        userLabel: userName.trim(),
+        status: 'Выполнено',
+      });
       closeModal();
-      showNotification('Вы пригласили нового пользователя!');
-    } else {
-      alert('Пожалуйста, заполните все поля');
+      showNotification('Менеджер склада создан');
+      await loadUsers();
+      setSelectedUsers([]);
+    } catch (e) {
+      setInviteError(e instanceof Error ? e.message : 'Ошибка создания пользователя');
+    } finally {
+      setInviteSubmitting(false);
     }
   };
 
   const handleEdit = () => {
     if (selectedUsers.length === 0) {
-      alert('Пожалуйста, выберите пользователя');
+      alert('Выберите пользователя');
       return;
     }
-
     if (selectedUsers.length > 1) {
       alert('Выберите только одного пользователя');
       return;
     }
-
-    const userToEdit = users.find(user => user.id === selectedUsers[0]);
-
-    if (userToEdit) {
-      setSelectedUserForEdit(userToEdit);
+    const u = users.find((user) => user.id === selectedUsers[0]);
+    if (u) {
+      setEditVariant(getEditVariant(u));
+      setSelectedUserForEdit(u);
       setShowEditModal(true);
     }
   };
 
-  const handleSaveUser = async (updatedUser: User) => {
-    // Имитация задержки сохранения
-    await new Promise(resolve => setTimeout(resolve, 500));
+  const handleWindSave = async (payload: WindEditSavePayload) => {
+    const u = selectedUserForEdit;
+    if (u == null) return;
+    const id = u.id;
+    const roleName = u.role?.name ?? '';
 
-    setUsers(prev =>
-      prev.map(user =>
-        user.id === updatedUser.id ? updatedUser : user
-      )
-    );
+    if (payload.shouldDelete) {
+      if (!window.confirm(`Удалить пользователя #${id} (${payload.userName})?`)) {
+        return;
+      }
+      await api.deleteAdminUser(id);
+      appendAdminAction({
+        action: `Удалён пользователь (${formatRoleName(roleName)})`,
+        userLabel: payload.userName,
+        status: 'Выполнено',
+      });
+      setShowEditModal(false);
+      setSelectedUserForEdit(null);
+      setSelectedUsers([]);
+      showNotification('Пользователь удалён');
+      await loadUsers();
+      return;
+    }
 
-    setSelectedUsers([]);
+    if (warehouseManagerRoleId == null || warehouseManagerRoleId <= 0) {
+      throw new Error('Не загружена роль менеджера');
+    }
+
+    await api.updateAdminUser(id, {
+      userName: payload.userName,
+      password: payload.password,
+      contactPhone: payload.contactPhone,
+      roleId: warehouseManagerRoleId,
+    });
+    appendAdminAction({
+      action: 'Обновлены данные менеджера склада',
+      userLabel: payload.userName,
+      status: 'Выполнено',
+    });
     setShowEditModal(false);
-    showNotification('Пользователь обновлен!');
+    setSelectedUserForEdit(null);
+    setSelectedUsers([]);
+    showNotification('Данные менеджера обновлены');
+    await loadUsers();
   };
 
   const handleBack = () => {
-    if (onBack) {
-      onBack(); // Используем пропс если он передан
-    } else {
-      navigate(-1); // Иначе возвращаемся на предыдущую страницу
-    }
-  };
-
-  const handleTabChange = (tab: 'all' | 'active') => {
-    setActiveTab(tab);
-    setSelectedUsers([]);
+    if (onBack) onBack();
+    else navigate(-1);
   };
 
   return (
     <>
-      {/* Убираем передачу пропса - просто рендерим HeaderAdmin без параметров */}
       <HeaderAdmin />
 
       <div className={styles['admin-users-container']}>
         <div className={styles['admin-users-main-container']}>
           <div className={styles['admin-users-header']}>
             <h1>Пользователи</h1>
-            <button className={styles['admin-users-back-button']} onClick={handleBack}>
+            <button type="button" className={styles['admin-users-back-button']} onClick={handleBack}>
               Назад
             </button>
           </div>
 
-          <div className={styles['admin-users-tabs']}>
-            <button
-              type="button"
-              className={`${styles['admin-users-tab']} ${activeTab === 'all' ? styles['admin-users-active'] : ''}`}
-              onClick={() => handleTabChange('all')}
-            >
-              Все пользователи
-            </button>
-            <button
-              type="button"
-              className={`${styles['admin-users-tab']} ${activeTab === 'active' ? styles['admin-users-active'] : ''}`}
-              onClick={() => handleTabChange('active')}
-            >
-              Активные
-            </button>
-          </div>
-          
-          <div className={styles['admin-users-table-wrapper']}>
-            <table className={styles['admin-users-table']}>
-              <thead>
-                <tr>
-                  <th className={styles['admin-users-checkbox-cell']}></th>
-                  <th>ID</th>
-                  <th>Имя</th>
-                  <th>Email</th>
-                  <th>Роль</th>
-                  <th>Статус</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredUsers.map(user => (
-                  <tr key={user.id}>
-                    <td className={styles['admin-users-checkbox-cell']} onClick={(e) => e.stopPropagation()}>
-                      <input
-                        type="checkbox"
-                        checked={selectedUsers.includes(user.id)}
-                        onChange={() => handleSelectUser(user.id)}
-                      />
-                    </td>
-                    <td>{user.id}</td>
-                    <td>{user.name}</td>
-                    <td>{user.email}</td>
-                    <td>{user.role}</td>
-                    <td>{user.status}</td>
-                  </tr>
-                ))}
-                {filteredUsers.length === 0 && (
-                  <tr>
-                    <td colSpan={6} style={{ textAlign: 'center', padding: '40px' }}>
-                      Нет пользователей для отображения
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+          {(listError || rolesError) && (
+            <div className={styles['admin-users-error']} role="alert">
+              {listError && <p>{listError}</p>}
+              {rolesError && <p>Роли: {rolesError}</p>}
+            </div>
+          )}
 
-          {/* Кнопки действий как на скриншоте */}
-          <div className={styles['admin-users-action-buttons']}>
-            <button className={styles['admin-users-edit-button']} onClick={handleEdit}>
-              Редактировать пользователя
-            </button>
-            <button className={styles['admin-users-invite-button']} onClick={openModal}>
-              Пригласить сотрудника
-            </button>
-          </div>
+          {loading ? (
+            <p className={styles['admin-users-loading']}>Загрузка…</p>
+          ) : (
+            <>
+              <div className={styles['admin-users-table-wrapper']}>
+                <table className={styles['admin-users-table']}>
+                  <thead>
+                    <tr>
+                      <th className={styles['admin-users-checkbox-cell']} />
+                      <th>ID</th>
+                      <th>Логин</th>
+                      <th>Телефон</th>
+                      <th>Роль</th>
+                      <th>Регистрация</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.map((user) => (
+                      <tr key={user.id}>
+                        <td
+                          className={styles['admin-users-checkbox-cell']}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedUsers.includes(user.id)}
+                            onChange={() => handleSelectUser(user.id)}
+                          />
+                        </td>
+                        <td>{user.id}</td>
+                        <td>{user.userName}</td>
+                        <td>{user.contactPhone || '—'}</td>
+                        <td>{user.role ? formatRoleName(user.role.name) : '—'}</td>
+                        <td>{formatCreatedAt(user.createdAt)}</td>
+                      </tr>
+                    ))}
+                    {users.length === 0 && !listError && (
+                      <tr>
+                        <td colSpan={6} style={{ textAlign: 'center', padding: '40px' }}>
+                          Нет пользователей
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
 
-          {/* Модальное окно для приглашения с крестиком */}
+              <div className={styles['admin-users-action-buttons']}>
+                <button type="button" className={styles['admin-users-edit-button']} onClick={handleEdit}>
+                  Открыть карточку
+                </button>
+                <button type="button" className={styles['admin-users-invite-button']} onClick={openModal}>
+                  Добавить менеджера склада
+                </button>
+              </div>
+            </>
+          )}
+
           {showModal && (
             <div className={styles['admin-users-modal-overlay']} onClick={closeModal}>
               <div className={styles['admin-users-invite-modal']} onClick={(e) => e.stopPropagation()}>
                 <div className={styles['admin-users-modal-header-with-close']}>
-                  <h2 className={styles['admin-users-modal-title']}>Данные нового сотрудника</h2>
-                  <button className={styles['admin-users-modal-close-button']} onClick={closeModal}>
+                  <h2 className={styles['admin-users-modal-title']}>Новый менеджер склада</h2>
+                  <button type="button" className={styles['admin-users-modal-close-button']} onClick={closeModal}>
                     ×
                   </button>
                 </div>
-                
+
                 <div className={styles['admin-users-modal-form']}>
                   <div className={styles['admin-users-form-group']}>
-                    <label>Имя:</label>
+                    <label>Логин:</label>
                     <input
                       type="text"
-                      placeholder="Введите имя"
-                      value={newUser.firstName}
-                      onChange={(e) => setNewUser({...newUser, firstName: e.target.value})}
+                      value={newUser.userName}
+                      onChange={(e) => setNewUser({ ...newUser, userName: e.target.value })}
+                      placeholder="Имя пользователя"
+                      autoComplete="username"
                     />
                   </div>
-                  
                   <div className={styles['admin-users-form-group']}>
-                    <label>Фамилия:</label>
+                    <label>Пароль:</label>
                     <input
-                      type="text"
-                      placeholder="Введите фамилию"
-                      value={newUser.lastName}
-                      onChange={(e) => setNewUser({...newUser, lastName: e.target.value})}
+                      type="password"
+                      value={newUser.password}
+                      onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                      placeholder="Пароль"
+                      autoComplete="new-password"
                     />
                   </div>
-                  
                   <div className={styles['admin-users-form-group']}>
-                    <label>Email:</label>
-                    <input
-                      type="email"
-                      placeholder="example@mail.ru"
-                      value={newUser.email}
-                      onChange={(e) => setNewUser({...newUser, email: e.target.value})}
-                    />
-                  </div>
-                  
-                  <div className={styles['admin-users-form-group']}>
-                    <label>Должность:</label>
-                    <select
-                      value={newUser.role}
-                      onChange={(e) => setNewUser({...newUser, role: e.target.value})}
-                      className={styles['admin-users-role-select']}
-                    >
-                      <option value="Менеджер">Менеджер</option>
-                      <option value="Покупатель">Покупатель</option>
-                      <option value="Продавец">Продавец</option>
-                    </select>
+                    <label>Роль:</label>
+                    <input type="text" value="Менеджер склада" disabled className={styles['admin-users-role-readonly']} />
                   </div>
                 </div>
-                
+
+                {inviteError && (
+                  <p className={styles['admin-users-invite-error']} role="alert">
+                    {inviteError}
+                  </p>
+                )}
+
                 <div className={styles['admin-users-modal-actions']}>
-                  <button className={styles['admin-users-submit-button']} onClick={handleInvite}>
-                    Отправить приглашение
+                  <button
+                    type="button"
+                    className={styles['admin-users-submit-button']}
+                    onClick={() => void handleInvite()}
+                    disabled={inviteSubmitting || warehouseManagerRoleId == null}
+                  >
+                    {inviteSubmitting ? 'Создание…' : 'Создать'}
                   </button>
                 </div>
               </div>
@@ -315,14 +393,13 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
             isOpen={showEditModal}
             onClose={() => setShowEditModal(false)}
             userData={selectedUserForEdit}
-            onSave={handleSaveUser}
+            variant={editVariant}
+            warehouseManagerRoleId={warehouseManagerRoleId ?? 0}
+            onSave={handleWindSave}
           />
 
-          {/* Toast уведомление */}
           {showToast && (
-            <div className={styles['admin-users-toast-notification']}>
-              {toastMessage}
-            </div>
+            <div className={styles['admin-users-toast-notification']}>{toastMessage}</div>
           )}
         </div>
       </div>

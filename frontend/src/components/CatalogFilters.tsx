@@ -10,11 +10,9 @@ type Props = {
   products: CatalogGridProduct[];
   value: CatalogFilterState;
   onChange: (next: CatalogFilterState) => void;
-  /** Подкатегории выбранной категории (тип товара); на странице /catalog/cat/sub не передаём */
   subcategoryOptions?: { slug: string; name: string }[];
 };
 
-/** Фильтры: бренд, размер, цена; «тип» = подкатегории раздела на странице категории. */
 const CatalogFilters: React.FC<Props> = ({
   products,
   value,

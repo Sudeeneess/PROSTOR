@@ -8,6 +8,7 @@ import { createOrdersService } from './services/orders';
 import { createOrderMovementsService } from './services/orderMovements';
 import { createPaymentsService } from './services/payments';
 import { createCustomerService } from './services/customer';
+import { createAdminService } from './services/admin';
 
 export const api = {
   ...createAuthService(apiRequest),
@@ -19,4 +20,5 @@ export const api = {
   ...createOrderMovementsService(apiRequest),
   ...createPaymentsService(apiRequest),
   ...createCustomerService(apiRequest),
+  ...createAdminService(apiRequest),
 };

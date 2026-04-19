@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import HeaderAdmin from "./HeaderAdmin";
 import styles from './AuthAdmin.module.css';
 import { api, resolveAfterLogin } from "../../services/api";
@@ -104,9 +104,6 @@ const AuthorizationAdmin: React.FC = () => {
             </button>
           </div>
 
-          <div className={styles['admin-auth-registration-link']}>
-            Нет аккаунта? <Link to="/admin/register">Зарегистрироваться</Link>
-          </div>
         </form>
       </main>
     </div>

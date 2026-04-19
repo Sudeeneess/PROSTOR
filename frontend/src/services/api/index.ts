@@ -35,5 +35,11 @@ export type {
   CustomerDashboard,
   Category,
   CategoryRequest,
+  AdminUserDto,
+  AdminRoleDto,
+  AdminDashboardStats,
+  AdminUserCreateBody,
+  AdminDebugRoleRow,
+  AdministratorEntryDto,
 } from './types';
 export { CATEGORIES_LIST_PAGE_SIZE } from './types';

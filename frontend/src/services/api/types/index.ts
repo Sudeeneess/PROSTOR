@@ -35,3 +35,11 @@ export type { OrderMovementDto } from './orderMovement';
 export type { CustomerDashboard } from './customer';
 export type { Category, CategoryRequest } from './category';
 export { CATEGORIES_LIST_PAGE_SIZE } from './category';
+export type {
+  AdminUserDto,
+  AdminRoleDto,
+  AdminDashboardStats,
+  AdminUserCreateBody,
+  AdminDebugRoleRow,
+  AdministratorEntryDto,
+} from './adminUser';

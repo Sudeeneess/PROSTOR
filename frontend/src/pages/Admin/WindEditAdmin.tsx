@@ -1,181 +1,261 @@
 import React, { useState, useEffect } from 'react';
 import styles from './WindEditAdmin.module.css';
+import type { AdminUserDto } from '../../services/api';
 
-interface UserData {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-  status: string;
+export interface WindEditSavePayload {
+  userName: string;
+  contactPhone: string;
+  roleId: number;
+  password: string;
+  shouldDelete: boolean;
 }
+
+export type WindEditVariant = 'manager' | 'customer_or_seller' | 'admin_view';
 
 interface WindEditAdminProps {
   isOpen: boolean;
   onClose: () => void;
-  userData: UserData | null;
-  onSave: (updatedUser: UserData) => void;
+  userData: AdminUserDto | null;
+  variant: WindEditVariant;
+  /** id роли WAREHOUSE_MANAGER для сохранения менеджера */
+  warehouseManagerRoleId: number;
+  onSave: (payload: WindEditSavePayload) => Promise<void>;
 }
 
 const WindEditAdmin: React.FC<WindEditAdminProps> = ({
   isOpen,
   onClose,
   userData,
-  onSave
+  variant,
+  warehouseManagerRoleId,
+  onSave,
 }) => {
-  const [editedUser, setEditedUser] = useState<UserData | null>(null);
-  const [pendingActions, setPendingActions] = useState<{
-    block?: boolean;
-    delete?: boolean;
-  }>({});
+  const [userName, setUserName] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [shouldDelete, setShouldDelete] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const isManager = variant === 'manager';
+  const isViewDelete = variant === 'customer_or_seller';
+  const isAdminView = variant === 'admin_view';
 
   useEffect(() => {
     if (userData) {
-      setEditedUser({ ...userData });
-      setPendingActions({});
+      setUserName(userData.userName || '');
+      setContactPhone(userData.contactPhone || '');
+      setPassword('');
+      setShouldDelete(false);
+      setError(null);
     }
   }, [userData]);
 
-  const handleInputChange = (field: keyof UserData, value: string) => {
-    if (editedUser) {
-      setEditedUser({
-        ...editedUser,
-        [field]: value
+  if (!isOpen || !userData) return null;
+
+  const roleLabel = (() => {
+    const n = userData.role?.name ?? '';
+    switch (n) {
+      case 'ADMIN':
+        return 'Администратор';
+      case 'CUSTOMER':
+        return 'Покупатель';
+      case 'SELLER':
+        return 'Продавец';
+      case 'WAREHOUSE_MANAGER':
+        return 'Менеджер склада';
+      default:
+        return n || '—';
+    }
+  })();
+
+  const handlePrimary = async () => {
+    setError(null);
+
+    if (shouldDelete) {
+      setSaving(true);
+      try {
+        await onSave({
+          userName,
+          contactPhone,
+          roleId: userData.role?.id ?? 0,
+          password: '',
+          shouldDelete: true,
+        });
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Ошибка удаления');
+      } finally {
+        setSaving(false);
+      }
+      return;
+    }
+
+    if (!isManager) {
+      return;
+    }
+
+    if (!userName.trim()) {
+      setError('Укажите логин');
+      return;
+    }
+    if (!/^\d{11}$/.test(contactPhone.trim())) {
+      setError('Телефон: ровно 11 цифр');
+      return;
+    }
+    if (!password.trim()) {
+      setError(
+        'Укажите пароль: текущий API требует непустой пароль в теле PUT при обновлении пользователя'
+      );
+      return;
+    }
+    if (warehouseManagerRoleId <= 0) {
+      setError('Не загружена роль менеджера склада. Обновите страницу.');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      await onSave({
+        userName: userName.trim(),
+        contactPhone: contactPhone.trim(),
+        roleId: warehouseManagerRoleId,
+        password: password.trim(),
+        shouldDelete: false,
       });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Ошибка сохранения');
+    } finally {
+      setSaving(false);
     }
   };
 
-  const handleBlock = () => {
-    setPendingActions(prev => ({
-      ...prev,
-      block: !prev.block
-    }));
-  };
-
-  const handleDelete = () => {
-    setPendingActions(prev => ({
-      ...prev,
-      delete: !prev.delete
-    }));
-  };
-
-  const handleSave = () => {
-    if (editedUser) {
-      let updatedUser = { ...editedUser };
-      
-      // Применяем отложенные действия
-      if (pendingActions.block) {
-        updatedUser.status = 'Заблокирован';
-      }
-      if (pendingActions.delete) {
-        updatedUser.status = 'Удален';
-      }
-      
-      onSave(updatedUser);
+  const handleFooterClick = () => {
+    if (isAdminView) {
       onClose();
+      return;
     }
+    if (isViewDelete && !shouldDelete) {
+      onClose();
+      return;
+    }
+    void handlePrimary();
   };
 
-  const getDisplayName = () => {
-    if (!editedUser) return '';
-    const nameParts = editedUser.name.split(' ');
-    return nameParts[0] || '';
-  };
-
-  const getDisplayLastName = () => {
-    if (!editedUser) return '';
-    const nameParts = editedUser.name.split(' ');
-    return nameParts[1] || '';
-  };
-
-  if (!isOpen || !editedUser) return null;
+  const title =
+    isManager
+      ? 'Редактирование менеджера склада'
+      : isViewDelete
+        ? 'Просмотр: покупатель / продавец'
+        : 'Просмотр: администратор';
 
   return (
     <div className={styles['admin-wind-edit-overlay']} onClick={onClose}>
-      <div className={styles['admin-wind-edit-modal']} onClick={e => e.stopPropagation()}>
+      <div className={styles['admin-wind-edit-modal']} onClick={(e) => e.stopPropagation()}>
         <div className={styles['admin-wind-edit-header']}>
-          <h2>Информация о пользователе</h2>
-          <button className={styles['admin-wind-edit-close']} onClick={onClose}>
-            ✕
+          <h2>{title}</h2>
+          <button type="button" className={styles['admin-wind-edit-close']} onClick={onClose}>
+            {'\u00d7'}
           </button>
         </div>
 
         <div className={styles['admin-wind-edit-content']}>
           <div className={styles['admin-wind-edit-user-info-section']}>
-            <h3>Пользователь</h3>
-            
-            <div className={styles['admin-wind-edit-form-row']}>
-              <div className={styles['admin-wind-edit-form-group']}>
-                <label>Фамилия:</label>
-                <input
-                  type="text"
-                  value={getDisplayName()}
-                  onChange={(e) => {
-                    const lastName = getDisplayLastName();
-                    handleInputChange('name', `${e.target.value} ${lastName}`.trim());
-                  }}
-                  placeholder="Введите фамилию"
-                />
-              </div>
-              
-              <div className={styles['admin-wind-edit-form-group']}>
-                <label>Имя:</label>
-                <input
-                  type="text"
-                  value={getDisplayLastName()}
-                  onChange={(e) => {
-                    const firstName = getDisplayName();
-                    handleInputChange('name', `${firstName} ${e.target.value}`.trim());
-                  }}
-                  placeholder="Введите имя"
-                />
-              </div>
-            </div>
+            <h3>Данные</h3>
 
             <div className={styles['admin-wind-edit-form-group']}>
-              <label>Email:</label>
-              <input
-                type="email"
-                value={editedUser.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
-                placeholder="Введите email"
-              />
-            </div>
-
-            <div className={styles['admin-wind-edit-form-group']}>
-              <label>Должность:</label>
+              <label>Логин:</label>
               <input
                 type="text"
-                value={editedUser.role}
-                onChange={(e) => handleInputChange('role', e.target.value)}
-                placeholder="Введите должность"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                placeholder="Логин"
+                disabled={!isManager || shouldDelete}
               />
             </div>
+
+            <div className={styles['admin-wind-edit-form-group']}>
+              <label>Телефон (11 цифр):</label>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={contactPhone}
+                onChange={(e) => setContactPhone(e.target.value.replace(/\D/g, '').slice(0, 11))}
+                placeholder="79991234567"
+                disabled={!isManager || shouldDelete}
+              />
+            </div>
+
+            {isManager && (
+              <div className={styles['admin-wind-edit-form-group']}>
+                <label>Роль:</label>
+                <input type="text" value="Менеджер склада" disabled />
+              </div>
+            )}
+
+            {!isManager && (
+              <div className={styles['admin-wind-edit-form-group']}>
+                <label>Роль:</label>
+                <input type="text" value={roleLabel} disabled />
+              </div>
+            )}
+
+            {isManager && (
+              <div className={styles['admin-wind-edit-form-group']}>
+                <label>Новый пароль:</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Обязательно для сохранения"
+                  disabled={shouldDelete}
+                  autoComplete="new-password"
+                />
+              </div>
+            )}
           </div>
 
-          <div className={styles['admin-wind-edit-actions-section']}>
-            <h3>Действия:</h3>
-            <div className={styles['admin-wind-edit-action-buttons']}>
-              <button
-                type="button"
-                className={`${styles['admin-wind-edit-action-button']} ${styles['admin-wind-edit-block-button']} ${pendingActions.block ? styles['admin-wind-edit-active'] : ''}`}
-                onClick={handleBlock}
-              >
-                Заблокировать 
-              </button>
-              <button
-                type="button"
-                className={`${styles['admin-wind-edit-action-button']} ${styles['admin-wind-edit-delete-button']} ${pendingActions.delete ? styles['admin-wind-edit-active'] : ''}`}
-                onClick={handleDelete}
-              >
-                Удалить 
-              </button>
+          {!isAdminView && (
+            <div className={styles['admin-wind-edit-actions-section']}>
+              <h3>Действия</h3>
+              <div className={styles['admin-wind-edit-action-buttons']}>
+                <button
+                  type="button"
+                  className={`${styles['admin-wind-edit-action-button']} ${styles['admin-wind-edit-delete-button']} ${shouldDelete ? styles['admin-wind-edit-active'] : ''}`}
+                  onClick={() => setShouldDelete((v) => !v)}
+                >
+                  Удалить пользователя
+                </button>
+              </div>
             </div>
-          </div>
+          )}
+
+          {isAdminView && (
+            <p className={styles['admin-wind-edit-hint']}>
+              Учётные записи администраторов только для просмотра.
+            </p>
+          )}
+
+          {error && (
+            <p className={styles['admin-wind-edit-error']} role="alert">
+              {error}
+            </p>
+          )}
         </div>
 
         <div className={styles['admin-wind-edit-footer']}>
-          <button className={styles['admin-wind-edit-save-button']} onClick={handleSave}>
-            Сохранить изменения
+          <button
+            type="button"
+            className={styles['admin-wind-edit-save-button']}
+            onClick={handleFooterClick}
+            disabled={saving}
+          >
+            {saving
+              ? 'Сохранение…'
+              : isAdminView || (isViewDelete && !shouldDelete)
+                ? 'Закрыть'
+                : shouldDelete
+                  ? 'Подтвердить удаление'
+                  : 'Сохранить изменения'}
           </button>
         </div>
       </div>

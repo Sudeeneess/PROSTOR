@@ -1,4 +1,4 @@
-[18.04.2026 19:42] Пиздахлюйка: // Главная страница неавторизованных пользователей для всех ролей
+// Главная страница неавторизованных пользователей для всех ролей
 import React from 'react';
 import {
   BrowserRouter as Router,
@@ -40,8 +40,6 @@ import MainSeller from './pages/Seller/MainSeller';
 import AuthorizationAdmin from './pages/Admin/AuthAdmin';
 import Admin from './pages/Admin/AdminPage';
 import UsersAdmin from './pages/Admin/UsersAdmin';
-import ProductAdmin from './pages/Admin/ProductAdmin';
-import RegistrAdmin from './pages/Admin/RegistrAdmin';
 import { api } from './services/api';
 
 // ЗАЩИТА МАРШРУТОВ - ПОКУПАТЕЛЬ 
@@ -51,7 +49,7 @@ const PrivateBuyerRoute: React.FC<{ children: React.ReactNode }> = ({ children }
   const token = localStorage.getItem('token');
   const userRole = api.getStoredUserRole();
 
-  if (!token  userRole !== 'customer') {
+  if (!token || userRole !== 'customer') {
     return <Navigate to="/auth" replace />;
   }
 
@@ -74,7 +72,7 @@ const PrivateProfileRoute: React.FC<{ children: React.ReactNode }> = ({ children
   const token = localStorage.getItem('token');
   const userRole = api.getStoredUserRole();
 
-  if (!token  userRole !== 'customer') {
+  if (!token || userRole !== 'customer') {
     return <Navigate to="/auth" replace />;
   }
 
@@ -82,12 +80,12 @@ const PrivateProfileRoute: React.FC<{ children: React.ReactNode }> = ({ children
 };
 
 // ЗАЩИТА МАРШРУТОВ - ПРОДАВЕЦ
-[18.04.2026 19:42] Пиздахлюйка: // Проверка авторизации продавца
+// Проверка авторизации продавца
 const PrivateSellerRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const token = localStorage.getItem('token');
   const userRole = sessionStorage.getItem('userRole');
   
-  if (!token  userRole !== 'seller') {
+  if (!token || userRole !== 'seller') {
     return <Navigate to="/seller/auth" replace />;
   }
   
@@ -113,7 +111,7 @@ const PrivateWarehouseRoute: React.FC<{ children: React.ReactNode }> = ({ childr
   const token = localStorage.getItem('token');
   const userRole = sessionStorage.getItem('userRole');
   
-  if (!token  userRole !== 'warehouse_manager') {
+  if (!token || userRole !== 'warehouse_manager') {
     return <Navigate to="/warehouse/auth" replace />;
   }
   
@@ -198,7 +196,7 @@ const AppContent: React.FC = () => {
         (() => {
           const token = localStorage.getItem('token');
           const userRole = api.getStoredUserRole();
-[18.04.2026 19:42] Пиздахлюйка: // Перенаправление по ролям
+// Перенаправление по ролям
           if (token && userRole === 'customer') {
             return <Navigate to="/customer" replace />;
           }
@@ -381,12 +379,7 @@ const AppContent: React.FC = () => {
         </RedirectAdminIfAuthenticated>
       } />
 
-      {/* Регистрация администратора */}
-      <Route path="/admin/register" element={
-        <RedirectAdminIfAuthenticated>
-          <RegistrAdmin />
-        </RedirectAdminIfAuthenticated>
-      } />
+      <Route path="/admin/register" element={<Navigate to="/admin/auth" replace />} />
 
       {/* Главная панель администратора */}
       <Route path="/admin" element={
@@ -402,13 +395,8 @@ const AppContent: React.FC = () => {
         </PrivateAdminRoute>
       } />
       
-      {/* Управление товарами */}
-      <Route path="/admin/products" element={
-        <PrivateAdminRoute>
-          <ProductAdmin />
-        </PrivateAdminRoute>
-      } />
-      
+      <Route path="/admin/products" element={<Navigate to="/admin" replace />} />
+
       {/* перенаправления и обработка ошибок */}
       
       {/* Перенаправления со старых маршрутов */}
