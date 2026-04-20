@@ -32,10 +32,10 @@ public interface GoodsReceptionRepository extends JpaRepository<GoodsReception, 
             JOIN gr.seller s
             LEFT JOIN gr.acceptedByWarehouseManager wm
             LEFT JOIN gr.products p
-            WHERE (:status IS NULL OR gr.status = :status)
-              AND (:sellerId IS NULL OR s.id = :sellerId)
-              AND (:fromDate IS NULL OR gr.createdAt >= :fromDate)
-              AND (:toDate IS NULL OR gr.createdAt <= :toDate)
+            WHERE gr.status = COALESCE(:status, gr.status)
+              AND s.id = COALESCE(:sellerId, s.id)
+              AND gr.createdAt >= COALESCE(:fromDate, gr.createdAt)
+              AND gr.createdAt <= COALESCE(:toDate, gr.createdAt)
             GROUP BY gr.id, s.id, s.companyName, gr.status, gr.createdAt, gr.acceptedAt, wm.id
             ORDER BY gr.createdAt DESC
             """)
