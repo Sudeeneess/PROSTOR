@@ -2,6 +2,7 @@ package com.prostor.prostorApp.modules.product.model;
 
 import com.prostor.prostorApp.modules.order.model.OrderItem;
 import com.prostor.prostorApp.modules.user.model.Seller;
+import com.prostor.prostorApp.modules.warehouse.model.GoodsReception;
 import com.prostor.prostorApp.modules.warehouse.model.WarehouseStock;
 import jakarta.persistence.*;
 import lombok.*;
@@ -33,6 +34,10 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Product parent;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reception_id")
+    private GoodsReception reception;
 
     @Column(name = "name", nullable = false, length = 150)
     private String name;

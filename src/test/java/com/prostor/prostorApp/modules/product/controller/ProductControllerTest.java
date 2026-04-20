@@ -77,7 +77,7 @@ class ProductControllerTest {
     void getAll_WithQueryParams_DelegatesToService() throws Exception {
         ProductResponse item = sampleResponse(1, "Alpha");
         Page<ProductResponse> page = new PageImpl<>(List.of(item), PageRequest.of(0, 10), 1);
-        when(productService.filter(eq(1), eq(2), eq(10.0), eq(99.0), eq("needle"), any(Pageable.class)))
+        when(productService.filterPublic(eq(1), eq(2), eq(10.0), eq(99.0), eq("needle"), any(Pageable.class)))
                 .thenReturn(page);
 
         String json = mockMvc.perform(get("/api/products")
@@ -98,13 +98,13 @@ class ProductControllerTest {
         assertEquals(1, root.get("content").size());
         assertEquals("Alpha", root.get("content").get(0).get("name").asText());
 
-        verify(productService).filter(eq(1), eq(2), eq(10.0), eq(99.0), eq("needle"), any(Pageable.class));
+        verify(productService).filterPublic(eq(1), eq(2), eq(10.0), eq(99.0), eq("needle"), any(Pageable.class));
     }
 
     @Test
     @DisplayName("GET /api/products/{id} returns 200 when product exists")
     void getById_WhenFound_ReturnsOk() throws Exception {
-        when(productService.getById(5)).thenReturn(sampleResponse(5, "Found"));
+        when(productService.getPublicById(5)).thenReturn(sampleResponse(5, "Found"));
 
         String json = mockMvc.perform(get("/api/products/5"))
                 .andExpect(status().isOk())
@@ -116,13 +116,13 @@ class ProductControllerTest {
         assertEquals(5, body.getId());
         assertEquals("Found", body.getName());
 
-        verify(productService).getById(5);
+        verify(productService).getPublicById(5);
     }
 
     @Test
     @DisplayName("GET /api/products/{id} returns 404 when not found")
     void getById_WhenMissing_ReturnsNotFound() throws Exception {
-        when(productService.getById(999))
+        when(productService.getPublicById(999))
                 .thenThrow(new EntityNotFoundException("Product not found with id: 999"));
 
         String json = mockMvc.perform(get("/api/products/999"))

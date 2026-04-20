@@ -10,7 +10,10 @@ import com.prostor.prostorApp.modules.product.repository.ProductRepository;
 import com.prostor.prostorApp.modules.order.repository.OrderItemRepository;
 import com.prostor.prostorApp.modules.user.model.Seller;
 import com.prostor.prostorApp.modules.user.repository.SellerRepository;
+import com.prostor.prostorApp.modules.warehouse.model.GoodsReception;
+import com.prostor.prostorApp.modules.warehouse.model.ReceptionStatus;
 import com.prostor.prostorApp.modules.warehouse.repository.WarehouseStockRepository;
+import com.prostor.prostorApp.modules.warehouse.service.GoodsReceptionService;
 import com.prostor.prostorApp.modules.warehouse.service.WarehouseStockService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,6 +53,9 @@ class ProductServiceTest {
     private WarehouseStockService warehouseStockService;
 
     @Mock
+    private GoodsReceptionService goodsReceptionService;
+
+    @Mock
     private ProductCardRepository productCardRepository;
 
     @Mock
@@ -65,6 +71,7 @@ class ProductServiceTest {
     private ProductRequest testProductRequest;
     private Seller testSeller;
     private Category testCategory;
+    private GoodsReception acceptedReception;
 
     @BeforeEach
     void setUp() {
@@ -75,6 +82,11 @@ class ProductServiceTest {
         testCategory = new Category();
         testCategory.setId(1);
         testCategory.setCategoryName("Test Category");
+
+        acceptedReception = new GoodsReception();
+        acceptedReception.setId(1);
+        acceptedReception.setSeller(testSeller);
+        acceptedReception.setStatus(ReceptionStatus.ACCEPTED);
 
         testProduct = new Product();
         testProduct.setId(1);
@@ -89,6 +101,8 @@ class ProductServiceTest {
         testProductRequest.setPrice(100.0);
         testProductRequest.setSellerId(1);
         testProductRequest.setCategoryId(1);
+
+        lenient().when(goodsReceptionService.getOrCreateAcceptedReception(any(Seller.class))).thenReturn(acceptedReception);
     }
 
     @Test

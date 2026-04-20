@@ -8,10 +8,12 @@ import com.prostor.prostorApp.common.exception.GlobalExceptionHandler;
 import com.prostor.prostorApp.modules.product.dto.ProductRequest;
 import com.prostor.prostorApp.modules.product.dto.ProductResponse;
 import com.prostor.prostorApp.modules.product.service.ProductService;
+import com.prostor.prostorApp.modules.user.dto.SellerProductCreateRequest;
 import com.prostor.prostorApp.modules.user.model.Seller;
 import com.prostor.prostorApp.modules.user.model.User;
 import com.prostor.prostorApp.modules.user.repository.SellerRepository;
 import com.prostor.prostorApp.modules.user.repository.UserRepository;
+import com.prostor.prostorApp.modules.warehouse.service.WarehouseStockService;
 import com.prostor.prostorApp.security.JwtAuthenticationFilter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -84,6 +86,9 @@ class SellerControllerTest {
     private SellerRepository sellerRepository;
 
     @MockBean
+    private WarehouseStockService warehouseStockService;
+
+    @MockBean
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Test
@@ -152,8 +157,9 @@ class SellerControllerTest {
     @DisplayName("POST /api/seller/products creates with resolved seller id")
     void createProduct_created() throws Exception {
         stubSellerPrincipal("seller_pro", 5, 99);
-        ProductRequest req = validProductRequest();
-        when(productService.create(any(ProductRequest.class))).thenReturn(sampleProduct(12, 99));
+        SellerProductCreateRequest req = validSellerProductCreateRequest();
+        when(productService.createForSellerWithInitialStock(any(ProductRequest.class), eq(1), eq(5)))
+                .thenReturn(sampleProduct(12, 99));
 
         String json = mockMvc.perform(post("/api/seller/products")
                         .with(user("seller_pro").roles("SELLER"))
@@ -171,10 +177,9 @@ class SellerControllerTest {
     @DisplayName("POST /api/seller/products returns 400 when body invalid")
     void createProduct_validation() throws Exception {
         stubSellerPrincipal("seller_pro", 5, 99);
-        ProductRequest req = new ProductRequest();
+        SellerProductCreateRequest req = new SellerProductCreateRequest();
         req.setName("");
-        req.setPrice(-1);
-        req.setSellerId(1);
+        req.setPrice(-1.0);
         req.setCategoryId(1);
 
         String json = mockMvc.perform(post("/api/seller/products")
@@ -268,6 +273,16 @@ class SellerControllerTest {
         s.setUser(u);
         when(userRepository.findByUserName(username)).thenReturn(Optional.of(u));
         when(sellerRepository.findByUserId(userId)).thenReturn(Optional.of(s));
+    }
+
+    private static SellerProductCreateRequest validSellerProductCreateRequest() {
+        SellerProductCreateRequest r = new SellerProductCreateRequest();
+        r.setName("Item");
+        r.setPrice(10.0);
+        r.setCategoryId(1);
+        r.setWarehouseId(1);
+        r.setInitialQuantity(5);
+        return r;
     }
 
     private static ProductRequest validProductRequest() {

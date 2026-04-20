@@ -11,4 +11,5 @@ public interface CustomerRepository extends JpaRepository<Customer,Integer> {
 
     Optional<Customer> findByUserId(Integer userId);
     boolean existsByUserId(Integer userId);
+    boolean existsByIdAndUserUserName(Integer id, String userName);
 }

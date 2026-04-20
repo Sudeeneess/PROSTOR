@@ -87,6 +87,7 @@ class ProductCardServiceTest {
     @Test
     @DisplayName("Should return cards for product id")
     void getByProductId_ShouldReturnList() {
+        when(productRepository.findPublicById(10)).thenReturn(Optional.of(product));
         when(productCardRepository.findByProductId(10)).thenReturn(List.of(card));
 
         List<ProductCardResponse> result = productCardService.getByProductId(10);
@@ -101,6 +102,7 @@ class ProductCardServiceTest {
     @DisplayName("Should return card when found by id")
     void getById_WhenExists_ShouldReturnResponse() {
         when(productCardRepository.findById(100)).thenReturn(Optional.of(card));
+        when(productRepository.findPublicById(10)).thenReturn(Optional.of(product));
 
         ProductCardResponse result = productCardService.getById(100);
 
@@ -119,6 +121,15 @@ class ProductCardServiceTest {
                 () -> productCardService.getById(1));
 
         assertTrue(ex.getMessage().contains("ProductCard not found"));
+    }
+
+    @Test
+    @DisplayName("Should hide card when product is not public")
+    void getById_WhenProductPending_ShouldThrow() {
+        when(productCardRepository.findById(100)).thenReturn(Optional.of(card));
+        when(productRepository.findPublicById(10)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> productCardService.getById(100));
     }
 
     @Test
