@@ -1,7 +1,16 @@
 package com.prostor.prostorApp.modules.user.service;
 
+import com.prostor.prostorApp.common.exception.BusinessException;
 import com.prostor.prostorApp.modules.admin.model.Administrator;
 import com.prostor.prostorApp.modules.admin.repository.AdministratorRepository;
+import com.prostor.prostorApp.modules.order.model.Order;
+import com.prostor.prostorApp.modules.order.model.OrderItem;
+import com.prostor.prostorApp.modules.order.repository.OrderItemRepository;
+import com.prostor.prostorApp.modules.order.repository.OrderMovementRepository;
+import com.prostor.prostorApp.modules.order.repository.OrderRepository;
+import com.prostor.prostorApp.modules.order.repository.OrderReturnRepository;
+import com.prostor.prostorApp.modules.order.repository.PaymentRepository;
+import com.prostor.prostorApp.modules.product.repository.ProductRepository;
 import com.prostor.prostorApp.modules.user.dto.RoleDto;
 import com.prostor.prostorApp.modules.user.dto.UserCreateRequest;
 import com.prostor.prostorApp.modules.user.dto.UserResponse;
@@ -9,6 +18,7 @@ import com.prostor.prostorApp.modules.user.model.*;
 import com.prostor.prostorApp.modules.user.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +42,12 @@ public class UserService {
     private final SellerRepository sellerRepository;
     private final AdministratorRepository administratorRepository;
     private final WarehouseManagerRepository warehouseManagerRepository;
+    private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final PaymentRepository paymentRepository;
+    private final OrderMovementRepository orderMovementRepository;
+    private final OrderReturnRepository orderReturnRepository;
+    private final ProductRepository productRepository;
 
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll().stream()
@@ -117,11 +133,8 @@ public class UserService {
 
     @Transactional
     public void deleteUser(int id) {
-        if (!userRepository.existsById(id)) {
-            throw new RuntimeException("User not found with id: " + id);
-        }
-
-        User user = userRepository.findById(id).get();
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
         deleteRoleSpecificRecord(user);
 
         userRepository.deleteById(id);
@@ -211,17 +224,20 @@ public class UserService {
     }
 
     private void deleteRoleSpecificRecord(User user) {
+        if (user.getRole() == null || user.getRole().getName() == null) {
+            return;
+        }
         String roleName = user.getRole().getName().toUpperCase();
 
         switch (roleName) {
             case "CUSTOMER":
                 customerRepository.findByUserId(user.getId())
-                        .ifPresent(customerRepository::delete);
+                        .ifPresent(this::deleteCustomerWithOrders);
                 break;
 
             case "SELLER":
                 sellerRepository.findByUserId(user.getId())
-                        .ifPresent(sellerRepository::delete);
+                        .ifPresent(this::deleteSellerWithPolicyA);
                 break;
 
             case "ADMIN":
@@ -234,5 +250,56 @@ public class UserService {
                         .ifPresent(warehouseManagerRepository::delete);
                 break;
         }
+    }
+
+    private void deleteCustomerWithOrders(Customer customer) {
+        List<Order> orders = orderRepository.findByCustomerId(customer.getId());
+
+        for (Order order : orders) {
+            List<OrderItem> items = orderItemRepository.findByOrderId(order.getId());
+
+            for (OrderItem item : items) {
+                if (Boolean.TRUE.equals(item.getIsOrdered()) && !Boolean.TRUE.equals(item.getIsFinalized())) {
+                    // Reuse order cancellation behavior: toggling isOrdered releases reserved stock via trigger.
+                    item.setIsOrdered(false);
+                    orderItemRepository.save(item);
+                }
+            }
+
+            for (OrderItem item : items) {
+                paymentRepository.deleteByOrderItemId(item.getId());
+                orderMovementRepository.deleteByOrderItemId(item.getId());
+            }
+
+            List<Integer> orderReturnIds = items.stream()
+                    .map(OrderItem::getOrderReturn)
+                    .filter(java.util.Objects::nonNull)
+                    .map(returnEntity -> returnEntity.getId())
+                    .distinct()
+                    .toList();
+
+            orderItemRepository.deleteByOrderId(order.getId());
+
+            for (Integer orderReturnId : orderReturnIds) {
+                if (orderItemRepository.countByOrderReturnId(orderReturnId) == 0) {
+                    orderReturnRepository.deleteById(orderReturnId);
+                }
+            }
+
+            orderRepository.deleteById(order.getId());
+        }
+
+        customerRepository.delete(customer);
+    }
+
+    private void deleteSellerWithPolicyA(Seller seller) {
+        if (!productRepository.findBySellerId(seller.getId()).isEmpty()) {
+            throw new BusinessException(
+                    "SELLER_HAS_PRODUCTS",
+                    "Seller has products and cannot be deleted",
+                    HttpStatus.CONFLICT
+            );
+        }
+        sellerRepository.delete(seller);
     }
 }

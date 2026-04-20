@@ -14,6 +14,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
 
     // Все позиции заказа
     List<OrderItem> findByOrderId(Integer orderId);
+    void deleteByOrderId(Integer orderId);
 
     // Все позиции с конкретным товаром
     List<OrderItem> findByProductId(Integer productId);
@@ -23,6 +24,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
 
     // Товары, связанные с возвратом
     List<OrderItem> findByOrderReturnId(Integer orderReturnId);
+    long countByOrderReturnId(Integer orderReturnId);
 
     boolean existsByProductId(Integer productId);
 

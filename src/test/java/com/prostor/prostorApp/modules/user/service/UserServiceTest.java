@@ -1,7 +1,17 @@
 package com.prostor.prostorApp.modules.user.service;
 
+import com.prostor.prostorApp.common.exception.BusinessException;
 import com.prostor.prostorApp.modules.admin.model.Administrator;
 import com.prostor.prostorApp.modules.admin.repository.AdministratorRepository;
+import com.prostor.prostorApp.modules.order.model.Order;
+import com.prostor.prostorApp.modules.order.model.OrderItem;
+import com.prostor.prostorApp.modules.order.model.OrderReturn;
+import com.prostor.prostorApp.modules.order.repository.OrderItemRepository;
+import com.prostor.prostorApp.modules.order.repository.OrderMovementRepository;
+import com.prostor.prostorApp.modules.order.repository.OrderRepository;
+import com.prostor.prostorApp.modules.order.repository.OrderReturnRepository;
+import com.prostor.prostorApp.modules.order.repository.PaymentRepository;
+import com.prostor.prostorApp.modules.product.repository.ProductRepository;
 import com.prostor.prostorApp.modules.user.dto.UserCreateRequest;
 import com.prostor.prostorApp.modules.user.dto.UserResponse;
 import com.prostor.prostorApp.modules.user.model.*;
@@ -42,6 +52,18 @@ class UserServiceTest {
     private AdministratorRepository administratorRepository;
     @Mock
     private WarehouseManagerRepository warehouseManagerRepository;
+    @Mock
+    private OrderRepository orderRepository;
+    @Mock
+    private OrderItemRepository orderItemRepository;
+    @Mock
+    private PaymentRepository paymentRepository;
+    @Mock
+    private OrderMovementRepository orderMovementRepository;
+    @Mock
+    private OrderReturnRepository orderReturnRepository;
+    @Mock
+    private ProductRepository productRepository;
 
     @InjectMocks
     private UserService userService;
@@ -351,7 +373,7 @@ class UserServiceTest {
     @Test
     @DisplayName("deleteUser throws when missing")
     void deleteUser_missing() {
-        when(userRepository.existsById(10)).thenReturn(false);
+        when(userRepository.findById(10)).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class, () -> userService.deleteUser(10));
     }
@@ -359,14 +381,66 @@ class UserServiceTest {
     @Test
     @DisplayName("deleteUser removes customer profile then user")
     void deleteUser_customer() {
-        when(userRepository.existsById(10)).thenReturn(true);
         when(userRepository.findById(10)).thenReturn(Optional.of(user));
-        when(customerRepository.findByUserId(10)).thenReturn(Optional.of(new Customer()));
+        Customer customer = new Customer();
+        customer.setId(55);
+        when(customerRepository.findByUserId(10)).thenReturn(Optional.of(customer));
+        when(orderRepository.findByCustomerId(55)).thenReturn(List.of());
 
         userService.deleteUser(10);
 
-        verify(customerRepository).delete(any(Customer.class));
+        verify(customerRepository).delete(customer);
         verify(userRepository).deleteById(10);
+    }
+
+    @Test
+    @DisplayName("deleteUser releases active reservations and deletes customer orders cascade")
+    void deleteUser_customerWithOrdersCascade() {
+        when(userRepository.findById(10)).thenReturn(Optional.of(user));
+        Customer customer = new Customer();
+        customer.setId(77);
+        when(customerRepository.findByUserId(10)).thenReturn(Optional.of(customer));
+
+        Order order = new Order();
+        order.setId(500);
+        when(orderRepository.findByCustomerId(77)).thenReturn(List.of(order));
+
+        OrderReturn orderReturn = new OrderReturn();
+        orderReturn.setId(900);
+        OrderItem item = new OrderItem();
+        item.setId(700);
+        item.setIsOrdered(true);
+        item.setIsFinalized(false);
+        item.setOrderReturn(orderReturn);
+        when(orderItemRepository.findByOrderId(500)).thenReturn(List.of(item));
+        when(orderItemRepository.countByOrderReturnId(900)).thenReturn(0L);
+
+        userService.deleteUser(10);
+
+        verify(orderItemRepository).save(any(OrderItem.class));
+        verify(paymentRepository).deleteByOrderItemId(700);
+        verify(orderMovementRepository).deleteByOrderItemId(700);
+        verify(orderItemRepository).deleteByOrderId(500);
+        verify(orderReturnRepository).deleteById(900);
+        verify(orderRepository).deleteById(500);
+        verify(customerRepository).delete(customer);
+        verify(userRepository).deleteById(10);
+    }
+
+    @Test
+    @DisplayName("deleteUser throws business conflict when seller has products")
+    void deleteUser_sellerWithProductsConflict() {
+        user.setRole(roleSeller);
+        when(userRepository.findById(10)).thenReturn(Optional.of(user));
+
+        Seller seller = new Seller();
+        seller.setId(88);
+        when(sellerRepository.findByUserId(10)).thenReturn(Optional.of(seller));
+        when(productRepository.findBySellerId(88)).thenReturn(List.of(new com.prostor.prostorApp.modules.product.model.Product()));
+
+        BusinessException ex = assertThrows(BusinessException.class, () -> userService.deleteUser(10));
+        assertEquals("SELLER_HAS_PRODUCTS", ex.getCode());
+        verify(userRepository, never()).deleteById(10);
     }
 
     @Test

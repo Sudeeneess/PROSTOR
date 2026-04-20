@@ -14,4 +14,5 @@ public interface OrderMovementRepository extends JpaRepository<OrderMovement, In
     List<OrderMovement> findByMovementsStatusId(Integer statusId);
 
     List<OrderMovement> findByOrderItemId(Integer orderItemId);
+    void deleteByOrderItemId(Integer orderItemId);
 }
