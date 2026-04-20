@@ -6,7 +6,7 @@ export const API_BASE_URL = (
 )?.replace(/\/$/, '') || (
   import.meta.env.DEV
     ? 'http://localhost:8080'
-    : `${window.location.protocol}//${window.location.hostname}:8080`
+    : ''
 );
 
 export type RequestFn = <T>(
