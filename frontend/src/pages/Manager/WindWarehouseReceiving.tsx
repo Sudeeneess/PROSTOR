@@ -9,12 +9,14 @@ export interface ReceptionLine {
 interface WindWarehouseReceivingProps {
   isOpen: boolean;
   onClose: () => void;
-  onComplete: () => void;
+  onComplete: () => void | Promise<void>;
   sellerTitle: string;
   sellerSubtitle?: string;
   batchDateLabel: string;
   lines: ReceptionLine[];
   completeDisabled?: boolean;
+  linesLoading?: boolean;
+  footerNote?: string;
 }
 
 const WindWarehouseReceiving: React.FC<WindWarehouseReceivingProps> = ({
@@ -26,6 +28,8 @@ const WindWarehouseReceiving: React.FC<WindWarehouseReceivingProps> = ({
   batchDateLabel,
   lines,
   completeDisabled = false,
+  linesLoading = false,
+  footerNote,
 }) => {
   if (!isOpen) return null;
 
@@ -35,10 +39,19 @@ const WindWarehouseReceiving: React.FC<WindWarehouseReceivingProps> = ({
     }
   };
 
+  const [completeBusy, setCompleteBusy] = React.useState(false);
+
   const handleCompleteReception = () => {
-    if (completeDisabled) return;
-    onComplete();
-    onClose();
+    if (completeDisabled || completeBusy || linesLoading) return;
+    void (async () => {
+      setCompleteBusy(true);
+      try {
+        await Promise.resolve(onComplete());
+        onClose();
+      } finally {
+        setCompleteBusy(false);
+      }
+    })();
   };
 
   return (
@@ -51,7 +64,7 @@ const WindWarehouseReceiving: React.FC<WindWarehouseReceivingProps> = ({
               {sellerTitle}
               {sellerSubtitle ? ` · ${sellerSubtitle}` : ''}
             </p>
-            <p className={styles['wind-warehouse-receiving-meta']}>Дата занесения: {batchDateLabel}</p>
+            <p className={styles['wind-warehouse-receiving-meta']}>Дата создания приёмки: {batchDateLabel}</p>
           </div>
           <button type="button" className={styles['wind-warehouse-receiving-close']} onClick={onClose}>
             ×
@@ -64,11 +77,17 @@ const WindWarehouseReceiving: React.FC<WindWarehouseReceivingProps> = ({
               <thead>
                 <tr>
                   <th>Товар</th>
-                  <th>Количество</th>
+                  <th>Количество на складе</th>
                 </tr>
               </thead>
               <tbody>
-                {lines.length === 0 ? (
+                {linesLoading ? (
+                  <tr>
+                    <td colSpan={2} className={styles['wind-warehouse-receiving-empty']}>
+                      Загрузка позиций…
+                    </td>
+                  </tr>
+                ) : lines.length === 0 ? (
                   <tr>
                     <td colSpan={2} className={styles['wind-warehouse-receiving-empty']}>
                       Нет позиций
@@ -88,13 +107,22 @@ const WindWarehouseReceiving: React.FC<WindWarehouseReceivingProps> = ({
         </div>
 
         <div className={styles['wind-warehouse-receiving-footer']}>
+          {footerNote ? (
+            <p className={styles['wind-warehouse-receiving-meta']} style={{ marginBottom: '0.75rem' }}>
+              {footerNote}
+            </p>
+          ) : null}
           <button
             type="button"
             className={`${styles['wind-warehouse-receiving-button']} ${styles['wind-warehouse-receiving-complete-button']}`}
             onClick={handleCompleteReception}
-            disabled={completeDisabled}
+            disabled={completeDisabled || linesLoading || completeBusy}
           >
-            {completeDisabled ? 'Уже принято' : 'Завершить приёмку'}
+            {completeDisabled
+              ? 'Уже принято'
+              : completeBusy
+                ? 'Сохранение…'
+                : 'Завершить приёмку'}
           </button>
         </div>
       </div>

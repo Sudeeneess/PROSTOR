@@ -29,6 +29,11 @@ export function createAdminService(request: RequestFn) {
       return request<AdminUserDto>(`/api/admin/users/${id}`);
     },
 
+    getAdminUserByUsername(username: string): Promise<AdminUserDto> {
+      const enc = encodeURIComponent(username);
+      return request<AdminUserDto>(`/api/admin/users/username/${enc}`);
+    },
+
     getAdminUsersByRole(roleId: number): Promise<AdminUserDto[]> {
       return request<AdminUserDto[]>(`/api/admin/users/role/${roleId}`);
     },

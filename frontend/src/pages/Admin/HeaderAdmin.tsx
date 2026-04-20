@@ -27,6 +27,13 @@ const HeaderAdmin: React.FC<HeaderAdminProps> = ({ onMenuItemChange }) => {
         }
         break;
 
+      case 'receptions':
+        navigate('/admin/receptions');
+        if (onMenuItemChange) {
+          onMenuItemChange('receptions');
+        }
+        break;
+
       case 'admin':
         navigate('/admin'); // ✅ ДОБАВИЛИ норм переход
         if (onMenuItemChange) {
@@ -65,6 +72,13 @@ const HeaderAdmin: React.FC<HeaderAdminProps> = ({ onMenuItemChange }) => {
           onClick={() => handleMenuClick('users')}
         >
           Пользователи
+        </button>
+
+        <button
+          className={`${styles['admin-header-menu-item']} ${location.pathname.startsWith('/admin/receptions') ? styles['active'] : ''}`}
+          onClick={() => handleMenuClick('receptions')}
+        >
+          Приёмки
         </button>
         <button
           className={styles['admin-header-menu-item']}

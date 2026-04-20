@@ -43,3 +43,10 @@ export type {
   AdminDebugRoleRow,
   AdministratorEntryDto,
 } from './adminUser';
+export type {
+  ReceptionStatusDto,
+  GoodsReceptionListDto,
+  GoodsReceptionProductDto,
+  GoodsReceptionDetailsDto,
+  ListGoodsReceptionsParams,
+} from './goodsReception';

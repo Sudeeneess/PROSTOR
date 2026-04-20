@@ -74,6 +74,9 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
   const [inviteSubmitting, setInviteSubmitting] = useState(false);
   const [inviteError, setInviteError] = useState<string | null>(null);
   const [newUser, setNewUser] = useState({ userName: '', password: '' });
+  const [usernameLookup, setUsernameLookup] = useState('');
+  const [lookupError, setLookupError] = useState<string | null>(null);
+  const [lookupBusy, setLookupBusy] = useState(false);
 
   const loadRoles = useCallback(async () => {
     setRolesError(null);
@@ -114,6 +117,25 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
     setToastMessage(message);
     setShowToast(true);
     setTimeout(() => setShowToast(false), 3000);
+  };
+
+  const handleUsernameLookup = async () => {
+    const u = usernameLookup.trim();
+    if (!u) {
+      setLookupError('Введите логин');
+      return;
+    }
+    setLookupBusy(true);
+    setLookupError(null);
+    try {
+      const user = await api.getAdminUserByUsername(u);
+      setSelectedUsers([user.id]);
+      showNotification(`Найден: #${user.id} · ${user.userName} · ${user.role?.name ?? '—'}`);
+    } catch (e) {
+      setLookupError(e instanceof Error ? e.message : 'Пользователь не найден');
+    } finally {
+      setLookupBusy(false);
+    }
   };
 
   const handleSelectUser = (id: number) => {
@@ -273,6 +295,37 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
               {rolesError && <p>Роли: {rolesError}</p>}
             </div>
           )}
+
+          <div
+            style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', marginBottom: '1rem' }}
+          >
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <span>Поиск по логину (GET /api/admin/users/username/…)</span>
+              <input
+                type="search"
+                value={usernameLookup}
+                onChange={(e) => setUsernameLookup(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') void handleUsernameLookup();
+                }}
+                placeholder="Точный логин"
+                style={{ padding: '0.35rem 0.5rem', minWidth: '12rem' }}
+              />
+            </label>
+            <button
+              type="button"
+              className={styles['admin-users-back-button']}
+              disabled={lookupBusy}
+              onClick={() => void handleUsernameLookup()}
+            >
+              {lookupBusy ? 'Поиск…' : 'Найти'}
+            </button>
+            {lookupError ? (
+              <span className={styles['admin-users-error']} style={{ margin: 0 }}>
+                {lookupError}
+              </span>
+            ) : null}
+          </div>
 
           {loading ? (
             <p className={styles['admin-users-loading']}>Загрузка…</p>

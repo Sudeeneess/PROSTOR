@@ -41,5 +41,10 @@ export type {
   AdminUserCreateBody,
   AdminDebugRoleRow,
   AdministratorEntryDto,
+  ReceptionStatusDto,
+  GoodsReceptionListDto,
+  GoodsReceptionProductDto,
+  GoodsReceptionDetailsDto,
+  ListGoodsReceptionsParams,
 } from './types';
 export { CATEGORIES_LIST_PAGE_SIZE } from './types';
