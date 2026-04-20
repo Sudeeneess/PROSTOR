@@ -296,32 +296,29 @@ const UsersAdmin: React.FC<UsersAdminProps> = ({ onBack }) => {
             </div>
           )}
 
-          <div
-            style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', marginBottom: '1rem' }}
-          >
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-              <span>Поиск по логину (GET /api/admin/users/username/…)</span>
-              <input
-                type="search"
-                value={usernameLookup}
-                onChange={(e) => setUsernameLookup(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') void handleUsernameLookup();
-                }}
-                placeholder="Точный логин"
-                style={{ padding: '0.35rem 0.5rem', minWidth: '12rem' }}
-              />
-            </label>
+          <div className={styles['admin-users-lookup-row']}>
+            <input
+              type="search"
+              className={styles['admin-users-lookup-input']}
+              value={usernameLookup}
+              onChange={(e) => setUsernameLookup(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') void handleUsernameLookup();
+              }}
+              placeholder="Точный логин"
+              aria-label="Поиск пользователя по точному логину"
+              autoComplete="username"
+            />
             <button
               type="button"
-              className={styles['admin-users-back-button']}
+              className={styles['admin-users-lookup-button']}
               disabled={lookupBusy}
               onClick={() => void handleUsernameLookup()}
             >
               {lookupBusy ? 'Поиск…' : 'Найти'}
             </button>
             {lookupError ? (
-              <span className={styles['admin-users-error']} style={{ margin: 0 }}>
+              <span className={styles['admin-users-lookup-error']} role="alert">
                 {lookupError}
               </span>
             ) : null}

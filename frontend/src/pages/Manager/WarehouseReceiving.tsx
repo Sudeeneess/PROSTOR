@@ -22,11 +22,6 @@ function formatReceptionDate(iso: string | null | undefined): string {
   });
 }
 
-function receptionAuthPath(): string {
-  const role = sessionStorage.getItem('userRole');
-  return role === 'admin' ? '/admin/auth' : '/warehouse/auth';
-}
-
 const WarehouseReceiving: React.FC<WarehouseReceivingProps> = ({ onBack }) => {
   const navigate = useNavigate();
   const [receptions, setReceptions] = useState<GoodsReceptionListDto[]>([]);
@@ -49,8 +44,8 @@ const WarehouseReceiving: React.FC<WarehouseReceivingProps> = ({ onBack }) => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     const role = sessionStorage.getItem('userRole');
-    if (!token || (role !== 'warehouse_manager' && role !== 'admin')) {
-      navigate(receptionAuthPath(), { replace: true });
+    if (!token || role !== 'warehouse_manager') {
+      navigate('/warehouse/auth', { replace: true });
     }
   }, [navigate]);
 

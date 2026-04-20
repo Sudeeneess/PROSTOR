@@ -40,7 +40,6 @@ import MainSeller from './pages/Seller/MainSeller';
 import AuthorizationAdmin from './pages/Admin/AuthAdmin';
 import Admin from './pages/Admin/AdminPage';
 import UsersAdmin from './pages/Admin/UsersAdmin';
-import AdminGoodsReceptions from './pages/Admin/AdminGoodsReceptions';
 import { api } from './services/api';
 
 // ЗАЩИТА МАРШРУТОВ - ПОКУПАТЕЛЬ 
@@ -396,11 +395,7 @@ const AppContent: React.FC = () => {
         </PrivateAdminRoute>
       } />
 
-      <Route path="/admin/receptions" element={
-        <PrivateAdminRoute>
-          <AdminGoodsReceptions />
-        </PrivateAdminRoute>
-      } />
+      <Route path="/admin/receptions" element={<Navigate to="/admin" replace />} />
       
       <Route path="/admin/products" element={<Navigate to="/admin" replace />} />
 
