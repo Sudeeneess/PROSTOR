@@ -1,3 +1,32 @@
+-- 0. БАЗОВЫЕ РОЛИ И ПОЛЬЗОВАТЕЛИ
+-- =====================================================
+INSERT INTO roles (name) VALUES
+    ('ADMIN'),
+    ('CUSTOMER'),
+    ('SELLER'),
+    ('WAREHOUSE_MANAGER')
+ON CONFLICT (name) DO NOTHING;
+
+-- Пересоздаем базовых пользователей, так как предыдущие миграции могли очистить users.
+INSERT INTO users (role_id, user_name, password_hash, contact_phone, created_at)
+VALUES
+    ((SELECT id FROM roles WHERE name = 'ADMIN'), 'admin_user', '$2a$08$qyAVtvJeZeyMJW3o42UOi.AHVVtgHDnX8sMC09O4J/N3icKPvYmE2', '11111111111', CURRENT_TIMESTAMP),
+    ((SELECT id FROM roles WHERE name = 'CUSTOMER'), 'john_doe', '$2a$08$RxmTyPDthdqLR.NH.XYbO.ooXdIpw2NeMIMXhsta0P6uDhyKzpTmS', '22222222222', CURRENT_TIMESTAMP),
+    ((SELECT id FROM roles WHERE name = 'CUSTOMER'), 'jane_smith', '$2a$08$LC16dsaGrSNZUOcIjjSd0OlP9Z4SYss/8.owpnmUQQlxk6d1R8mpG', '33333333333', CURRENT_TIMESTAMP),
+    ((SELECT id FROM roles WHERE name = 'SELLER'), 'seller_pro', '$2a$08$i1WrCGAp41fPU89GWKW32eSznLzm3KitxqnIgXSw68kSkgenVCmJq', '44444444444', CURRENT_TIMESTAMP),
+    ((SELECT id FROM roles WHERE name = 'WAREHOUSE_MANAGER'), 'warehouse_mgr', '$2a$08$xKZs5gruIO1/BW1ePRUAS.RJS7o8Zxyjrm4SkjxzxEqpPQfOX.wfy', '55555555555', CURRENT_TIMESTAMP)
+ON CONFLICT (user_name) DO NOTHING;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM users WHERE user_name = 'seller_pro') THEN
+        RAISE EXCEPTION 'Пользователь seller_pro не найден, V9 не может быть применена';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM users WHERE user_name = 'warehouse_mgr') THEN
+        RAISE EXCEPTION 'Пользователь warehouse_mgr не найден, V9 не может быть применена';
+    END IF;
+END $$;
+
 -- 1. СВЯЗЫВАНИЕ ПОЛЬЗОВАТЕЛЕЙ С ПРОФИЛЯМИ
 -- =====================================================
 
