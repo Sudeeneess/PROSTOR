@@ -20,6 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -71,7 +72,7 @@ class ProductServiceTest {
     private ProductRequest testProductRequest;
     private Seller testSeller;
     private Category testCategory;
-    private GoodsReception acceptedReception;
+    private GoodsReception pendingReception;
 
     @BeforeEach
     void setUp() {
@@ -83,10 +84,10 @@ class ProductServiceTest {
         testCategory.setId(1);
         testCategory.setCategoryName("Test Category");
 
-        acceptedReception = new GoodsReception();
-        acceptedReception.setId(1);
-        acceptedReception.setSeller(testSeller);
-        acceptedReception.setStatus(ReceptionStatus.ACCEPTED);
+        pendingReception = new GoodsReception();
+        pendingReception.setId(1);
+        pendingReception.setSeller(testSeller);
+        pendingReception.setStatus(ReceptionStatus.PENDING);
 
         testProduct = new Product();
         testProduct.setId(1);
@@ -102,7 +103,7 @@ class ProductServiceTest {
         testProductRequest.setSellerId(1);
         testProductRequest.setCategoryId(1);
 
-        lenient().when(goodsReceptionService.getOrCreateAcceptedReception(any(Seller.class))).thenReturn(acceptedReception);
+        lenient().when(goodsReceptionService.getOrCreatePendingReception(any(Seller.class))).thenReturn(pendingReception);
     }
 
     @Test
@@ -154,7 +155,25 @@ class ProductServiceTest {
         verify(sellerRepository, times(1)).findById(1);
         verify(categoryRepository, times(1)).findById(1);
         verify(productRepository, times(1)).existsByNameAndSellerId("Test Product", 1);
+        verify(goodsReceptionService, times(1)).getOrCreatePendingReception(testSeller);
         verify(productRepository, times(1)).save(any(Product.class));
+    }
+
+    @Test
+    @DisplayName("Should assign pending reception to product during creation")
+    void create_ShouldAssignPendingReceptionToSavedProduct() {
+        when(sellerRepository.findById(1)).thenReturn(Optional.of(testSeller));
+        when(categoryRepository.findById(1)).thenReturn(Optional.of(testCategory));
+        when(productRepository.existsByNameAndSellerId("Test Product", 1)).thenReturn(false);
+        when(productRepository.save(any(Product.class))).thenReturn(testProduct);
+
+        productService.create(testProductRequest);
+
+        ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
+        verify(productRepository).save(productCaptor.capture());
+        Product savedProduct = productCaptor.getValue();
+        assertNotNull(savedProduct.getReception());
+        assertEquals(pendingReception, savedProduct.getReception());
     }
 
     @Test

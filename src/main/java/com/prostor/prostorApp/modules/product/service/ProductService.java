@@ -10,8 +10,10 @@ import com.prostor.prostorApp.modules.product.repository.ProductRepository;
 import com.prostor.prostorApp.modules.order.repository.OrderItemRepository;
 import com.prostor.prostorApp.modules.user.model.Seller;
 import com.prostor.prostorApp.modules.user.repository.SellerRepository;
+import com.prostor.prostorApp.modules.warehouse.model.GoodsReception;
 import com.prostor.prostorApp.modules.warehouse.repository.WarehouseStockRepository;
 import com.prostor.prostorApp.modules.warehouse.dto.WarehouseStockRequest;
+import com.prostor.prostorApp.modules.warehouse.service.GoodsReceptionService;
 import com.prostor.prostorApp.modules.warehouse.service.WarehouseStockService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final SellerRepository sellerRepository;
     private final CategoryRepository categoryRepository;
+    private final GoodsReceptionService goodsReceptionService;
     private final WarehouseStockService warehouseStockService;
     private final ProductCardRepository productCardRepository;
     private final WarehouseStockRepository warehouseStockRepository;
@@ -115,6 +118,8 @@ public class ProductService {
         Product product = toEntity(request);
         product.setSeller(seller);
         product.setCategory(category);
+        GoodsReception pendingReception = goodsReceptionService.getOrCreatePendingReception(seller);
+        product.setReception(pendingReception);
 
         if (request.getParentId() != null) {
             Product parent = productRepository.findById(request.getParentId())
