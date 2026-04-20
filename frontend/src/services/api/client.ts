@@ -3,7 +3,11 @@ import { extractApiErrorMessage } from './utils/apiErrorMessage';
 
 export const API_BASE_URL = (
   import.meta.env.VITE_API_BASE_URL as string | undefined
-)?.replace(/\/$/, '') || 'http://localhost:8080';
+)?.replace(/\/$/, '') || (
+  import.meta.env.DEV
+    ? 'http://localhost:8080'
+    : `${window.location.protocol}//${window.location.hostname}:8080`
+);
 
 export type RequestFn = <T>(
   endpoint: string,
