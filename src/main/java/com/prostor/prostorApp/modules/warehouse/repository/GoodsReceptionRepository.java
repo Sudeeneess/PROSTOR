@@ -14,36 +14,15 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface GoodsReceptionRepository extends JpaRepository<GoodsReception, Integer> {
+public interface GoodsReceptionRepository extends JpaRepository<GoodsReception, Integer>, GoodsReceptionRepositoryCustom {
 
     Optional<GoodsReception> findFirstBySellerIdAndStatusOrderByCreatedAtDesc(Integer sellerId, ReceptionStatus status);
 
-    @Query("""
-            SELECT
-                gr.id AS id,
-                s.id AS sellerId,
-                s.companyName AS sellerCompanyName,
-                gr.status AS status,
-                gr.createdAt AS createdAt,
-                gr.acceptedAt AS acceptedAt,
-                wm.id AS acceptedByWarehouseManagerId,
-                COUNT(p.id) AS positionsCount
-            FROM GoodsReception gr
-            JOIN gr.seller s
-            LEFT JOIN gr.acceptedByWarehouseManager wm
-            LEFT JOIN gr.products p
-            WHERE gr.status = COALESCE(:status, gr.status)
-              AND s.id = COALESCE(:sellerId, s.id)
-              AND gr.createdAt >= COALESCE(:fromDate, gr.createdAt)
-              AND gr.createdAt <= COALESCE(:toDate, gr.createdAt)
-            GROUP BY gr.id, s.id, s.companyName, gr.status, gr.createdAt, gr.acceptedAt, wm.id
-            ORDER BY gr.createdAt DESC
-            """)
     List<GoodsReceptionListRow> findForWarehouseList(
-            @Param("status") ReceptionStatus status,
-            @Param("sellerId") Integer sellerId,
-            @Param("fromDate") LocalDateTime fromDate,
-            @Param("toDate") LocalDateTime toDate
+            ReceptionStatus status,
+            Integer sellerId,
+            LocalDateTime fromDate,
+            LocalDateTime toDate
     );
 
     @Query("""
