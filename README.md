@@ -1,25 +1,99 @@
 ## Prostor
 
-Маркетплейс для продажи и покупки товаров. Полнофункциональное веб-приложение с бэкендом на Spring Boot и фронтендом на React.
+Маркетплейс для продажи и покупки товаров. Полнофункциональное веб-приложение с бэкендом на Spring Boot, фронтендом на React и PostgreSQL.
 
 ---
 
-## **ДЛЯ ТЕСТА/ПРОД:**
+## Запуск проекта только через Docker
+
+Ниже инструкция для запуска проекта, если на компьютере есть **только Docker** (без отдельной установки Java/Node.js/PostgreSQL).
+
+### 1) Что нужно установить перед запуском
+
+Обязательно установите:
+
+- **Docker Desktop** (вместе с Docker Engine и Docker Compose).
+
+Проверка после установки:
+
 ```bash
-# 1. Клонируй
+docker --version
+docker compose version
+```
+
+Если команды возвращают версии, можно запускать проект.
+
+### 2) Клонирование репозитория
+
+```bash
 git clone https://github.com/Sudeeneess/PROSTOR.git
-cd prostor-marketplace
+cd PROSTOR
+```
 
-# 2. Запусти
-docker-compose up -d
+### 3) Запуск всех сервисов
 
-# 3. Открой
-# - Фронт: http://localhost:3001
-# - API: http://localhost:8080
-# - БД: http://localhost:8081 (adminer)
+```bash
+docker compose up -d --build
+```
 
-# 4. Останови (когда надоест)
-docker-compose down
+Что будет запущено:
+
+- `postgres` - база данных PostgreSQL;
+- `backend` - Spring Boot API;
+- `frontend` - React приложение (через Nginx);
+- `adminer` - веб-интерфейс для работы с БД.
+
+### 4) Проверка, что всё поднялось
+
+```bash
+docker compose ps
+```
+
+### 5) Адреса после запуска
+
+- Фронтенд: http://localhost:3001
+- API: http://localhost:8080
+- Swagger: http://localhost:8080/swagger-ui.html
+- Health check: http://localhost:8080/actuator/health
+- Adminer: http://localhost:8081
+
+### 6) Как остановить проект
+
+Остановить контейнеры:
+
+```bash
+docker compose down
+```
+
+Остановить и удалить том с данными БД (полная очистка):
+
+```bash
+docker compose down -v
+```
+
+### 7) Полезные команды для диагностики
+
+```bash
+# Логи всех сервисов
+docker compose logs -f
+
+# Логи только бэкенда
+docker compose logs -f backend
+
+# Пересборка и перезапуск
+docker compose up -d --build
+
+# Перезапуск одного сервиса
+docker compose restart backend
+```
+
+---
+
+## **ДЛЯ ТЕСТА/ПРОД (кратко):**
+```bash
+git clone https://github.com/Sudeeneess/PROSTOR.git
+cd PROSTOR
+docker compose up -d --build
 ```
 
 ---
